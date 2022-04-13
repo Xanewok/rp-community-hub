@@ -113,4 +113,10 @@ module.exports = {
     //   }
     // }
   // }
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: '<INSERT_KEY_HERE>'
+  }
 };

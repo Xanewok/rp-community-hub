@@ -11,11 +11,17 @@ module.exports = async function (deployer, network, accounts) {
 
     await deployer.deploy(RpYieldCollector, confetti, raid);
   } else {
-    await deployer.deploy(TestConfetti);
-    const confetti = await TestConfetti.deployed();
-    await deployer.deploy(TestRaid, TestConfetti.address);
-    await confetti.grantRole(await web3.utils.keccak256("MINTER_ROLE"), TestRaid.address);
+    let confetti;
+    if (chainId === 0x4) {
+      confetti = "0x9BEfb9f109ac064e4A3E629528525d3474fcF2c1";
+    } else {
+      // await deployer.deploy(TestConfetti);
+      // confetti = await TestConfetti.address;
+    }
+    // await deployer.deploy(TestRaid, confetti);
+    // await confetti.grantRole(await web3.utils.keccak256("MINTER_ROLE"), TestRaid.address);
+    throw new Error(`${await web3.utils.keccak256("MINTER_ROLE")}`);
 
-    await deployer.deploy(RpYieldCollector, TestConfetti.address, TestRaid.address)
+    await deployer.deploy(RpYieldCollector, confetti, TestRaid.address)
   }
 };
