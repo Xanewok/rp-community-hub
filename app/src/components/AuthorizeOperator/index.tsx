@@ -29,6 +29,7 @@ export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
       return { msg: 'Authorized', disabled: true }
     } else if (
       !account ||
+      !operator ||
       `${owner}`.toLowerCase() != `${account}`.toLowerCase()
     ) {
       return { msg: 'Not authorized', disabled: true }

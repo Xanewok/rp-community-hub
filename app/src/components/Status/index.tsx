@@ -149,12 +149,20 @@ const Status = ({ connected }: StatusProps) => {
             <Select
               ml="auto"
               w="85%"
+              variant={controller != '' ? 'filled' : undefined}
+              _hover={{ filter: 'brightness(1.25)' }}
+              background={controller != '' ? 'purple.300' : 'purple.200'}
+              border="1px"
               onChange={(ev) => setController(ev.target.value)}
+              placeholder="Address"
+              value={controller}
             >
               {[...new Set(accountList)]
                 .filter((val) => !!val)
                 .map((acc, idx) => (
-                  <option key={idx}>{acc}</option>
+                  <option key={idx} value={acc}>
+                    {acc}
+                  </option>
                 ))}
             </Select>
           </Flex>
