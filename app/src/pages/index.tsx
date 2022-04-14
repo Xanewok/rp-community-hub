@@ -161,7 +161,7 @@ const Home: NextPage = () => {
           You&apos;re interacting with the contract at your own responsibility.
         </Text>
         <Text fontSize="xs" color="white">
-          Accumulation and/or collecting tax includes a 0.5% service fee.
+          Accumulation or collecting tax includes a 0.5% service fee.
         </Text>
       </Box>
       <Box mt="20px" mb="5px" textAlign="center">
