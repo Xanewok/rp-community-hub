@@ -49,8 +49,8 @@ const Status = ({ connected }: StatusProps) => {
   const [collectTax, enableCollectTax] = useState(false)
   const [taxCollector, setTaxCollector] = useState('')
   const [taxRate, setTaxRate] = useState(0)
-  const [controller, setController] = useState('')
-  console.log({ accumulate, collectTax, controller })
+  const [operator, setOperator] = useState('')
+  console.log({ accumulate, collectTax, operator })
 
   const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
 
@@ -140,22 +140,22 @@ const Status = ({ connected }: StatusProps) => {
         <AccountList
           accountList={accountList}
           setAccountList={setAccountList}
-          controller={controller}
+          operator={operator}
         />
 
         <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens">
           <Flex my="0.375em">
-            <Text>Controller</Text>
+            <Text>Operator</Text>
             <Select
               ml="auto"
               w="85%"
-              variant={controller != '' ? 'filled' : undefined}
+              variant={operator != '' ? 'filled' : undefined}
               _hover={{ filter: 'brightness(1.25)' }}
-              background={controller != '' ? 'purple.300' : 'purple.200'}
+              background={operator != '' ? 'purple.300' : 'purple.200'}
               border="1px"
-              onChange={(ev) => setController(ev.target.value)}
+              onChange={(ev) => setOperator(ev.target.value)}
               placeholder="Address"
-              value={controller}
+              value={operator}
             >
               {[...new Set(accountList)]
                 .filter((val) => !!val)

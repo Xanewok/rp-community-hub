@@ -35,7 +35,7 @@ export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
       return { msg: 'Not authorized', disabled: true }
     } else {
       return {
-        msg: 'Authorize',
+        msg: 'Authorize operator',
         disabled: false,
         onClick: () => {
           const signer = library?.getSigner(owner)

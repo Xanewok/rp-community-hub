@@ -25,9 +25,9 @@ import { PendingRewards } from '../PendingRewards'
 export const AccountList = (props: {
   accountList: string[]
   setAccountList: Dispatch<SetStateAction<string[]>>
-  controller: string
+  operator: string
 }) => {
-  const { accountList, setAccountList, controller } = props
+  const { accountList, setAccountList, operator } = props
 
   const { account } = useEthers()
 
@@ -63,7 +63,7 @@ export const AccountList = (props: {
           <Tooltip label="Whether a given address has approved this contract to transfer $CFTI">
             <Th>Approved</Th>
           </Tooltip>
-          <Tooltip label="Whether a given address has authorized the selected Controller account to move $CFTI on their behalf">
+          <Tooltip label="Whether a given address has authorized the selected Operator account to move $CFTI on their behalf">
             <Th>Authorized</Th>
           </Tooltip>
           <Th>Pending</Th>
@@ -93,7 +93,7 @@ export const AccountList = (props: {
                 <ApproveCfti owner={acc} />
               </Td>
               <Td>
-                <AuthorizeOperator owner={acc} operator={controller} />
+                <AuthorizeOperator owner={acc} operator={operator} />
               </Td>
               <Td>
                 <PendingRewards owner={acc} />
