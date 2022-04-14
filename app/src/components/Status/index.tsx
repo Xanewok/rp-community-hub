@@ -18,6 +18,7 @@ import {
   NumberInput,
   NumberInputField,
   Checkbox,
+  Select,
 } from '@chakra-ui/react'
 import BannerBox from '../Global/BannerBox'
 import { useEthers, useNetwork, useTokenBalance } from '@usedapp/core'
@@ -48,7 +49,8 @@ const Status = ({ connected }: StatusProps) => {
   const [collectTax, enableCollectTax] = useState(false)
   const [taxCollector, setTaxCollector] = useState('')
   const [taxRate, setTaxRate] = useState(0)
-  console.log({ accumulate, collectTax })
+  const [controller, setController] = useState('')
+  console.log({ accumulate, collectTax, controller })
 
   const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
 
@@ -138,14 +140,25 @@ const Status = ({ connected }: StatusProps) => {
         <AccountList
           accountList={accountList}
           setAccountList={setAccountList}
+          controller={controller}
         />
 
-        <Flex my="0.375em">
-          <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens">
+        <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens">
+          <Flex my="0.375em">
             <Text>Controller</Text>
-          </Tooltip>
-          <AddressInput disabled ml="auto" w="85%" value={accounts[0]} />
-        </Flex>
+            <Select
+              ml="auto"
+              w="85%"
+              onChange={(ev) => setController(ev.target.value)}
+            >
+              {[...new Set(accountList)]
+                .filter((val) => !!val)
+                .map((acc, idx) => (
+                  <option key={idx}>{acc}</option>
+                ))}
+            </Select>
+          </Flex>
+        </Tooltip>
 
         <Flex>
           <Checkbox

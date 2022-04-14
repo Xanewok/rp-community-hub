@@ -18,11 +18,11 @@ export const useIsOperatorFor = (operator: any, holder: any) => {
   return value?.[0]
 }
 
-export const AuthorizeOperator = (props: { owner: any }) => {
-  const { owner } = props
+export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
+  const { owner, operator } = props
 
   const { library, account } = useEthers()
-  const isOperator = useIsOperatorFor(account, owner)
+  const isOperator = useIsOperatorFor(operator, owner)
 
   const state = useMemo(() => {
     if (isOperator) {
@@ -37,14 +37,14 @@ export const AuthorizeOperator = (props: { owner: any }) => {
         msg: 'Authorize',
         disabled: false,
         onClick: () => {
-          const signer = library?.getSigner(account)
+          const signer = library?.getSigner(owner)
           if (signer) {
-            COLLECTOR_CONTRACT.connect(signer).authorizeOperator(account)
+            COLLECTOR_CONTRACT.connect(signer).authorizeOperator(operator)
           }
         },
       }
     }
-  }, [isOperator, account, owner, library])
+  }, [isOperator, account, owner, library, operator])
 
   return (
     <Button

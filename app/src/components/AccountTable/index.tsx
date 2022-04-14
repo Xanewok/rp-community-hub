@@ -25,8 +25,9 @@ import { PendingRewards } from '../PendingRewards'
 export const AccountList = (props: {
   accountList: string[]
   setAccountList: Dispatch<SetStateAction<string[]>>
+  controller: string
 }) => {
-  const { accountList, setAccountList } = props
+  const { accountList, setAccountList, controller } = props
 
   const { account } = useEthers()
 
@@ -92,14 +93,10 @@ export const AccountList = (props: {
                 <ApproveCfti owner={acc} />
               </Td>
               <Td>
-                <AuthorizeOperator owner={acc} />
+                <AuthorizeOperator owner={acc} operator={controller} />
               </Td>
               <Td>
                 <PendingRewards owner={acc} />
-                {/* <Flex justifyContent={'space-around'}>
-                  <Text>fds</Text>
-                  <Img src="/cfti.png" /> */}
-                {/* </Flex> */}
               </Td>
               <Td>
                 <IconButton
