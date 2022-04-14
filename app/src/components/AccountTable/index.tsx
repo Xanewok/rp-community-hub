@@ -19,6 +19,7 @@ import { useEthers } from '@usedapp/core'
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import { AddressInput } from '../AddressInput'
 import { ApproveCfti } from '../ApproveCfti'
+import { AuthorizeOperator } from '../AuthorizeOperator'
 import { PendingRewards } from '../PendingRewards'
 
 export const AccountList = (props: {
@@ -90,7 +91,9 @@ export const AccountList = (props: {
               <Td>
                 <ApproveCfti owner={acc} />
               </Td>
-              <Td>TODO</Td>
+              <Td>
+                <AuthorizeOperator owner={acc} />
+              </Td>
               <Td>
                 <PendingRewards owner={acc} />
                 {/* <Flex justifyContent={'space-around'}>
