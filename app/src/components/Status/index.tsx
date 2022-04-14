@@ -6,15 +6,7 @@ import {
   Flex,
   Tooltip,
   useToast,
-  Table,
-  Tbody,
-  Thead,
-  Th,
-  Tr,
-  Td,
-  IconButton,
   createIcon,
-  Input,
   NumberInput,
   NumberInputField,
   Checkbox,
@@ -149,13 +141,22 @@ const Status = ({ connected }: StatusProps) => {
             <Select
               ml="auto"
               w="85%"
-              variant={operator != '' ? 'filled' : undefined}
+              variant={
+                operator != '' && web3.utils.isAddress(operator)
+                  ? 'filled'
+                  : undefined
+              }
               _hover={{ filter: 'brightness(1.25)' }}
-              background={operator != '' ? 'purple.300' : 'purple.200'}
+              background={
+                operator != '' && web3.utils.isAddress(operator)
+                  ? 'purple.300'
+                  : 'purple.200'
+              }
               border="1px"
               onChange={(ev) => setOperator(ev.target.value)}
               placeholder="Address"
               value={operator}
+              isInvalid={operator != '' && !web3.utils.isAddress(operator)}
             >
               {[...new Set(accountList)]
                 .filter((val) => !!val)

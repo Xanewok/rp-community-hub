@@ -1,7 +1,8 @@
-import { Button } from '@chakra-ui/react'
+import { Button, useToast } from '@chakra-ui/react'
 import { useCall, useEthers } from '@usedapp/core'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { COLLECTOR_CONTRACT } from '../../constants'
+import web3 from 'web3'
 
 export const useIsOperatorFor = (operator: any, holder: any) => {
   const { value, error } =
@@ -20,6 +21,19 @@ export const useIsOperatorFor = (operator: any, holder: any) => {
 
 export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
   const { owner, operator } = props
+  const toast = useToast()
+  const showErrorToast = useCallback(
+    (err: any) => {
+      console.error(JSON.stringify(err))
+      const error = err.error || err
+      toast({
+        description: `${error.message}`,
+        status: 'error',
+        duration: 3000,
+      })
+    },
+    [toast]
+  )
 
   const { library, account } = useEthers()
   const isOperator = useIsOperatorFor(operator, owner)
@@ -38,6 +52,12 @@ export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
         msg: 'Authorize operator',
         disabled: false,
         onClick: () => {
+          if (!web3.utils.isAddress(operator)) {
+            showErrorToast(
+              new Error('Operator is not a valid Ethereum address')
+            )
+            return
+          }
           const signer = library?.getSigner(owner)
           if (signer) {
             COLLECTOR_CONTRACT.connect(signer).authorizeOperator(operator)
@@ -45,7 +65,7 @@ export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
         },
       }
     }
-  }, [isOperator, account, owner, library, operator])
+  }, [isOperator, account, owner, library, operator, showErrorToast])
 
   return (
     <Button
