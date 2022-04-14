@@ -123,6 +123,58 @@ const Home: NextPage = () => {
         <Status connected={account} />
       </Container>
       <Box mt="80px" textAlign="center" textColor="white.50">
+        <Heading fontSize="2xl" textAlign="center" color="white">
+          Overview
+        </Heading>
+        <Text mx="2em" mb="1em" fontSize="lg" color="white">
+          This tool lets you claim your CFTI rewards from multiple wallets with
+          just one transaction. <br />
+          In addition to a simple batch rewards claim, it also supports (for a
+          small fee):
+          <ol>
+            <li>accumulating the rewards to any address of your choosing</li>
+            <li>
+              collecting a reward tax and sending it to another account (e.g.
+              guild treasury wallet)
+            </li>
+          </ol>
+        </Text>
+        <Heading fontSize="2xl" textAlign="center" color="white">
+          Instructions
+        </Heading>
+        <Text mx="2em" mb="1em" fontSize="lg" color="white">
+          <ol>
+            <li>
+              For each wallet, approve our contract to move the wallet&apos;s
+              $CFTI
+              <Text fontSize="xs">
+                (make sure it&apos;s active in your MetaMask/Web3 provider)
+              </Text>
+            </li>
+            <li>
+              For each wallet, authorize an <b>operator</b> that will manage its
+              funds via this contract
+              <Text fontSize="xs">
+                (make sure it&apos;s active and <b>select</b> the operator
+                from the drop-down that you wish to authorize)
+              </Text>
+            </li>
+            <li>
+              Optionally, enable the accumulate and/or the tax feature and fill
+              the addresses
+            </li>
+            <li>
+              Claim the rewards!
+              <Text fontSize="xs">
+                (make sure that your connected Web3 account matches the selected
+                operator)
+              </Text>
+            </li>
+          </ol>
+        </Text>
+        <Heading mt="2.5em" mb="0.3em" fontSize="lg" textAlign="center" color="white">
+          Disclaimer
+        </Heading>
         <Text fontSize="xs" color="white">
           Important: This an unofficial utility for{' '}
           <Link color="purple.900" href="https://raid.party/">
@@ -173,8 +225,8 @@ const Home: NextPage = () => {
             target="_blank"
           >
             tracker
-          </Link>
-          {' '}by:{' '}
+          </Link>{' '}
+          by:{' '}
           <Link
             color="purple.900"
             href="https://oktal.eth.link"
