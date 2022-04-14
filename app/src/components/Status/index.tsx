@@ -28,6 +28,7 @@ import { logEvent } from '../../utils'
 import { useSigner } from '../../hooks'
 import { ApproveCfti } from '../ApproveCfti'
 import { AddressInput } from '../AddressInput'
+import { AccountList } from '../AccountTable'
 
 type StatusProps = {
   connected: any
@@ -62,30 +63,6 @@ const Status = ({ connected }: StatusProps) => {
     [toast]
   )
 
-  const handleChange = useCallback(
-    (e: any) =>
-      setAccountList((list) => {
-        console.log({ target: e.target })
-        const idx = Number(e.target.id.replace('account-', ''))
-        console.log({
-          idx,
-          prev: list.slice(0, idx),
-          val: e.target.value,
-          after: list.slice(idx + 1),
-        })
-
-        return [...list.slice(0, idx), e.target.value, ...list.slice(idx + 1)]
-      }),
-    []
-  )
-  const removeItem = useCallback(
-    (idx: any) =>
-      setAccountList((list) => {
-        return [...list.slice(0, idx), ...list.slice(idx + 1)]
-      }),
-    []
-  )
-
   const signer = useSigner()
 
   return (
@@ -97,75 +74,18 @@ const Status = ({ connected }: StatusProps) => {
           </Text>
         )}
 
-        <Table mb="0.6em">
-          <Thead>
-            <Tr>
-              <Th w="32rem">Address</Th>
-              <Tooltip label="Whether a given address has approved this contract to transfer $CFTI">
-                <Th>Approved</Th>
-              </Tooltip>
-              <Tooltip label="Whether a given address has authorized the selected Controller account to move $CFTI on their behalf">
-                <Th>Authorized</Th>
-              </Tooltip>
-              <Th>Pending</Th>
-              <Th>
-                <IconButton
-                  disabled={!connected}
-                  size="sm"
-                  aria-label="Create"
-                  icon={<PlusIcon />}
-                  onClick={() => setAccountList((old) => [...old, ''])}
-                />
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {accountList
-              .map((element) => {
-                console.log('inspect - ' + element)
-                return element
-              })
-              .map((acc, idx) => {
-                return (
-                  <Tr key={idx}>
-                    <Td w="32rem">
-                      <AddressInput
-                        id={`account-${idx}`}
-                        onChange={handleChange}
-                        value={acc}
-                      />
-                    </Td>
-                    <Td>
-                      <ApproveCfti owner={acc} />
-                    </Td>
-                    <Td>TODO</Td>
-                    <Td>
-                      <Flex justifyContent={'space-around'}>
-                        <Text>fds</Text>
-                        <Img src="/cfti.png" />
-                      </Flex>
-                    </Td>
-                    <Td>
-                      <IconButton
-                        disabled={!connected}
-                        size="sm"
-                        aria-label="Delete"
-                        icon={<DeleteIcon />}
-                        onClick={() => removeItem(idx)}
-                      />
-                    </Td>
-                  </Tr>
-                )
-              })}
-            <Tr></Tr>
-          </Tbody>
-        </Table>
+        <AccountList
+          accountList={accountList}
+          setAccountList={setAccountList}
+        />
+
         <Flex my="0.375em">
           <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens">
             <Text>Controller</Text>
           </Tooltip>
           <AddressInput disabled ml="auto" w="85%" value={accounts[0]} />
         </Flex>
+
         <Flex>
           <Checkbox
             size="lg"
@@ -188,6 +108,7 @@ const Status = ({ connected }: StatusProps) => {
             w="85%"
           />
         </Flex>
+
         <Flex>
           <Checkbox
             size="lg"
@@ -226,6 +147,7 @@ const Status = ({ connected }: StatusProps) => {
             </NumberInput>
           </Flex>
         </Flex>
+
         <Button mt="1rem">Claim rewards</Button>
       </Box>
       {connected && (
