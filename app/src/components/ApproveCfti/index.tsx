@@ -19,7 +19,7 @@ export const ApproveCfti = (props: { owner: any }) => {
     if (allowance?.gte(requiredAllowance)) {
       return { msg: 'Approved', disabled: true }
     } else if (!account || `${owner}`.toLowerCase() != `${account}`.toLowerCase()) {
-      return { msg: 'Change account', disabled: true }
+      return { msg: 'Not approved', disabled: true }
     } else {
       return {
         msg: 'Approve $CFTI',
