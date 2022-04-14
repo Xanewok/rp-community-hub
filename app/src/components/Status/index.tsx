@@ -168,6 +168,7 @@ const Status = ({ connected }: StatusProps) => {
             ml="auto"
             w="85%"
             onChange={(ev) => setStash(ev.target.value)}
+            value={stash}
           />
         </Flex>
 
@@ -192,6 +193,7 @@ const Status = ({ connected }: StatusProps) => {
             ml="auto"
             w="85%"
             onChange={(ev) => setTaxCollector(ev.target.value)}
+            value={taxCollector}
           />
         </Flex>
         <Flex my="0.375em">
@@ -201,6 +203,7 @@ const Status = ({ connected }: StatusProps) => {
               w="15%"
               format={(value) => `${value}%`}
               onChange={(str, num) => setTaxRate(num)}
+              value={taxRate}
               min={0}
               max={100}
               keepWithinRange={true}
