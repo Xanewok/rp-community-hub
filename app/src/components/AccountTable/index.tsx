@@ -66,7 +66,7 @@ export const AccountList = (props: {
           <Tooltip label="Whether a given address has authorized the selected Operator account to move $CFTI on their behalf">
             <Th>Authorized</Th>
           </Tooltip>
-          <Th>Pending</Th>
+          <Th>Balance + Yield</Th>
           <Th>
             <IconButton
               disabled={!account}
