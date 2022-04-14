@@ -1,0 +1,21 @@
+@font-face {
+  font-family: 'VP';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/VP-Regular.otf') format('opentype');
+}
+@font-face {
+  font-family: 'VP';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('/fonts/VP-Medium.otf') format('opentype');
+}
+@font-face {
+  font-family: 'VP';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url('/fonts/VP-Bold.otf') format('opentype');
+}

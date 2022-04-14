@@ -20,7 +20,7 @@ module.exports = async function (deployer, network, accounts) {
     }
     // await deployer.deploy(TestRaid, confetti);
     // await confetti.grantRole(await web3.utils.keccak256("MINTER_ROLE"), TestRaid.address);
-    throw new Error(`${await web3.utils.keccak256("MINTER_ROLE")}`);
+    // throw new Error(`${await web3.utils.keccak256("MINTER_ROLE")}`);
 
     await deployer.deploy(RpYieldCollector, confetti, TestRaid.address)
   }

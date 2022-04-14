@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "test": "truffle test",
-    "compile": "truffle test"
+    "compile": "truffle compile"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0"

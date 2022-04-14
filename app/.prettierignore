@@ -1,0 +1,10 @@
+# Prettier CLI will ignore files located in node_modules directory.
+
+# dependencies
+node_modules
+package-lock.json
+
+# next.js
+/.next/
+/out/
+next-env.d.ts

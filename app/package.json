@@ -1,0 +1,35 @@
+{
+  "name": "confetti-roll",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@babel/core": "^7.17.5",
+    "@chakra-ui/react": "^1.6.5",
+    "@emotion/react": "^11.1.5",
+    "@emotion/styled": "^11.3.0",
+    "@next/bundle-analyzer": "^12.1.4",
+    "@usedapp/core": "^0.11.0",
+    "ethers": "4.0.4",
+    "framer-motion": "^4.1.17",
+    "next": "12.0.10",
+    "next-seo": "^4.26.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "web3": "1"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.14",
+    "@types/react": "17.0.39",
+    "eslint": "8.8.0",
+    "eslint-config-next": "12.0.10",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.6.1",
+    "typescript": "4.5.5"
+  }
+}

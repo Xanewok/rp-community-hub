@@ -6,11 +6,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
-interface IRaid {
-    function claimRewards(address user) external;
-
-    function getPendingRewards(address user) external view returns (uint256);
-}
+import './IRaid.sol';
 
 /**
  * @title Raid Party pending rewards batch collection

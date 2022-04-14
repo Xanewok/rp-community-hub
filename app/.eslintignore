@@ -1,0 +1,13 @@
+# https://eslint.org/docs/user-guide/configuring/ignoring-code#the-eslintignore-file
+
+# In addition to any patterns in the .eslintignore file, ESLint always follows a
+# couple of implicit ignore rules even if the --no-ignore flag is passed. The
+# implicit rules are as follows:
+
+# node_modules/ is ignored.
+# dot-files (except for .eslintrc.*), as well as dot-folders and their contents,
+# are ignored.
+
+# next.js
+/out/
+next-env.d.ts
