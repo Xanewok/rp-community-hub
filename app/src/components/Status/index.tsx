@@ -21,12 +21,12 @@ import {
 } from '@chakra-ui/react'
 import BannerBox from '../Global/BannerBox'
 import { useEthers, useNetwork, useTokenBalance } from '@usedapp/core'
-import { TOKEN_ADDRESS } from '../../constants'
+import { COLLECTOR_CONTRACT, TOKEN_ADDRESS } from '../../constants'
 import { useState, useEffect, useCallback } from 'react'
+import web3 from 'web3'
 
 import { logEvent } from '../../utils'
 import { useSigner } from '../../hooks'
-import { ApproveCfti } from '../ApproveCfti'
 import { AddressInput } from '../AddressInput'
 import { AccountList } from '../AccountTable'
 
@@ -43,9 +43,12 @@ const Status = ({ connected }: StatusProps) => {
   const [accountList, setAccountList] = useState<string[]>([])
   console.log({ accountList: JSON.stringify(accountList) })
 
-  const [accumulateEnabled, enableAccumulate] = useState(false)
-  const [collectTaxEnabled, enableCollectTax] = useState(false)
-  console.log({ accumulateEnabled })
+  const [accumulate, enableAccumulate] = useState(false)
+  const [stash, setStash] = useState('')
+  const [collectTax, enableCollectTax] = useState(false)
+  const [taxCollector, setTaxCollector] = useState('')
+  const [taxRate, setTaxRate] = useState(0)
+  console.log({ accumulate, collectTax })
 
   const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
 
@@ -55,7 +58,7 @@ const Status = ({ connected }: StatusProps) => {
       console.error(JSON.stringify(err))
       const error = err.error || err
       toast({
-        description: `${error.message}`,
+        description: [`${error.message}`, `(${err.code})`].join(' '),
         status: 'error',
         duration: 3000,
       })
@@ -64,6 +67,64 @@ const Status = ({ connected }: StatusProps) => {
   )
 
   const signer = useSigner()
+
+  const claimRewards = useCallback(async () => {
+    const wallets = accountList.filter(web3.utils.isAddress)
+    const signer = provider?.getSigner(accounts[0])
+    if (!signer || wallets.length <= 0) {
+      return
+    }
+
+    try {
+      const contract = COLLECTOR_CONTRACT.connect(signer)
+
+      if (!accumulate && !collectTax) {
+        console.log('claimMultipleRewards', { wallets })
+        await contract.claimMultipleRewards(wallets)
+      } else if (!collectTax) {
+        console.log('claimMultipleRewardsTo', { wallets, stash })
+        await contract.claimMultipleRewardsTo(wallets, stash)
+      } else if (!accumulate) {
+        const taxBasisPoints = Math.round(taxRate * 100)
+        console.log('taxedClaimMultipleRewards', {
+          wallets,
+          taxBasisPoints,
+          taxCollector,
+        })
+        await contract.taxedClaimMultipleRewards(
+          wallets,
+          taxBasisPoints,
+          taxCollector
+        )
+      } else {
+        const taxBasisPoints = Math.round(taxRate * 100)
+        console.log('taxedClaimMultipleRewardsTo', {
+          wallets,
+          stash,
+          taxBasisPoints,
+          taxCollector,
+        })
+        await contract.taxedClaimMultipleRewardsTo(
+          wallets,
+          stash,
+          taxBasisPoints,
+          taxCollector
+        )
+      }
+    } catch (e) {
+      showErrorToast(e)
+    }
+  }, [
+    accountList,
+    provider,
+    accounts,
+    stash,
+    taxRate,
+    taxCollector,
+    showErrorToast,
+    accumulate,
+    collectTax,
+  ])
 
   return (
     <BannerBox heading="Accounts">
@@ -90,7 +151,7 @@ const Status = ({ connected }: StatusProps) => {
           <Checkbox
             size="lg"
             disabled={!connected}
-            checked={accumulateEnabled}
+            checked={accumulate}
             onChange={({ target }) => enableAccumulate(target.checked)}
           >
             <Text ml="2" mb="2" fontSize="xl" fontWeight="bold">
@@ -103,9 +164,10 @@ const Status = ({ connected }: StatusProps) => {
         <Flex my="0.375em">
           <Text>Stash</Text>
           <AddressInput
-            disabled={!connected || !accumulateEnabled}
+            disabled={!connected || !accumulate}
             ml="auto"
             w="85%"
+            onChange={(ev) => setStash(ev.target.value)}
           />
         </Flex>
 
@@ -113,7 +175,7 @@ const Status = ({ connected }: StatusProps) => {
           <Checkbox
             size="lg"
             disabled={!connected}
-            checked={collectTaxEnabled}
+            checked={collectTax}
             onChange={({ target }) => enableCollectTax(target.checked)}
           >
             <Text ml="2" mb="2" fontSize="xl" fontWeight="bold">
@@ -126,9 +188,10 @@ const Status = ({ connected }: StatusProps) => {
         <Flex my="0.375em">
           <Text>Collector</Text>
           <AddressInput
-            disabled={!connected || !collectTaxEnabled}
+            disabled={!connected || !collectTax}
             ml="auto"
             w="85%"
+            onChange={(ev) => setTaxCollector(ev.target.value)}
           />
         </Flex>
         <Flex my="0.375em">
@@ -137,18 +200,26 @@ const Status = ({ connected }: StatusProps) => {
             <NumberInput
               w="15%"
               format={(value) => `${value}%`}
-              defaultValue={3}
+              onChange={(str, num) => setTaxRate(num)}
               min={0}
               max={100}
               keepWithinRange={true}
               clampValueOnBlur={true}
             >
-              <NumberInputField disabled={!connected || !collectTaxEnabled} />
+              <NumberInputField disabled={!connected || !collectTax} />
             </NumberInput>
           </Flex>
         </Flex>
 
-        <Button mt="1rem">Claim rewards</Button>
+        <Button
+          disabled={
+            !signer || accountList.filter(web3.utils.isAddress).length <= 0
+          }
+          mt="1rem"
+          onClick={claimRewards}
+        >
+          Claim rewards
+        </Button>
       </Box>
       {connected && (
         <Flex justify="space-between">
