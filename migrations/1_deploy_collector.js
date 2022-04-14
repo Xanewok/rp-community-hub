@@ -1,7 +1,7 @@
 const RpYieldCollector = artifacts.require("RpYieldCollector");
 
 const TestConfetti = artifacts.require("TestConfetti");
-const TestRaid = artifacts.require("TestRaid");
+// const TestRaid = artifacts.require("TestRaid");
 
 module.exports = async function (deployer, network, accounts) {
   const chainId = await web3.eth.net.getId();
@@ -12,8 +12,10 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(RpYieldCollector, confetti, raid);
   } else {
     let confetti;
+    let raid;
     if (chainId === 0x4) {
       confetti = "0x9BEfb9f109ac064e4A3E629528525d3474fcF2c1";
+      raid = "0x03570874f6137509916d86002fa68acce3ddcc60";
     } else {
       // await deployer.deploy(TestConfetti);
       // confetti = await TestConfetti.address;
@@ -22,6 +24,6 @@ module.exports = async function (deployer, network, accounts) {
     // await confetti.grantRole(await web3.utils.keccak256("MINTER_ROLE"), TestRaid.address);
     // throw new Error(`${await web3.utils.keccak256("MINTER_ROLE")}`);
 
-    await deployer.deploy(RpYieldCollector, confetti, TestRaid.address)
+    await deployer.deploy(RpYieldCollector, confetti, raid)
   }
 };
