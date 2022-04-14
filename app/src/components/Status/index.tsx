@@ -120,7 +120,7 @@ const Status = ({ connected }: StatusProps) => {
             </Tr>
           </Thead>
           <Tbody>
-            {Array.from(accountList.values())
+            {accountList
               .map((element) => {
                 console.log('inspect - ' + element)
                 return element

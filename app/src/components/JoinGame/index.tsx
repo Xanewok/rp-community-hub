@@ -80,7 +80,7 @@ export const JoinGame = (props: JoinGameProps) => {
     //     .joinGlobalGame()
     //     .catch(showErrorToast)
     // }
-  }, [game, showErrorToast, signer])
+  }, [game, signer])
   const disabled = false
   // !signer ||
   // (!allowance || approved &&
