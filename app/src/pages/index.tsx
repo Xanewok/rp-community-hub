@@ -128,60 +128,58 @@ const Home: NextPage = () => {
         <Heading fontSize="2xl" textAlign="center" color="white">
           Overview
         </Heading>
+
         <Text mb="1em" fontSize="lg" color="white">
           This tool lets you claim your CFTI rewards from multiple wallets with
           just one transaction.
           <Text mt="0.3em" fontSize="lg" color="white">
-          In addition to a simple batch rewards claim, it also supports (for a
-          small fee):
+            In addition to a simple batch rewards claim, it also supports (for a
+            0.5% service fee):
           </Text>
-
-          <OrderedList ml="max(60px, 15vw)" mr="max(20px, 5vw)" textAlign="left">
-            <ListItem>
-              accumulating the rewards to any address of your choosing
-            </ListItem>
-            <ListItem>
-              collecting a reward tax and sending it to another account (e.g.
-              guild treasury wallet)
-            </ListItem>
-          </OrderedList>
+          <Flex justify={'center'}>
+            <OrderedList textAlign="left">
+              <ListItem>
+                collecting all the rewards to a single address of your choosing
+              </ListItem>
+              <ListItem>
+                collecting a reward tax and sending it to another account (e.g.
+                guild wallet)
+              </ListItem>
+            </OrderedList>
+          </Flex>
           <Heading mt="1em" fontSize="2xl" textAlign="center" color="white">
-          Instructions
-        </Heading>
-          <OrderedList
-            ml="max(60px, 15vw)"
-            mr="max(20px, 5vw)"
-            mt="-0.5em"
-            fontSize="lg"
-            textAlign="left"
-          >
-            <ListItem>
-              For each wallet, approve our contract to move the wallet&apos;s
-              $CFTI
-              <Text fontSize="xs" color="white">
-                (make sure it&apos;s active in your MetaMask/Web3 provider)
-              </Text>
-            </ListItem>
-            <ListItem>
-              For each wallet, authorize an operator that will manage its funds
-              via this contract
-              <Text fontSize="xs" color="white">
-                (make sure it&apos;s active and select the operator from the
-                drop-down that you wish to authorize)
-              </Text>
-            </ListItem>
-            <ListItem>
-              Optionally, enable the accumulate and/or the tax feature and fill
-              the addresses
-            </ListItem>
-            <ListItem>
-              Claim the rewards!
-              <Text fontSize="xs" color="white">
-                (make sure that your connected Web3 account matches the selected
-                operator)
-              </Text>
-            </ListItem>
-          </OrderedList>
+            Instructions
+          </Heading>
+          <Flex justify={'center'}>
+            <OrderedList mt="-0.5em" fontSize="lg" textAlign="left">
+              <ListItem>
+                For each wallet, approve our contract to move the wallet&apos;s
+                $CFTI
+                <Text fontSize="xs" color="white">
+                  (make sure it&apos;s active in your MetaMask/Web3 provider)
+                </Text>
+              </ListItem>
+              <ListItem>
+                For each wallet, authorize an operator that will manage its
+                funds via this contract
+                <Text fontSize="xs" color="white">
+                  (make sure it&apos;s active and select the operator from the
+                  drop-down that you wish to authorize)
+                </Text>
+              </ListItem>
+              <ListItem>
+                Optionally, enable the accumulate and/or the tax feature and
+                fill the addresses
+              </ListItem>
+              <ListItem>
+                Claim the rewards! {' '}
+                <Text as="span" fontSize="xs" color="white">
+                  (make sure that your connected Web3 account matches the
+                  selected operator)
+                </Text>
+              </ListItem>
+            </OrderedList>
+          </Flex>
         </Text>
         <Heading
           mt="2em"
@@ -238,7 +236,7 @@ const Home: NextPage = () => {
           Theme based on RP{' '}
           <Link
             color="purple.900"
-            href="https://raidpartytracker.eth.limo"
+            href="https://tracker.roll.party"
             target="_blank"
           >
             tracker
