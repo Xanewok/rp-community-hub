@@ -34,7 +34,6 @@ const Status = ({ connected }: StatusProps) => {
     activate,
   } = useNetwork()
   const [accountList, setAccountList] = useState<string[]>([])
-  console.log({ accountList: JSON.stringify(accountList) })
 
   const [accumulate, enableAccumulate] = useState(false)
   const [stash, setStash] = useState('')
@@ -42,7 +41,6 @@ const Status = ({ connected }: StatusProps) => {
   const [taxCollector, setTaxCollector] = useState('')
   const [taxRate, setTaxRate] = useState(0)
   const [operator, setOperator] = useState('')
-  console.log({ accumulate, collectTax, operator })
 
   const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
 
@@ -73,18 +71,12 @@ const Status = ({ connected }: StatusProps) => {
       const contract = COLLECTOR_CONTRACT.connect(signer)
 
       if (!accumulate && !collectTax) {
-        console.log('claimMultipleRewards', { wallets })
         await contract.claimMultipleRewards(wallets)
       } else if (!collectTax) {
-        console.log('claimMultipleRewardsTo', { wallets, stash })
         await contract.claimMultipleRewardsTo(wallets, stash)
       } else if (!accumulate) {
         const taxBasisPoints = Math.round(taxRate * 100)
-        console.log('taxedClaimMultipleRewards', {
-          wallets,
-          taxBasisPoints,
-          taxCollector,
-        })
+
         await contract.taxedClaimMultipleRewards(
           wallets,
           taxBasisPoints,
@@ -92,12 +84,7 @@ const Status = ({ connected }: StatusProps) => {
         )
       } else {
         const taxBasisPoints = Math.round(taxRate * 100)
-        console.log('taxedClaimMultipleRewardsTo', {
-          wallets,
-          stash,
-          taxBasisPoints,
-          taxCollector,
-        })
+
         await contract.taxedClaimMultipleRewardsTo(
           wallets,
           stash,

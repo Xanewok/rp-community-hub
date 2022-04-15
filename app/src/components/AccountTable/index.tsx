@@ -34,15 +34,7 @@ export const AccountList = (props: {
   const handleChange = useCallback(
     (e: any) =>
       setAccountList((list) => {
-        console.log({ target: e.target })
         const idx = Number(e.target.id.replace('account-', ''))
-        console.log({
-          idx,
-          prev: list.slice(0, idx),
-          val: e.target.value,
-          after: list.slice(idx + 1),
-        })
-
         return [...list.slice(0, idx), e.target.value, ...list.slice(idx + 1)]
       }),
     [setAccountList]
