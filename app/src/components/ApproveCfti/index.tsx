@@ -3,8 +3,10 @@ import { useEthers, useTokenAllowance } from '@usedapp/core'
 import { ethers } from 'ethers'
 import { useMemo } from 'react'
 import { CONFETTI_CONTRACT, TOKEN_ADDRESS } from '../../constants'
+import { usePendingRewards } from '../../hooks'
 
 const SPENDER = TOKEN_ADDRESS['COLLECTOR']
+const MAX_UINT256 = ethers.constants.MaxUint256
 
 // 1. If the user has already approved the contract, just
 export const ApproveCfti = (props: { owner: any }) => {
@@ -12,13 +14,15 @@ export const ApproveCfti = (props: { owner: any }) => {
 
   const { library, account } = useEthers()
   const allowance = useTokenAllowance(TOKEN_ADDRESS['CFTI'], owner, SPENDER)
-  // TODO: Support allowing less money than infinite
-  const requiredAllowance = ethers.constants.MaxUint256.toString()
+  const pendingRewards = usePendingRewards(owner)
 
   const state = useMemo(() => {
-    if (allowance?.gte(requiredAllowance)) {
+    if (allowance?.gte(pendingRewards)) {
       return { msg: 'Approved', disabled: true }
-    } else if (!account || `${owner}`.toLowerCase() != `${account}`.toLowerCase()) {
+    } else if (
+      !account ||
+      `${owner}`.toLowerCase() != `${account}`.toLowerCase()
+    ) {
       return { msg: 'Not approved', disabled: true }
     } else {
       return {
@@ -29,13 +33,13 @@ export const ApproveCfti = (props: { owner: any }) => {
           if (signer) {
             CONFETTI_CONTRACT.connect(signer).approve(
               TOKEN_ADDRESS['COLLECTOR'],
-              requiredAllowance
+              MAX_UINT256
             )
           }
         },
       }
     }
-  }, [allowance, requiredAllowance, account, owner, library])
+  }, [allowance, pendingRewards, account, owner, library])
 
   return (
     <Button
