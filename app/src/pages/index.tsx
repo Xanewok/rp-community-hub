@@ -143,6 +143,7 @@ const Home: NextPage = () => {
           Instructions
         </Heading>
         <Text mx="2em" mb="1em" fontSize="lg" color="white">
+          To use the tool, do the following:
           <ol>
             <li>
               For each wallet, approve our contract to move the wallet&apos;s
