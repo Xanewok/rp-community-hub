@@ -19,7 +19,8 @@ const customTheme = extendTheme({
   global: {
     'html, body': {
       lineHeight: 'tall',
-      // color: "white"
+      color: "white",
+      textColor: "white",
     },
   },
   fontSizes: {
@@ -82,18 +83,6 @@ const customTheme = extendTheme({
     Text: {
       baseStyle: {
         fontSize: 'md',
-      },
-    },
-    Td: {
-      baseStyle: {
-        borderColor: 'green',
-        color: 'purple.200',
-        borderBottom: '2px',
-      },
-      variants: {
-        simple: {
-          borderColor: 'green',
-        },
       },
     },
     Input: {

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.17.5",
-    "@chakra-ui/react": "^1.6.5",
+    "@chakra-ui/react": "^1.8.8",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
     "@next/bundle-analyzer": "^12.1.4",

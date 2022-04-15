@@ -8,6 +8,8 @@ import {
   Flex,
   Tooltip,
   Link,
+  OrderedList,
+  ListItem,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useCall, useEthers, useInterval } from '@usedapp/core'
@@ -122,58 +124,72 @@ const Home: NextPage = () => {
       <Container maxW="100%">
         <Status connected={account} />
       </Container>
-      <Box mt="80px" textAlign="center" textColor="white.50">
+      <Box mt="80px" mx="2em" textAlign="center" textColor="white">
         <Heading fontSize="2xl" textAlign="center" color="white">
           Overview
         </Heading>
-        <Text mx="2em" mb="1em" fontSize="lg" color="white">
+        <Text mb="1em" fontSize="lg" color="white">
           This tool lets you claim your CFTI rewards from multiple wallets with
-          just one transaction. <br />
+          just one transaction.
+          <Text mt="0.3em" fontSize="lg" color="white">
           In addition to a simple batch rewards claim, it also supports (for a
           small fee):
-          <ol>
-            <li>accumulating the rewards to any address of your choosing</li>
-            <li>
+          </Text>
+
+          <OrderedList ml="max(60px, 15vw)" mr="max(20px, 5vw)" textAlign="left">
+            <ListItem>
+              accumulating the rewards to any address of your choosing
+            </ListItem>
+            <ListItem>
               collecting a reward tax and sending it to another account (e.g.
               guild treasury wallet)
-            </li>
-          </ol>
-        </Text>
-        <Heading fontSize="2xl" textAlign="center" color="white">
+            </ListItem>
+          </OrderedList>
+          <Heading mt="1em" fontSize="2xl" textAlign="center" color="white">
           Instructions
         </Heading>
-        <Text mx="2em" mb="1em" fontSize="lg" color="white">
-          To use the tool, do the following:
-          <ol>
-            <li>
+          <OrderedList
+            ml="max(60px, 15vw)"
+            mr="max(20px, 5vw)"
+            mt="-0.5em"
+            fontSize="lg"
+            textAlign="left"
+          >
+            <ListItem>
               For each wallet, approve our contract to move the wallet&apos;s
               $CFTI
-              <Text fontSize="xs">
+              <Text fontSize="xs" color="white">
                 (make sure it&apos;s active in your MetaMask/Web3 provider)
               </Text>
-            </li>
-            <li>
-              For each wallet, authorize an <b>operator</b> that will manage its
-              funds via this contract
-              <Text fontSize="xs">
-                (make sure it&apos;s active and <b>select</b> the operator
-                from the drop-down that you wish to authorize)
+            </ListItem>
+            <ListItem>
+              For each wallet, authorize an operator that will manage its funds
+              via this contract
+              <Text fontSize="xs" color="white">
+                (make sure it&apos;s active and select the operator from the
+                drop-down that you wish to authorize)
               </Text>
-            </li>
-            <li>
+            </ListItem>
+            <ListItem>
               Optionally, enable the accumulate and/or the tax feature and fill
               the addresses
-            </li>
-            <li>
+            </ListItem>
+            <ListItem>
               Claim the rewards!
-              <Text fontSize="xs">
+              <Text fontSize="xs" color="white">
                 (make sure that your connected Web3 account matches the selected
                 operator)
               </Text>
-            </li>
-          </ol>
+            </ListItem>
+          </OrderedList>
         </Text>
-        <Heading mt="2.5em" mb="0.3em" fontSize="lg" textAlign="center" color="white">
+        <Heading
+          mt="2em"
+          mb="0.3em"
+          fontSize="lg"
+          textAlign="center"
+          color="white"
+        >
           Disclaimer
         </Heading>
         <Text fontSize="xs" color="white">
@@ -181,7 +197,7 @@ const Home: NextPage = () => {
           <Link color="purple.900" href="https://raid.party/">
             Raid Party
           </Link>
-          .{' '}
+          .
         </Text>
         <Text fontSize="xs" color="white">
           This is not officially endorsed, but you can review the source code
