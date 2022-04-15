@@ -1,6 +1,6 @@
-export const title = 'Raid Party Tracker'
-const description = 'Raid Party Tracker is a tool for monitoring your current CFTI yield.'
-const url = 'https://raid.party'
+export const title = 'Raid Party Yield collector'
+const description = 'Raid Party Yield collector is a tool for batch claiming CFTI yield.'
+const url = 'https://collect.roll.party'
 
 const SEO = {
     title,
@@ -22,8 +22,8 @@ const SEO = {
     },
     twitter: {
         cardType: 'summary_large_image',
-        handle: '@oktalize',
-        site: '@oktalize'
+        handle: '@xanecrypto',
+        site: '@xanecrypto'
     },
     additionalLinkTags: [
         {
