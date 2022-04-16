@@ -16,9 +16,9 @@ export const PendingRewards = (props: { owner: any }) => {
   if (!web3.utils.isAddress(owner)) return null
 
   return (
-    <Flex justifyContent={'space-around'}>
+    <Flex direction="row" justifyContent={'space-around'}>
       <Text>{[balance, pendingRewards].map(formatNumber).join(' + ')}</Text>
-      <Img ml="5px" src="/cfti.png" />
+      <Img h="28px" w="28px" ml="5px" my="auto" src="/cfti.png" />
     </Flex>
   )
 }
