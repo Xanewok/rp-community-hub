@@ -16,11 +16,19 @@ import {
   createIcon,
 } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
+import { CONFETTI_CONTRACT, RAID_CONTRACT } from '../../constants'
 import { AddressInput } from '../AddressInput'
 import { ApproveCfti } from '../ApproveCfti'
 import { AuthorizeOperator } from '../AuthorizeOperator'
 import { PendingRewards } from '../PendingRewards'
+import web3 from 'web3'
 
 export const AccountList = (props: {
   accountList: string[]
@@ -29,7 +37,7 @@ export const AccountList = (props: {
 }) => {
   const { accountList, setAccountList, operator } = props
 
-  const { account } = useEthers()
+  const { library, account } = useEthers()
 
   const handleChange = useCallback(
     (e: any) =>
@@ -46,6 +54,40 @@ export const AccountList = (props: {
       }),
     [setAccountList]
   )
+
+  const [totalTokens, setTotalTokens] = useState<[number, number]>([0, 0])
+  function formatTotalTokens(tokens: [number, number]) {
+    const [balance, rewards] = tokens.map((x) => x / 10 ** 18)
+    const sum = balance + rewards
+    return `${balance.toPrecision(4)} + ${rewards.toPrecision(4)} (${Math.floor(
+      sum
+    )})`
+  }
+  useEffect(() => {
+    const signer = library?.getSigner()
+    if (!signer) {
+      return
+    }
+    const confetti = CONFETTI_CONTRACT.connect(signer)
+    const raid = RAID_CONTRACT.connect(signer)
+    Promise.all(
+      accountList
+        .filter((x) => !!x)
+        .filter(web3.utils.isAddress)
+        .map((acc) =>
+          Promise.all([confetti.balanceOf(acc), raid.getPendingRewards(acc)])
+        )
+    ).then((data) => {
+      const totalBalance = data
+        .map(([balance]) => balance)
+        .reduce((prev, curr) => prev + Number(curr), 0)
+      const totalPending = data
+        .map(([, pending]) => pending)
+        .reduce((prev, curr) => prev + Number(curr), 0)
+      console.log({ totalBalance, totalPending })
+      setTotalTokens([totalBalance, totalPending])
+    })
+  }, [library, accountList])
 
   return (
     <Table mb="0.6em">
@@ -102,6 +144,18 @@ export const AccountList = (props: {
             </Tr>
           )
         })}
+        {accountList.filter((x) => !!x).filter(web3.utils.isAddress).length >
+          0 && (
+          <Tr key="sum">
+            <Td />
+            <Td />
+            <Td />
+            <Td>
+              <Text fontSize="xs">Total: {formatTotalTokens(totalTokens)}</Text>
+            </Td>
+            <Td />
+          </Tr>
+        )}
         <Tr></Tr>
       </Tbody>
     </Table>
