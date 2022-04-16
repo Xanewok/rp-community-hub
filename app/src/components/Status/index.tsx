@@ -14,7 +14,12 @@ import {
 } from '@chakra-ui/react'
 import BannerBox from '../Global/BannerBox'
 import { useEthers, useNetwork, useTokenBalance } from '@usedapp/core'
-import { COLLECTOR_CONTRACT, TOKEN_ADDRESS } from '../../constants'
+import {
+  COLLECTOR_CONTRACT,
+  CONFETTI_CONTRACT,
+  RAID_CONTRACT,
+  TOKEN_ADDRESS,
+} from '../../constants'
 import { useState, useEffect, useCallback } from 'react'
 import web3 from 'web3'
 
@@ -42,7 +47,39 @@ const Status = ({ connected }: StatusProps) => {
   const [taxRate, setTaxRate] = useState(0)
   const [operator, setOperator] = useState('')
 
+  const signer = useSigner()
+
   const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
+  // TODO: Abstract that away
+  const [totalRewards, setTotalRewards] = useState(0)
+  useEffect(() => {
+    if (!signer) {
+      return
+    }
+    const raid = RAID_CONTRACT.connect(signer)
+    Promise.all(
+      accountList
+        .filter((x) => !!x)
+        .filter(web3.utils.isAddress)
+        .map((acc) => raid.getPendingRewards(acc))
+    )
+      .then((rewards) => rewards.reduce((prev, cur) => prev + Number(cur), 0))
+      .then((rewards) => setTotalRewards(rewards / 10 ** 18))
+  }, [signer, accountList])
+  const [totalBalance, setTotalBalance] = useState(0)
+  useEffect(() => {
+    if (!signer) {
+      return
+    }
+    const confetti = CONFETTI_CONTRACT.connect(signer)
+    const specifiedWallets = accountList
+      .filter((x) => !!x)
+      .filter(web3.utils.isAddress)
+    const wallets = specifiedWallets.length > 0 ? specifiedWallets : accounts
+    Promise.all(wallets.map((acc) => confetti.balanceOf(acc)))
+      .then((rewards) => rewards.reduce((prev, cur) => prev + Number(cur), 0))
+      .then((rewards) => setTotalBalance(rewards / 10 ** 18))
+  }, [signer, accountList, accounts])
 
   const toast = useToast()
   const showErrorToast = useCallback(
@@ -57,8 +94,6 @@ const Status = ({ connected }: StatusProps) => {
     },
     [toast]
   )
-
-  const signer = useSigner()
 
   const claimRewards = useCallback(async () => {
     const wallets = accountList.filter(web3.utils.isAddress)
@@ -123,7 +158,7 @@ const Status = ({ connected }: StatusProps) => {
           needsAuthorization={accumulate || collectTax}
         />
 
-        <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens">
+        <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens for accumulation/tax">
           <Flex my="0.375em">
             <Text>Operator</Text>
             <Select
@@ -145,6 +180,7 @@ const Status = ({ connected }: StatusProps) => {
               placeholder="Address"
               value={operator}
               isInvalid={operator != '' && !web3.utils.isAddress(operator)}
+              isDisabled={!accumulate && !collectTax}
             >
               {[...new Set(accountList)]
                 .filter((val) => !!val)
@@ -224,24 +260,31 @@ const Status = ({ connected }: StatusProps) => {
           </Flex>
         </Flex>
 
-        <Button
-          disabled={
-            !signer || accountList.filter(web3.utils.isAddress).length <= 0
-          }
-          mt="1rem"
-          onClick={claimRewards}
-        >
-          Claim rewards
-        </Button>
+        <Flex direction="column" justify="center">
+          <Img h="28px" w="28px" ml="auto" mr="auto" mt="6px" src="/cfti.png" />
+          <Text color="white" fontWeight="bold">
+            {totalRewards.toPrecision(4)}
+          </Text>
+          <Button
+            disabled={
+              !signer || accountList.filter(web3.utils.isAddress).length <= 0
+            }
+            mt="1rem"
+            ml="auto"
+            mr="auto"
+            onClick={claimRewards}
+          >
+            Claim rewards
+          </Button>
+        </Flex>
       </Box>
       {connected && (
         <Flex justify="space-between">
           <Flex ml="auto">
             <Img h="27px" mt="6px" src="/cfti.png" pr="10px" />
             <Text>
-              {isNaN(Number(balance))
-                ? '...'
-                : `${(Number(balance) / 10 ** 18).toPrecision(4)}`}
+              {totalBalance.toPrecision(4)} (
+              {(totalBalance + totalRewards).toPrecision(4)})
             </Text>
           </Flex>
           {/* <DeathRoll
