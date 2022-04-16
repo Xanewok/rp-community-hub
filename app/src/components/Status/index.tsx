@@ -24,7 +24,7 @@ import { useState, useEffect, useCallback } from 'react'
 import web3 from 'web3'
 
 import { logEvent } from '../../utils'
-import { useSigner } from '../../hooks'
+import { useLocalStorage, useSigner } from '../../hooks'
 import { AddressInput } from '../AddressInput'
 import { AccountList } from '../AccountTable'
 
@@ -38,7 +38,7 @@ const Status = ({ connected }: StatusProps) => {
     deactivate,
     activate,
   } = useNetwork()
-  const [accountList, setAccountList] = useState<string[]>([])
+  const [accountList, setAccountList] = useLocalStorage<string[]>('accs', [])
 
   const [accumulate, enableAccumulate] = useState(false)
   const [stash, setStash] = useState('')
