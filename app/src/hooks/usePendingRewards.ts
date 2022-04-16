@@ -1,5 +1,5 @@
 import { useCall } from '@usedapp/core'
-import { RAID_CONTRACT } from '../constants'
+import { COLLECTOR_CONTRACT, RAID_CONTRACT } from '../constants'
 
 export const usePendingRewards = (account: any) => {
   const { value, error } =
@@ -7,6 +7,21 @@ export const usePendingRewards = (account: any) => {
       contract: RAID_CONTRACT,
       method: 'getPendingRewards',
       args: [account],
+    }) ?? {}
+
+  if (error) {
+    console.error(error.message)
+    return null
+  }
+  return value?.[0]
+}
+
+export const useMultiplePendingRewards = (accounts: any[]) => {
+  const { value, error } =
+    useCall({
+      contract: COLLECTOR_CONTRACT,
+      method: 'getPendingRewards',
+      args: [accounts],
     }) ?? {}
 
   if (error) {

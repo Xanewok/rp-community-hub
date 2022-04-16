@@ -27,6 +27,7 @@ import { logEvent } from '../../utils'
 import { useLocalStorage, useSigner } from '../../hooks'
 import { AddressInput } from '../AddressInput'
 import { AccountList } from '../AccountTable'
+import { useMultiplePendingRewards } from '../../hooks/usePendingRewards'
 
 type StatusProps = {
   connected: any
@@ -51,21 +52,8 @@ const Status = ({ connected }: StatusProps) => {
 
   const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
   // TODO: Abstract that away
-  const [totalRewards, setTotalRewards] = useState(0)
-  useEffect(() => {
-    if (!signer) {
-      return
-    }
-    const raid = RAID_CONTRACT.connect(signer)
-    Promise.all(
-      accountList
-        .filter((x) => !!x)
-        .filter(web3.utils.isAddress)
-        .map((acc) => raid.getPendingRewards(acc))
-    )
-      .then((rewards) => rewards.reduce((prev, cur) => prev + Number(cur), 0))
-      .then((rewards) => setTotalRewards(rewards / 10 ** 18))
-  }, [signer, accountList])
+  const totalRewards =
+    (Number(useMultiplePendingRewards(accountList || [])) || 0) / 10 ** 18
   const [totalBalance, setTotalBalance] = useState(0)
   useEffect(() => {
     if (!signer) {
