@@ -34,8 +34,9 @@ export const AccountList = (props: {
   accountList: string[]
   setAccountList: Dispatch<SetStateAction<string[]>>
   operator: string
+  needsAuthorization: boolean
 }) => {
-  const { accountList, setAccountList, operator } = props
+  const { accountList, setAccountList, operator, needsAuthorization } = props
 
   const { library, account } = useEthers()
 
@@ -94,12 +95,16 @@ export const AccountList = (props: {
       <Thead>
         <Tr>
           <Th w="32rem">Address</Th>
-          <Tooltip label="Whether a given address has approved this contract to transfer $CFTI">
-            <Th>Approved</Th>
-          </Tooltip>
-          <Tooltip label="Whether a given address has authorized the selected Operator account to move $CFTI on their behalf">
-            <Th>Authorized</Th>
-          </Tooltip>
+          {needsAuthorization && (
+            <Tooltip label="Whether a given address has approved this contract to transfer $CFTI">
+              <Th>Approved</Th>
+            </Tooltip>
+          )}
+          {needsAuthorization && (
+            <Tooltip label="Whether a given address has authorized the selected Operator account to move $CFTI on their behalf">
+              <Th>Authorized</Th>
+            </Tooltip>
+          )}
           <Th>Balance + Yield</Th>
           <Th>
             <IconButton
@@ -123,12 +128,16 @@ export const AccountList = (props: {
                   value={acc}
                 />
               </Td>
-              <Td>
-                <ApproveCfti owner={acc} />
-              </Td>
-              <Td>
-                <AuthorizeOperator owner={acc} operator={operator} />
-              </Td>
+              {needsAuthorization && (
+                <Td>
+                  <ApproveCfti owner={acc} />
+                </Td>
+              )}
+              {needsAuthorization && (
+                <Td>
+                  <AuthorizeOperator owner={acc} operator={operator} />
+                </Td>
+              )}
               <Td>
                 <PendingRewards owner={acc} />
               </Td>
@@ -147,8 +156,8 @@ export const AccountList = (props: {
         {accountList.filter((x) => !!x).filter(web3.utils.isAddress).length >
           0 && (
           <Tr key="sum">
-            <Td />
-            <Td />
+            {needsAuthorization && <Td />}
+            {needsAuthorization && <Td />}
             <Td />
             <Td>
               <Text fontSize="xs">Total: {formatTotalTokens(totalTokens)}</Text>

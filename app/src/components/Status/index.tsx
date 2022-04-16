@@ -120,6 +120,7 @@ const Status = ({ connected }: StatusProps) => {
           accountList={accountList}
           setAccountList={setAccountList}
           operator={operator}
+          needsAuthorization={accumulate || collectTax}
         />
 
         <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens">
