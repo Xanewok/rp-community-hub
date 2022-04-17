@@ -17,7 +17,7 @@ export const ApproveCfti = (props: { owner: any }) => {
   const pendingRewards = usePendingRewards(owner)
 
   const state = useMemo(() => {
-    if (allowance?.gte(pendingRewards)) {
+    if (allowance?.gte(pendingRewards) && allowance?.gt(0)) {
       return { msg: 'Approved', disabled: true }
     } else if (
       !account ||
