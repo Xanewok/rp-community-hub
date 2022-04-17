@@ -14,16 +14,21 @@ export const ExpectedYield = (props: { owner: any }) => {
   if (!web3.utils.isAddress(owner)) return null
 
   return (
-    <Flex direction="row" justify={'right'}>
-      <Text>{expectedDailyYield} /day</Text>
-      <Img
+    <Flex
+      direction="row"
+      justifyContent={['space-evenly', 'space-evenly', 'right']}
+      alignItems="end"
+      h="28px"
+    >
+      {/* <Img
         h="28px"
         w="28px"
-        ml="10px"
+        mr="10px"
         my="auto"
-        display={['none', 'yes']}
+        display={['none', 'inline']}
         src="/cfti.png"
-      />
+      /> */}
+      <Text mb="6px">~ {expectedDailyYield} /day</Text>
     </Flex>
   )
 }

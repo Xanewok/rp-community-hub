@@ -1,6 +1,7 @@
 import { Flex, Img, Text } from '@chakra-ui/react'
+import { useTokenBalance } from '@usedapp/core'
+import { TOKEN_ADDRESS } from '../../constants'
 import web3 from 'web3'
-import { usePendingRewards } from '../../hooks'
 
 const roundTo = (value: number, decimals: number) =>
   Math.floor(value * 10 ** decimals) / 10 ** decimals
@@ -10,10 +11,10 @@ const formatNumber = (value: any, decimals: number) =>
     ? '...'
     : `${roundTo(Number(value) / 10 ** 18, decimals)}`
 
-export const PendingRewards = (props: { owner: any }) => {
+export const Balance = (props: { owner: any }) => {
   const { owner } = props
 
-  const pendingRewards = usePendingRewards(owner)
+  const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], owner)
 
   if (!web3.utils.isAddress(owner)) return null
 
@@ -24,18 +25,14 @@ export const PendingRewards = (props: { owner: any }) => {
       alignItems="end"
       h="28px"
     >
-      {/* <Img
+      <Img
         h="28px"
         w="28px"
         mr="10px"
-        my="auto"
         display={['none', 'none', 'block']}
         src="/cfti.png"
-      /> */}
-      <Text mb="6px" mr="4px" display={['none', 'none', 'inline']}>
-        +{' '}
-      </Text>
-      <Text mb="6px">{formatNumber(pendingRewards, 3)}</Text>
+      />
+      <Text mb="6px">{formatNumber(balance, 2)}</Text>
     </Flex>
   )
 }

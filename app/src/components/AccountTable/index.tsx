@@ -28,6 +28,7 @@ import { AddressInput } from '../AddressInput'
 import { ApproveCfti } from '../ApproveCfti'
 import { AuthorizeOperator } from '../AuthorizeOperator'
 import { PendingRewards } from '../PendingRewards'
+import { Balance } from '../Balance'
 import web3 from 'web3'
 import { ExpectedYield } from '../ExpectedYield'
 
@@ -62,7 +63,7 @@ export const AccountList = (props: {
       <Thead>
         <Tr>
           <Th
-            w="30em"
+            w="24em"
             px="min(24px, 1vw)"
             letterSpacing={['normal', 'normal', 'wider']}
           >
@@ -88,12 +89,29 @@ export const AccountList = (props: {
               </Th>
             </Tooltip>
           )}
-          <Th display={['none', 'none', 'none', 'table-cell']}>Expected</Th>
           <Th
             display={needsAuthorization ? ['none', 'table-cell'] : undefined}
             letterSpacing={['normal', 'normal', 'wider']}
+            textAlign="right"
+            px="min(24px, 1vw)"
           >
-            Balance + Yield
+            Balance
+          </Th>
+          <Th
+            display={needsAuthorization ? ['none', 'table-cell'] : undefined}
+            letterSpacing={['normal', 'normal', 'wider']}
+            textAlign="right"
+            px="min(24px, 1vw)"
+          >
+            Yield
+          </Th>
+          <Th
+            display={['none', 'none', 'none', 'table-cell']}
+            textAlign="right"
+            pl="min(24px, 2vw)"
+            pr="min(24px, 1vw)"
+          >
+            Expected
           </Th>
           <Th px="min(24px, 1vw)">
             <IconButton
@@ -110,7 +128,7 @@ export const AccountList = (props: {
         {accountList.map((acc, idx) => {
           return (
             <Tr key={idx}>
-              <Td w="30em" px="min(24px, 1vw)">
+              <Td w="24em" px="min(24px, 1vw)">
                 <AddressInput
                   id={`account-${idx}`}
                   onChange={handleChange}
@@ -127,11 +145,28 @@ export const AccountList = (props: {
                   <AuthorizeOperator owner={acc} operator={operator} />
                 </Td>
               )}
-              <Td display={['none', 'none', 'none', 'table-cell']}>
-                <ExpectedYield owner={acc} />
+              <Td
+                display={
+                  needsAuthorization ? ['none', 'table-cell'] : undefined
+                }
+                px="min(24px, 1vw)"
+              >
+                <Balance owner={acc} />
               </Td>
-              <Td display={needsAuthorization ? ['none', 'table-cell'] : undefined}>
+              <Td
+                display={
+                  needsAuthorization ? ['none', 'table-cell'] : undefined
+                }
+                px="min(24px, 1vw)"
+              >
                 <PendingRewards owner={acc} />
+              </Td>
+              <Td
+                display={['none', 'none', 'none', 'table-cell']}
+                pl="min(36px, 3vw)"
+            pr="min(24px, 1vw)"
+              >
+                <ExpectedYield owner={acc} />
               </Td>
               <Td px="min(24px, 1vw)">
                 <IconButton
