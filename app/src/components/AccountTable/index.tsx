@@ -60,19 +60,40 @@ export const AccountList = (props: {
     <Table mb="0.6em">
       <Thead>
         <Tr>
-          <Th w="32rem">Address</Th>
+          <Th
+            w="30em"
+            px="min(24px, 1vw)"
+            letterSpacing={['normal', 'normal', 'wider']}
+          >
+            Address
+          </Th>
           {needsAuthorization && (
             <Tooltip label="Whether a given address has approved this contract to transfer $CFTI">
-              <Th>Approved</Th>
+              <Th
+                px="min(24px, 1vw)"
+                letterSpacing={['normal', 'normal', 'wider']}
+              >
+                Approved
+              </Th>
             </Tooltip>
           )}
           {needsAuthorization && (
             <Tooltip label="Whether a given address has authorized the selected Operator account to move $CFTI on their behalf">
-              <Th>Authorized</Th>
+              <Th
+                px="min(24px, 1vw)"
+                letterSpacing={['normal', 'normal', 'wider']}
+              >
+                Authorized
+              </Th>
             </Tooltip>
           )}
-          <Th>Balance + Yield</Th>
-          <Th>
+          <Th
+            display={needsAuthorization ? ['none', 'yes'] : undefined}
+            letterSpacing={['normal', 'normal', 'wider']}
+          >
+            Balance + Yield
+          </Th>
+          <Th px="min(24px, 1vw)">
             <IconButton
               disabled={!account}
               size="sm"
@@ -87,7 +108,7 @@ export const AccountList = (props: {
         {accountList.map((acc, idx) => {
           return (
             <Tr key={idx}>
-              <Td w="32rem">
+              <Td w="30em" px="min(24px, 1vw)">
                 <AddressInput
                   id={`account-${idx}`}
                   onChange={handleChange}
@@ -95,19 +116,19 @@ export const AccountList = (props: {
                 />
               </Td>
               {needsAuthorization && (
-                <Td>
+                <Td px="min(24px, 1vw)">
                   <ApproveCfti owner={acc} />
                 </Td>
               )}
               {needsAuthorization && (
-                <Td>
+                <Td px="min(24px, 1vw)">
                   <AuthorizeOperator owner={acc} operator={operator} />
                 </Td>
               )}
-              <Td>
+              <Td display={needsAuthorization ? ['none', 'yes'] : undefined}>
                 <PendingRewards owner={acc} />
               </Td>
-              <Td>
+              <Td px="min(24px, 1vw)">
                 <IconButton
                   disabled={!account}
                   size="sm"

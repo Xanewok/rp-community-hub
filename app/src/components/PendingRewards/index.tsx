@@ -4,8 +4,13 @@ import { TOKEN_ADDRESS } from '../../constants'
 import { usePendingRewards } from '../../hooks'
 import web3 from 'web3'
 
-const formatNumber = (value: any) =>
-  isNaN(Number(value)) ? '...' : `${(Number(value) / 10 ** 18).toPrecision(4)}`
+const roundTo = (value: number, decimals: number) =>
+  Math.floor(value * 10 ** decimals) / 10 ** decimals
+
+const formatNumber = (value: any, decimals: number) =>
+  isNaN(Number(value))
+    ? '...'
+    : `${roundTo(Number(value) / 10 ** 18, decimals)}`
 
 export const PendingRewards = (props: { owner: any }) => {
   const { owner } = props
@@ -16,9 +21,16 @@ export const PendingRewards = (props: { owner: any }) => {
   if (!web3.utils.isAddress(owner)) return null
 
   return (
-    <Flex direction="row" justifyContent={'space-around'}>
-      <Text>{[balance, pendingRewards].map(formatNumber).join(' + ')}</Text>
-      <Img h="28px" w="28px" ml="5px" my="auto" src="/cfti.png" />
+    <Flex direction="row" justifyContent={'right'}>
+      <Text>{`${formatNumber(balance, 2)} + ${formatNumber(pendingRewards, 3)}`}</Text>
+      <Img
+        h="28px"
+        w="28px"
+        ml="10px"
+        my="auto"
+        display={['none', 'yes']}
+        src="/cfti.png"
+      />
     </Flex>
   )
 }

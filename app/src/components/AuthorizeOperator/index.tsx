@@ -46,7 +46,7 @@ export const AuthorizeOperator = (props: { owner: any; operator: any }) => {
       !operator ||
       `${owner}`.toLowerCase() != `${account}`.toLowerCase()
     ) {
-      return { msg: 'Not authorized', disabled: true }
+      return { msg: 'Unauthorized', disabled: true }
     } else {
       return {
         msg: 'Authorize operator',
