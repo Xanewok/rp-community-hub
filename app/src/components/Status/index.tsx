@@ -20,7 +20,7 @@ import {
   RAID_CONTRACT,
   TOKEN_ADDRESS,
 } from '../../constants'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import web3 from 'web3'
 
 import { logEvent } from '../../utils'
@@ -28,6 +28,7 @@ import { useLocalStorage, useSigner } from '../../hooks'
 import { AddressInput } from '../AddressInput'
 import { AccountList } from '../AccountTable'
 import { useMultiplePendingRewards } from '../../hooks/usePendingRewards'
+import { usePartyDamages } from '../../hooks/usePartyDamage'
 
 type StatusProps = {
   connected: any
@@ -50,7 +51,16 @@ const Status = ({ connected }: StatusProps) => {
 
   const signer = useSigner()
 
-  const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], accounts[0])
+  const damages = usePartyDamages(accountList)
+  const totalExpectedYield = useMemo(
+    () =>
+      Math.round(
+        damages
+          .map((value) => value / 830)
+          .reduce((prev, curr) => prev + curr, 0) * 100
+      ) / 100,
+    [damages]
+  )
   // TODO: Abstract that away
   const totalRewards =
     (Number(useMultiplePendingRewards(accountList || [])) || 0) / 10 ** 18
@@ -268,7 +278,11 @@ const Status = ({ connected }: StatusProps) => {
       </Box>
       {connected && (
         <Flex justify="space-between">
-          <Flex ml="auto">
+          <Flex>
+            <Img h="27px" ml="4px" mt="6px" src="/cfti.png" pr="10px" />
+            <Text>~ {totalExpectedYield} /day</Text>
+          </Flex>
+          <Flex>
             <Img h="27px" mt="6px" src="/cfti.png" pr="10px" />
             <Text>
               {totalBalance.toPrecision(4)} (

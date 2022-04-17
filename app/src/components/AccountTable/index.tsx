@@ -29,6 +29,7 @@ import { ApproveCfti } from '../ApproveCfti'
 import { AuthorizeOperator } from '../AuthorizeOperator'
 import { PendingRewards } from '../PendingRewards'
 import web3 from 'web3'
+import { ExpectedYield } from '../ExpectedYield'
 
 export const AccountList = (props: {
   accountList: string[]
@@ -87,8 +88,9 @@ export const AccountList = (props: {
               </Th>
             </Tooltip>
           )}
+          <Th display={['none', 'none', 'none', 'table-cell']}>Expected</Th>
           <Th
-            display={needsAuthorization ? ['none', 'yes'] : undefined}
+            display={needsAuthorization ? ['none', 'table-cell'] : undefined}
             letterSpacing={['normal', 'normal', 'wider']}
           >
             Balance + Yield
@@ -125,7 +127,10 @@ export const AccountList = (props: {
                   <AuthorizeOperator owner={acc} operator={operator} />
                 </Td>
               )}
-              <Td display={needsAuthorization ? ['none', 'yes'] : undefined}>
+              <Td display={['none', 'none', 'none', 'table-cell']}>
+                <ExpectedYield owner={acc} />
+              </Td>
+              <Td display={needsAuthorization ? ['none', 'table-cell'] : undefined}>
                 <PendingRewards owner={acc} />
               </Td>
               <Td px="min(24px, 1vw)">
