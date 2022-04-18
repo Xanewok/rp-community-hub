@@ -195,7 +195,7 @@ const Status = ({ connected }: StatusProps) => {
           <Checkbox
             size="lg"
             disabled={!connected}
-            checked={accumulate}
+            isChecked={accumulate}
             onChange={({ target }) => enableAccumulate(target.checked)}
           >
             <Text ml="2" mb="2" fontSize="xl" fontWeight="bold">
@@ -220,7 +220,7 @@ const Status = ({ connected }: StatusProps) => {
           <Checkbox
             size="lg"
             disabled={!connected}
-            checked={collectTax}
+            isChecked={collectTax}
             onChange={({ target }) => enableCollectTax(target.checked)}
           >
             <Text ml="2" mb="2" fontSize="xl" fontWeight="bold">
