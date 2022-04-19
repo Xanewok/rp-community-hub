@@ -139,6 +139,11 @@ const Status = ({ connected }: StatusProps) => {
     accumulate,
     collectTax,
   ])
+  // Whether the user needs to execute the action as the operator but the active
+  // signer account is different
+  const notOperator =
+    (accumulate || collectTax) &&
+    operator.toLowerCase() != (accounts[0] || '').toLowerCase()
 
   return (
     <BannerBox heading="Accounts">
@@ -272,7 +277,7 @@ const Status = ({ connected }: StatusProps) => {
             mr="auto"
             onClick={claimRewards}
           >
-            Claim rewards
+            {notOperator ? 'Switch account' : 'Claim rewards'}
           </Button>
         </Flex>
       </Box>
