@@ -6,11 +6,14 @@ import web3 from 'web3'
 
 export const useIsOperatorFor = (operator: any, holder: any) => {
   const { value, error } =
-    useCall({
-      contract: COLLECTOR_CONTRACT,
-      method: 'isOperatorFor',
-      args: [operator, holder],
-    }) ?? {}
+    useCall(
+      operator &&
+        holder && {
+          contract: COLLECTOR_CONTRACT,
+          method: 'isOperatorFor',
+          args: [operator, holder],
+        }
+    ) ?? {}
 
   if (error) {
     console.error(error.message)

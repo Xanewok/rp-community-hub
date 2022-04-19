@@ -19,11 +19,13 @@ export const usePartyDamage = (address: string | null | undefined) => {
 }
 
 export const usePartyDamages = (addresses: string[]) => {
-  const calls = addresses.map((address) => ({
-    contract: PARTY_CONTRACT,
-    method: 'getDamage',
-    args: [address],
-  }))
+  const calls = addresses
+    .filter((addr) => !!addr)
+    .map((address) => ({
+      contract: PARTY_CONTRACT,
+      method: 'getDamage',
+      args: [address],
+    }))
 
   const results = useCalls(calls)
 
