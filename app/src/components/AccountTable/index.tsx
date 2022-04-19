@@ -103,7 +103,7 @@ export const AccountList = (props: {
             textAlign="right"
             px="min(24px, 1vw)"
           >
-            Yield
+            Rewards
           </Th>
           <Th
             display={['none', 'none', 'none', 'table-cell']}
