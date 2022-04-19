@@ -93,7 +93,7 @@ const Status = ({ connected }: StatusProps) => {
   )
 
   return (
-    <BannerBox heading="Accounts">
+    <BannerBox heading="Batch claim">
       <Box p="16px" textAlign="center">
         {!connected && (
           <Text fontSize="xx-large" mb="20px" color="white">

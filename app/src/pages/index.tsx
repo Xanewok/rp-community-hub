@@ -61,7 +61,7 @@ const Home: NextPage = () => {
     <>
       <Flex justifyContent="center" p="10px">
         <Heading pt="20px" size="lg" mb="50px" textAlign="center" color="white">
-          <Img w="16rem" src="/logo.png" /> Yield collector
+          <Img w="16rem" src="/logo.png" /> Collect rewards
         </Heading>
         <Flex mt="25px" position="absolute" w="95%" justifyContent="right">
           <Tooltip
