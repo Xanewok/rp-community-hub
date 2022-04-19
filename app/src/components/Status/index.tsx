@@ -29,6 +29,7 @@ import { AddressInput } from '../AddressInput'
 import { AccountList } from '../AccountTable'
 import { useMultiplePendingRewards } from '../../hooks/usePendingRewards'
 import { usePartyDamages } from '../../hooks/usePartyDamage'
+import { ClaimButton } from '../ClaimButton'
 
 type StatusProps = {
   connected: any
@@ -36,9 +37,7 @@ type StatusProps = {
 
 const Status = ({ connected }: StatusProps) => {
   const {
-    network: { provider, chainId, accounts, errors },
-    deactivate,
-    activate,
+    network: { accounts  },
   } = useNetwork()
   const [accountList, setAccountList] = useLocalStorage<string[]>('accs', [])
 
@@ -92,58 +91,6 @@ const Status = ({ connected }: StatusProps) => {
     },
     [toast]
   )
-
-  const claimRewards = useCallback(async () => {
-    const wallets = accountList.filter(web3.utils.isAddress)
-    const signer = provider?.getSigner(accounts[0])
-    if (!signer || wallets.length <= 0) {
-      return
-    }
-
-    try {
-      const contract = COLLECTOR_CONTRACT.connect(signer)
-
-      if (!accumulate && !collectTax) {
-        await contract.claimMultipleRewards(wallets)
-      } else if (!collectTax) {
-        await contract.claimMultipleRewardsTo(wallets, stash)
-      } else if (!accumulate) {
-        const taxBasisPoints = Math.round(taxRate * 100)
-
-        await contract.taxedClaimMultipleRewards(
-          wallets,
-          taxBasisPoints,
-          taxCollector
-        )
-      } else {
-        const taxBasisPoints = Math.round(taxRate * 100)
-
-        await contract.taxedClaimMultipleRewardsTo(
-          wallets,
-          stash,
-          taxBasisPoints,
-          taxCollector
-        )
-      }
-    } catch (e) {
-      showErrorToast(e)
-    }
-  }, [
-    accountList,
-    provider,
-    accounts,
-    stash,
-    taxRate,
-    taxCollector,
-    showErrorToast,
-    accumulate,
-    collectTax,
-  ])
-  // Whether the user needs to execute the action as the operator but the active
-  // signer account is different
-  const notOperator =
-    (accumulate || collectTax) &&
-    operator.toLowerCase() != (accounts[0] || '').toLowerCase()
 
   return (
     <BannerBox heading="Accounts">
@@ -268,17 +215,12 @@ const Status = ({ connected }: StatusProps) => {
           <Text color="white" fontWeight="bold">
             {totalRewards.toPrecision(4)}
           </Text>
-          <Button
-            disabled={
-              !signer || accountList.filter(web3.utils.isAddress).length <= 0
-            }
-            mt="1rem"
-            ml="auto"
-            mr="auto"
-            onClick={claimRewards}
-          >
-            {notOperator ? 'Switch account' : 'Claim rewards'}
-          </Button>
+          <ClaimButton
+            accountList={accountList}
+            operator={operator}
+            accumulate={{ accumulate, stash }}
+            tax={{ collectTax, taxCollector, taxRate }}
+          />
         </Flex>
       </Box>
       {connected && (
