@@ -131,7 +131,9 @@ const Status = ({ connected }: StatusProps) => {
               onChange={(ev) => setOperator(ev.target.value)}
               placeholder="Address"
               value={operator}
-              isInvalid={operator != '' && !web3.utils.isAddress(operator)}
+              isInvalid={
+                (accumulate || collectTax) && !web3.utils.isAddress(operator)
+              }
               isDisabled={!accumulate && !collectTax}
             >
               {[...new Set(accountList)]
@@ -168,6 +170,8 @@ const Status = ({ connected }: StatusProps) => {
               w="85%"
               onChange={(ev) => setStash(ev.target.value)}
               value={stash}
+              isRequired={accumulate}
+              isInvalid={accumulate && !web3.utils.isAddress(stash)}
             />
           </Flex>
         </Tooltip>
@@ -195,6 +199,8 @@ const Status = ({ connected }: StatusProps) => {
               w="85%"
               onChange={(ev) => setTaxCollector(ev.target.value)}
               value={taxCollector}
+              isRequired={collectTax}
+              isInvalid={collectTax && !web3.utils.isAddress(stash)}
             />
           </Flex>
         </Tooltip>
