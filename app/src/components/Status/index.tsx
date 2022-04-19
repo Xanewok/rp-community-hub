@@ -51,11 +51,13 @@ const Status = ({ connected }: StatusProps) => {
   const signer = useSigner()
 
   const damages = usePartyDamages(accountList)
+  // https://docs.google.com/spreadsheets/d/1RScZkbKErwh66JJGFi9LJZdJlJBWpmOJgdivg_QlFYI
+  // Under "Yield calculator" sheet - based on bosses' spawn rate and rewards
   const totalExpectedYield = useMemo(
     () =>
       Math.round(
         damages
-          .map((value) => value / 830)
+          .map((value) => value / 650)
           .reduce((prev, curr) => prev + curr, 0) * 100
       ) / 100,
     [damages]
