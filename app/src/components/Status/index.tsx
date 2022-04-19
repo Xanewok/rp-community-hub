@@ -37,7 +37,7 @@ type StatusProps = {
 
 const Status = ({ connected }: StatusProps) => {
   const {
-    network: { accounts  },
+    network: { accounts },
   } = useNetwork()
   const [accountList, setAccountList] = useLocalStorage<string[]>('accs', [])
 
@@ -157,16 +157,18 @@ const Status = ({ connected }: StatusProps) => {
             </Text>
           </Checkbox>
         </Flex>
-        <Flex my="0.375em">
-          <Text>Stash</Text>
-          <AddressInput
-            isDisabled={!connected || !accumulate}
-            ml="auto"
-            w="85%"
-            onChange={(ev) => setStash(ev.target.value)}
-            value={stash}
-          />
-        </Flex>
+        <Tooltip label="The account that will receive all of the claimed rewards">
+          <Flex my="0.375em">
+            <Text>Stash</Text>
+            <AddressInput
+              isDisabled={!connected || !accumulate}
+              ml="auto"
+              w="85%"
+              onChange={(ev) => setStash(ev.target.value)}
+              value={stash}
+            />
+          </Flex>
+        </Tooltip>
 
         <Flex>
           <Checkbox
@@ -182,39 +184,48 @@ const Status = ({ connected }: StatusProps) => {
             </Text>
           </Checkbox>
         </Flex>
-        <Flex my="0.375em">
-          <Text>Collector</Text>
-          <AddressInput
-            isDisabled={!connected || !collectTax}
-            ml="auto"
-            w="85%"
-            onChange={(ev) => setTaxCollector(ev.target.value)}
-            value={taxCollector}
-          />
-        </Flex>
-        <Flex my="0.375em">
-          <Text>Tax rate</Text>
-          <Flex ml="auto" w="85%">
-            <NumberInput
-              w="15%"
-              format={(value) => `${value}%`}
-              onChange={(str, num) => setTaxRate(num)}
-              value={taxRate}
-              min={0}
-              max={100}
-              keepWithinRange={true}
-              clampValueOnBlur={true}
-            >
-              <NumberInputField disabled={!connected || !collectTax} />
-            </NumberInput>
+        <Tooltip label="The account that will receive a portion (tax) of all of the claimed rewards">
+          <Flex my="0.375em">
+            <Text>Collector</Text>
+            <AddressInput
+              isDisabled={!connected || !collectTax}
+              ml="auto"
+              w="85%"
+              onChange={(ev) => setTaxCollector(ev.target.value)}
+              value={taxCollector}
+            />
           </Flex>
-        </Flex>
+        </Tooltip>
+        <Tooltip label="How much of all of the claimed rewards will be sent to the Collector account">
+          <Flex my="0.375em">
+            <Text>Tax rate</Text>
+            <Flex ml="auto" w="85%">
+              <NumberInput
+                w="15%"
+                format={(value) => `${value}%`}
+                onChange={(str, num) => setTaxRate(num)}
+                value={taxRate}
+                min={0}
+                max={100}
+                keepWithinRange={true}
+                clampValueOnBlur={true}
+              >
+                <NumberInputField disabled={!connected || !collectTax} />
+              </NumberInput>
+            </Flex>
+          </Flex>
+        </Tooltip>
 
         <Flex direction="column" justify="center">
           <Img h="28px" w="28px" ml="auto" mr="auto" mt="6px" src="/cfti.png" />
-          <Text color="white" fontWeight="bold">
-            {totalRewards.toPrecision(4)}
-          </Text>
+          <Tooltip
+            bg="transparent"
+            label={<Img src="/cftirain.gif" alt="cftirain" />}
+          >
+            <Text color="white" fontWeight="bold">
+              {totalRewards.toPrecision(4)}
+            </Text>
+          </Tooltip>
           <ClaimButton
             accountList={accountList}
             operator={operator}
@@ -225,17 +236,31 @@ const Status = ({ connected }: StatusProps) => {
       </Box>
       {connected && (
         <Flex justify="space-between">
-          <Flex>
-            <Img h="27px" ml="4px" mt="6px" src="/cfti.png" pr="10px" />
-            <Text>~ {totalExpectedYield} /day</Text>
-          </Flex>
-          <Flex>
-            <Img h="27px" mt="6px" src="/cfti.png" pr="10px" />
-            <Text>
-              {totalBalance.toPrecision(4)} (
-              {(totalBalance + totalRewards).toPrecision(4)})
-            </Text>
-          </Flex>
+          <Tooltip label="Total expected daily rewards">
+            <Flex>
+              <Img h="27px" ml="4px" mt="6px" src="/cfti.png" pr="10px" />
+              <Text>~ {totalExpectedYield} /day</Text>
+            </Flex>
+          </Tooltip>
+          <Tooltip
+            label={
+              <>
+                <Text>{`Total balance: ${totalBalance.toPrecision(4)}`}</Text>
+                <Text>{`Total balance with
+                rewards: ${(totalBalance + totalRewards).toPrecision(
+                  4
+                )}`}</Text>
+              </>
+            }
+          >
+            <Flex>
+              <Img h="27px" mt="6px" src="/cfti.png" pr="10px" />
+              <Text>
+                {totalBalance.toPrecision(4)} (
+                {(totalBalance + totalRewards).toPrecision(4)})
+              </Text>
+            </Flex>
+          </Tooltip>
           {/* <DeathRoll
             startingRoll={rolls.startingRoll}
             rolls={rolls.rolls}
