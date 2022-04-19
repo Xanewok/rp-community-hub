@@ -146,7 +146,7 @@ const Status = ({ connected }: StatusProps) => {
         <Flex>
           <Checkbox
             size="lg"
-            disabled={!connected}
+            isDisabled={!connected}
             isChecked={accumulate}
             onChange={({ target }) => enableAccumulate(target.checked)}
           >
@@ -160,7 +160,7 @@ const Status = ({ connected }: StatusProps) => {
         <Flex my="0.375em">
           <Text>Stash</Text>
           <AddressInput
-            disabled={!connected || !accumulate}
+            isDisabled={!connected || !accumulate}
             ml="auto"
             w="85%"
             onChange={(ev) => setStash(ev.target.value)}
@@ -171,7 +171,7 @@ const Status = ({ connected }: StatusProps) => {
         <Flex>
           <Checkbox
             size="lg"
-            disabled={!connected}
+            isDisabled={!connected}
             isChecked={collectTax}
             onChange={({ target }) => enableCollectTax(target.checked)}
           >
@@ -185,7 +185,7 @@ const Status = ({ connected }: StatusProps) => {
         <Flex my="0.375em">
           <Text>Collector</Text>
           <AddressInput
-            disabled={!connected || !collectTax}
+            isDisabled={!connected || !collectTax}
             ml="auto"
             w="85%"
             onChange={(ev) => setTaxCollector(ev.target.value)}
