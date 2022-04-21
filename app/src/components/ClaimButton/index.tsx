@@ -1,10 +1,27 @@
 import { Button, Tooltip, useToast } from '@chakra-ui/react'
-import { useNetwork } from '@usedapp/core'
+import { useCall, useNetwork } from '@usedapp/core'
 import { useCallback } from 'react'
 import web3 from 'web3'
 
 import { COLLECTOR_CONTRACT } from '../../constants'
 import { useSigner } from '../../hooks/useSigner'
+
+export const useIsOperatorForWallets = (operator: any, accounts: any[]) => {
+  const { value, error } =
+    useCall(
+      operator && {
+        contract: COLLECTOR_CONTRACT,
+        method: 'isOperatorForWallets',
+        args: [operator, accounts.filter((acc) => !!acc)],
+      }
+    ) ?? {}
+
+  if (error) {
+    console.error(error.message)
+    return null
+  }
+  return value?.[0]
+}
 
 interface ClaimButtonProps {
   accountList: string[]
@@ -89,12 +106,16 @@ export const ClaimButton = (props: ClaimButtonProps) => {
   // signer account is different
   const hasToBeOperator = accumulate || collectTax
   const isOperator = operator.toLowerCase() == (accounts[0] || '').toLowerCase()
+  // Whether all of the accounts have succesfully authorized the operator account
+  const isAuthorized = useIsOperatorForWallets(operator, accountList)
 
   return (
     <Tooltip
       label={
         hasToBeOperator && !isOperator
           ? 'You need to be the Operator to submit this transaction'
+          : !isAuthorized
+          ? 'You need to be authorized by every wallet (for each wallet, switch to that wallet and authorize the Operator account using the buttons above)'
           : !accumulate
           ? 'Rewards will be claimed to their respective wallets'
           : 'Rewards will be claimed and sent to the Stash account'
@@ -105,7 +126,8 @@ export const ClaimButton = (props: ClaimButtonProps) => {
         disabled={
           !signer ||
           accountList.filter(web3.utils.isAddress).length <= 0 ||
-          (hasToBeOperator && !isOperator)
+          (hasToBeOperator && !isOperator) ||
+          !isAuthorized
         }
         mt="1rem"
         ml="auto"
