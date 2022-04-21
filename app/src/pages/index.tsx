@@ -12,7 +12,7 @@ import {
   ListItem,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import { useCall, useEthers, useInterval } from '@usedapp/core'
+import { useCall, useEthers, useGasPrice, useInterval } from '@usedapp/core'
 import { TOKEN_ADDRESS, SEEDERV2_CONTRACT } from '../constants'
 import Status from '../components/Status'
 import { useEffect, useState } from 'react'
@@ -43,6 +43,8 @@ const Home: NextPage = () => {
   useInterval(() => {
     setTimeTillSeed(nextSeedBatch * 1000 - new Date().getTime())
   }, 1000)
+
+  const gasPrice = useGasPrice()
 
   const doSeed = useCallback(() => {
     const signer = account && library?.getSigner(account)
@@ -91,6 +93,9 @@ const Home: NextPage = () => {
                   })}`}
             </Button>
           </Tooltip>
+          <Button size="xs" pb="6px" mr="20px" isDisabled={true}>
+            {`⛽ ${Math.trunc((Number(gasPrice) || 0) / 10 ** 9)} gwei`}
+          </Button>
           <Tooltip
             bg="purple.300"
             color="white"
@@ -172,7 +177,7 @@ const Home: NextPage = () => {
                 fill the addresses
               </ListItem>
               <ListItem>
-                Claim the rewards! {' '}
+                Claim the rewards!{' '}
                 <Text as="span" fontSize="xs" color="white">
                   (make sure that your connected Web3 account matches the
                   selected operator)
