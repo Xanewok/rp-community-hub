@@ -133,6 +133,7 @@ export const AccountList = (props: {
                   id={`account-${idx}`}
                   onChange={handleChange}
                   value={acc}
+                  isInvalid={accountList.indexOf(acc) < idx}
                 />
               </Td>
               {needsAuthorization && (
@@ -164,7 +165,7 @@ export const AccountList = (props: {
               <Td
                 display={['none', 'none', 'none', 'table-cell']}
                 pl="min(36px, 3vw)"
-            pr="min(24px, 1vw)"
+                pr="min(24px, 1vw)"
               >
                 <ExpectedYield owner={acc} />
               </Td>
