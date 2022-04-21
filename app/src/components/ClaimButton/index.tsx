@@ -114,7 +114,7 @@ export const ClaimButton = (props: ClaimButtonProps) => {
       label={
         hasToBeOperator && !isOperator
           ? 'You need to be the Operator to submit this transaction'
-          : !isAuthorized
+          : (hasToBeOperator && !isAuthorized)
           ? 'You need to be authorized by every wallet (for each wallet, switch to that wallet and authorize the Operator account using the buttons above)'
           : !accumulate
           ? 'Rewards will be claimed to their respective wallets'
@@ -127,7 +127,7 @@ export const ClaimButton = (props: ClaimButtonProps) => {
           !signer ||
           accountList.filter(web3.utils.isAddress).length <= 0 ||
           (hasToBeOperator && !isOperator) ||
-          !isAuthorized
+          (hasToBeOperator && !isAuthorized)
         }
         mt="1rem"
         ml="auto"
