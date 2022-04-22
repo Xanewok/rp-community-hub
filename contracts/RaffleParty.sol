@@ -14,6 +14,15 @@ interface IConfetti {
     function burnFrom(address account, uint256 amount) external;
 }
 
+interface IParty {
+        function getUserHero(address user)
+        external
+        view
+        override
+        returns (uint256)
+    {
+}
+
 /**
  * @title
  * @author xanewok.eth
@@ -21,7 +30,7 @@ interface IConfetti {
  */
 contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     IConfetti public immutable _confetti;
-    IRaid public immutable _raid;
+    IParty public immutable _party;
     IRpSeeder public immutable _rpSeeder;
 
     Raffle[] public _raffles;
@@ -43,7 +52,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
 
     constructor(
         address confetti,
-        address raid,
+        address party,
         address rpSeeder,
         address admin
     ) {
@@ -52,7 +61,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         _raffleCount = 0;
         _rpSeeder = IRpSeeder(rpSeeder);
         _confetti = IConfetti(confetti);
-        _raid = IRaid(raid);
+        _party = IRaid(raid);
     }
 
     function createRaffle(
@@ -77,6 +86,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         Raffle storage raffle = _raffles[raffleId];
         requireNotSeeded(raffle.endingSeedRound);
         require(raffle.totalTicketsBought < raffle.maxEntries, "Sold out");
+        require(_party.getUserHero(_msgSender()) != 0, "No hero staked");
 
         uint256 ticketCount = Math.min(
             raffle.maxEntries - raffle.totalTicketsBought,
