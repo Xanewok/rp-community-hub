@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-import "@openzeppelin/contracts/interfaces/IERC20.sol";
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "./IRaid.sol";
@@ -25,16 +23,14 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     IConfetti public immutable _confetti;
     IRaid public immutable _raid;
     IRpSeeder public immutable _rpSeeder;
-    uint16 public constant BP_PRECISION = 1e4;
-    uint16 public _feeBasisPoint = 50; // 0.5%
+
+    Raffle[] public _raffles;
 
     uint32 _raffleCount;
 
     bytes32 public constant RAFFLE_CREATOR = keccak256("RAFFLE_CREATOR");
 
     event RaffleCreated(uint256 indexed raffleId, address indexed creator);
-
-    Raffle[] public _raffles;
 
     struct Raffle {
         uint256 cost;
@@ -109,7 +105,12 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         uint256 seed = getSeed(raffle.endingSeedRound);
         require(seed != 0, "Raffle not finished");
 
-        // NOTE: This is a very
+        // NOTE: This is *very* naive. Ideally, we could create a tree where we
+        // can maintain a O(lg N) lookup on the ticket number (where nodes store
+        // the total tickets in their subtrees) and apply a pseudorandom permutation
+        // function.
+        // This way, the storage cost would be 2*|participants| rather than
+        // |totalTickets|
         address[] memory tickets = new address[](raffle.totalTicketsBought);
         for (uint256 i = 0; i < raffle.participants.length; i++) {
             address participant = raffle.participants[i];
