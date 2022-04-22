@@ -1,5 +1,5 @@
 {
-  "name": "rpyieldcollector",
+  "name": "cfti-shop",
   "private": true,
   "scripts": {
     "test": "truffle test",
