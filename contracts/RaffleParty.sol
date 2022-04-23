@@ -7,20 +7,11 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-import "./IRaid.sol";
+import "./IParty.sol";
 import "./IRPSeeder.sol";
 
 interface IConfetti {
     function burnFrom(address account, uint256 amount) external;
-}
-
-interface IParty {
-        function getUserHero(address user)
-        external
-        view
-        override
-        returns (uint256)
-    {
 }
 
 /**
@@ -59,9 +50,9 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         _setupRole(RAFFLE_CREATOR, admin);
 
         _raffleCount = 0;
-        _rpSeeder = IRpSeeder(rpSeeder);
+        _party = IParty(party);
         _confetti = IConfetti(confetti);
-        _party = IRaid(raid);
+        _rpSeeder = IRpSeeder(rpSeeder);
     }
 
     function createRaffle(
