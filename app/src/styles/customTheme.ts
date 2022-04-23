@@ -1,13 +1,4 @@
 import { theme, extendTheme } from '@chakra-ui/react'
-import { createBreakpoints } from '@chakra-ui/theme-tools'
-
-const breakpoints = createBreakpoints({
-  sm: '425px',
-  md: '768px',
-  lg: '1080px',
-  xl: '1280px',
-  '2xl': '1440px',
-})
 
 const customTheme = extendTheme({
   fonts: {
@@ -19,8 +10,8 @@ const customTheme = extendTheme({
   global: {
     'html, body': {
       lineHeight: 'tall',
-      color: "white",
-      textColor: "white",
+      color: 'white',
+      textColor: 'white',
     },
   },
   fontSizes: {
@@ -38,7 +29,13 @@ const customTheme = extendTheme({
     '8xl': '6.5rem',
     '9xl': '8.5rem',
   },
-  breakpoints,
+  breakpoints: {
+    sm: '640px',
+    md: '768px',
+    lg: '1080px',
+    xl: '1280px',
+    '2xl': '1440px',
+  },
   colors: {
     ...theme.colors,
     purple: {
