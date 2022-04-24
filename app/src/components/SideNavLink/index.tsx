@@ -19,7 +19,8 @@ export const SideNavLink = (props: { type: LinkType; selected?: boolean }) => (
       minWidth="148px"
       alignItems="center"
       display="flex"
-      color="white"
+      color={props.selected ? "white" : "rgb(255 255 255/.4)"}
+      borderRadius={props.selected ? undefined : '.375rem'}
       _hover={{ bg: props.selected ? '' : 'indigo.700' }}
       href={LINKS[props.type]}
       bg={props.selected ? 'indigo.400' : undefined}
@@ -33,7 +34,7 @@ export const SideNavLink = (props: { type: LinkType; selected?: boolean }) => (
       <Text
         as="span"
         fontSize="2xl"
-        textColor="rgb(255 255 255/.4)"
+	textColor={props.selected ? "white" : "rgb(255 255 255/.4)"}
         translateY="-0.5"
         fontWeight="bold"
         lineHeight={10}
