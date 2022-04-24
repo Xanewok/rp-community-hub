@@ -1,18 +1,20 @@
-import { Global, css } from '@emotion/react';
+import { Global, css } from '@emotion/react'
 
 const GlobalStyle: React.FC = (props) => (
-	<>
-		<Global
-			styles={css`
+  <>
+    <Global
+      styles={css`
         html {
           scoll-behavior: smooth;
           cursor: default;
         }
         body {
-          background: url("/tilebg.png");
+          background: url('/tilebg.png');
           background-repeat: no-repeat;
           background-size: cover;
-          color: "white"
+          color: 'white';
+          text-rendering: geometricPrecision;
+          font-smooth: never;
         }
         #__next {
           display: flex;
@@ -27,9 +29,9 @@ const GlobalStyle: React.FC = (props) => (
           background: initial;
         }
       `}
-		/>
-		{props.children}
-	</>
-);
+    />
+    {props.children}
+  </>
+)
 
-export default GlobalStyle;
+export default GlobalStyle
