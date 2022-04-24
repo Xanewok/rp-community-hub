@@ -63,26 +63,26 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <Flex flexDirection={['column', 'row']} h="100%">
+      <Flex flexDirection={['column', 'column', 'row']} h="100%">
         <Box
           flexShrink={0}
           zIndex={50}
           position="relative"
           w={[null, null, '25%', '20%']}
-          maxW={[null, null, null, null, '263px']}
+          maxW={[null, null, null, '263px']}
           bg="red.500"
         >
           <Box
             as="nav"
             w="100%"
             h={[null, null, '100%']}
-            bg={['indigo.800', 'indigo.600']}
+            bg={['indigo.800', 'indigo.800', 'indigo.600']}
             py={[null, null, 8]}
             px={[null, null, 5]}
             top={0}
           >
             <Flex
-              display={[null, 'none']}
+              display={[null, null, 'none']}
               h="56px"
               pr="3"
               alignItems="center"
@@ -131,6 +131,7 @@ const Home: NextPage = () => {
               w="100%"
               h="100%"
               flexDirection="column"
+              display={['none', 'none', 'flex']}
               // justify="space-between"
             >
               <Box px={[null, null, 0]} w="66.66667%">
