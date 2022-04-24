@@ -152,7 +152,7 @@ const Home: NextPage = () => {
                 <SideNavLink type="summon" />
                 <SideNavLink type="enhance" />
                 <SideNavLink type="guild" />
-                <SideNavLink type="market" />
+                <SideNavLink type="market" selected />
               </UnorderedList>
             </Flex>
           </Box>

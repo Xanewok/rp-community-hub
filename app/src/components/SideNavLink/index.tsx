@@ -11,7 +11,7 @@ export type LinkType =
   | 'guild'
   | 'market'
 
-export const SideNavLink = (props: { type: LinkType }) => (
+export const SideNavLink = (props: { type: LinkType; selected?: boolean }) => (
   <ListItem display="block" p={1} mt={2}>
     <Link
       px={2}
@@ -20,9 +20,14 @@ export const SideNavLink = (props: { type: LinkType }) => (
       alignItems="center"
       display="flex"
       color="white"
-      borderRadius=".375rem"
-      _hover={{ bg: 'indigo.700' }}
+      _hover={{ bg: props.selected ? '' : 'indigo.700' }}
       href={LINKS[props.type]}
+      bg={props.selected ? 'indigo.400' : undefined}
+      boxShadow={
+        props.selected
+          ? ' 0 -2px 0 0 #3e2e6c,0 2px 0 0 #2d265a,-2px 0 0 0 #281c49,2px 0 0 0 #281c49,0 0 0 2px #0f0c1b,0 -4px 0 0 #0f0c1b,0 4px 0 0 #0b0915,-4px 0 0 0 #0b0915,4px 0 0 0 #0b0915;'
+          : ''
+      }
     >
       {IMAGES[props.type]}
       <Text
@@ -30,7 +35,7 @@ export const SideNavLink = (props: { type: LinkType }) => (
         fontSize="2xl"
         textColor="rgb(255 255 255/.4)"
         translateY="-0.5"
-	fontWeight="bold"
+        fontWeight="bold"
         lineHeight={10}
         ml={3}
         pb={2}
