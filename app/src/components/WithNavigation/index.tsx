@@ -1,4 +1,4 @@
-import { Flex, Box, Img, UnorderedList, Text } from '@chakra-ui/react'
+import { Flex, Box, Img, UnorderedList, Text, ListItem } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
 import { useEffect, useState } from 'react'
 import { useUserHero } from '../../hooks'
@@ -104,6 +104,19 @@ export const WithNavigation: React.FC = (props) => {
                 <SideNavLink type="summon" />
                 <SideNavLink type="enhance" />
                 <SideNavLink type="guild" />
+                <ListItem
+                  display="block"
+                  mx="auto"
+                  w="90%"
+                  h="1px"
+                  my={6}
+                  bg="#0f0c1b"
+                  boxShadow="
+                  0 1px 0 0 #281c49,
+                  -1px 0 0 0 #281c49,
+                  1px 0 0 0 #281c49
+                  "
+                />
                 <SideNavLink type="market" selected />
               </UnorderedList>
             </Box>
