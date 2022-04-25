@@ -60,12 +60,14 @@ async function renderAddress(
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
+  cftiCost: number
 }
 
 const DISCORD_REGEX = /@?[^#@:]{2,32}#[0-9]{4}$/
 
 const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
+  const { cftiCost } = props
 
   const { account, library } = useEthers()
 
@@ -75,12 +77,12 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     [discordName]
   )
 
-  // Open the modal if we are fed some rolls to show
-
   // Close the modal whenever we change accounts
-  // useEffect(onClose, [account, onClose])
+  useEffect(onClose, [account, onClose])
   // Reset the state on modal open/close
-  // useEffect(() => {}, [isOpen])
+  useEffect(() => {
+    setDiscordName('Zarc#2493')
+  }, [isOpen])
 
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
@@ -135,7 +137,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               alignSelf="center"
               textColor="red.400"
             >
-              This transaction will cost 500{' '}
+              This transaction will cost {cftiCost}{' '}
               <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
             </Text>
             <Flex direction="row">
@@ -150,7 +152,14 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                 onChange={(ev) => setDiscordName(ev.target.value)}
                 isInvalid={!isDiscordNameValid}
               />
-              <Button ml={3} h="26px" w="33%">
+              <Button
+                ml={3}
+                h="26px"
+                w="33%"
+                onClick={() => {
+                  // TODO:
+                }}
+              >
                 Redeem
               </Button>
             </Flex>

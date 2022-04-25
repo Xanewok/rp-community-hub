@@ -67,9 +67,15 @@ export const Marketplace: React.FC = () => {
     [toast]
   )
 
-  const onRedeem = useCallback(() => {
-    onOpen()
-  }, [onOpen])
+  const [cftiCost, setCftiCost] = useState(0)
+
+  const onRedeem = useCallback(
+    (cost: number) => {
+      setCftiCost(cost)
+      onOpen()
+    },
+    [onOpen]
+  )
 
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
@@ -123,7 +129,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={30}
                 price={500}
-                onRedeem={onRedeem}
+                onRedeem={() => onRedeem(500)}
               >
                 A collection of 10,000 utility-enabled PFPs that feature a
                 richly diverse and unique pool of rarity-powered traits.
@@ -136,7 +142,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={30}
                 price={500}
-                onRedeem={onRedeem}
+                onRedeem={() => onRedeem(500)}
               >
                 Shinsei Galverse is a collection of 8,888 Gals shooting across
                 space and time to bring a project of peace to all cultures and
@@ -148,7 +154,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={30}
                 price={1000}
-                onRedeem={onRedeem}
+                onRedeem={() => onRedeem(1000)}
               >
                 Murakami.Flowers is a work in which artist Takashi Murakami’s
                 representative artwork, flowers, are expressed as dot art
@@ -162,7 +168,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={0}
                 spots={1}
                 price={9999}
-                onRedeem={onRedeem}
+                onRedeem={() => onRedeem(9999)}
               >
                 ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
               </MarketItem>
@@ -172,7 +178,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={10}
                 price={500}
-                onRedeem={onRedeem}
+                onRedeem={() => onRedeem(500)}
               >
                 Everai is a brand of Heroes. Our mission is to build a
                 long-lasting metaverse brand. Built for the people, with the
@@ -185,7 +191,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={7}
                 spots={30}
                 price={500}
-                onRedeem={onRedeem}
+                onRedeem={() => onRedeem(500)}
               >
                 The 0N1 Force are 7,777 generative side-profile characters with
                 over 100 hand-drawn features fighting for their existence.
@@ -198,7 +204,7 @@ export const Marketplace: React.FC = () => {
           )}
         </Grid>
       </Box>
-      <PurchaseModal isOpen={isOpen} onClose={onClose} />
+      <PurchaseModal cftiCost={cftiCost} isOpen={isOpen} onClose={onClose} />
     </Box>
   )
 }
