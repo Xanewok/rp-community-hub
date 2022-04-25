@@ -32,6 +32,7 @@ const TabItem: React.FC<{
         ? '0 -2px 0 0 #372a70,0 2px 0 0 #231b47,-2px 0 0 0 #372a70,2px 0 0 0 #372a70,0 0 0 2px #080611,0 -4px 0 0 #080611,0 4px 0 0 #080611,-4px 0 0 0 #080611,4px 0 0 0 #080611'
         : '0 -2px 0 0 #231b4c,0 2px 0 0 #231b47,-2px 0 0 0 #231b4c,2px 0 0 0 #231b4c,0 0 0 2px #080611,0 -4px 0 0 #080611,0 4px 0 0 #080611,-4px 0 0 0 #080611,4px 0 0 0 #080611'
     }
+    transitionDuration=".2s"
   >
     <Text
       as="span"
@@ -73,7 +74,10 @@ export const Marketplace: React.FC = () => {
         <Heading textColor="white" lineHeight="36px" mb={0}>
           Market
         </Heading>
-        <Heading
+        <Text mb={7} fontSize="2xl" textColor="#5E578A" lineHeight="32px">
+          Spend your hard-earned CFTI on prizes!
+        </Text>
+        {/* <Heading
           fontWeight="normal"
           textColor="#5E578A"
           lineHeight={3}
@@ -81,7 +85,7 @@ export const Marketplace: React.FC = () => {
           fontSize="2xl"
         >
           Spend your hard-earned CFTI on prizes!
-        </Heading>
+        </Heading> */}
         <Flex gap={4} mb={10}>
           <TabItem
             value="Raffles"
@@ -103,7 +107,81 @@ export const Marketplace: React.FC = () => {
           gap={10}
           gridTemplateColumns="repeat(auto-fill,minmax(500px,1fr))"
         >
-          {activeTab === 'raffles' ? [0, 1, 2].map(MarketItem) : []}
+          {activeTab === 'raffles' ? (
+            <>
+              <MarketItem
+                name="Moonbirds"
+                imgSrc="/moonbirds.png"
+                allocatedSpots={6}
+                spots={30}
+                price={500}
+              >
+                A collection of 10,000 utility-enabled PFPs that feature a
+                richly diverse and unique pool of rarity-powered traits. What's
+                more, each Moonbird unlocks private club membership and
+                additional benefits the longer you hold them.
+              </MarketItem>
+              <MarketItem
+                name="Shinsei Galverse"
+                imgSrc="/galverse.png"
+                allocatedSpots={6}
+                spots={30}
+                price={500}
+              >
+                Shinsei Galverse is a collection of 8,888 Gals shooting across
+                space and time to bring a project of peace to all cultures and
+                people.
+              </MarketItem>
+              <MarketItem
+                name="Murakami Flowers"
+                imgSrc="/murakami.png"
+                allocatedSpots={6}
+                spots={30}
+                price={1000}
+              >
+                Murakami.Flowers is a work in which artist Takashi Murakami’s
+                representative artwork, flowers, are expressed as dot art
+                evocative of Japanese TV games created in the 1970s. Each field
+                has 108 flower images, resulting in 11,664 flower images in
+                total.
+              </MarketItem>
+              <MarketItem
+                name="Zarc"
+                imgSrc="/zarc.jpg"
+                allocatedSpots={0}
+                spots={1}
+                price={9999}
+              >
+                ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+              </MarketItem>
+              <MarketItem
+                name="Everai Heroes"
+                imgSrc="/everai.jpg"
+                allocatedSpots={6}
+                spots={10}
+                price={500}
+              >
+                Everai is a brand of Heroes. Our mission is to build a
+                long-lasting metaverse brand. Built for the people, with the
+                people. Everai holders will be granted exclusive access to
+                drops, experiences, and much more.
+              </MarketItem>
+              <MarketItem
+                name="ON1 Force"
+                imgSrc="/oni.png"
+                allocatedSpots={7}
+                spots={30}
+                price={500}
+              >
+                The 0N1 Force are 7,777 generative side-profile characters with
+                over 100 hand-drawn features fighting for their existence.
+                Strength, spirit, and style are what you’ll need to survive in
+                The Ethereal Enclave.
+              </MarketItem>
+            </>
+          ) : (
+            []
+          )}
         </Grid>
       </Box>
     </Box>
