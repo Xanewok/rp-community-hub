@@ -1,6 +1,6 @@
-export const title = 'Raid Party Yield collector'
-const description = 'Raid Party Yield collector is a tool for batch claiming CFTI yield.'
-const url = 'https://collect.roll.party'
+export const title = 'Raid Party Marketplace'
+const description = 'Spend your hard-earned CFTI tokens on prizes!'
+const url = 'https://market.roll.party'
 
 const SEO = {
     title,
