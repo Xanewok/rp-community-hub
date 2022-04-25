@@ -24,6 +24,7 @@ export const SideNavLink = (props: { type: LinkType; selected?: boolean }) => (
       _hover={{ bg: props.selected ? '' : 'indigo.700' }}
       href={LINKS[props.type]}
       bg={props.selected ? 'indigo.400' : undefined}
+      ringColor="rgb(59 130 246/0.5)"
       boxShadow={
         props.selected
           ? ' 0 -2px 0 0 #3e2e6c,0 2px 0 0 #2d265a,-2px 0 0 0 #281c49,2px 0 0 0 #281c49,0 0 0 2px #0f0c1b,0 -4px 0 0 #0f0c1b,0 4px 0 0 #0b0915,-4px 0 0 0 #0b0915,4px 0 0 0 #0b0915;'
