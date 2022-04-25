@@ -109,9 +109,9 @@ export const Marketplace: React.FC = () => {
                 price={500}
               >
                 A collection of 10,000 utility-enabled PFPs that feature a
-                richly diverse and unique pool of rarity-powered traits. What's
-                more, each Moonbird unlocks private club membership and
-                additional benefits the longer you hold them.
+                richly diverse and unique pool of rarity-powered traits.
+                What&apos;s more, each Moonbird unlocks private club membership
+                and additional benefits the longer you hold them.
               </MarketItem>
               <MarketItem
                 name="Shinsei Galverse"
