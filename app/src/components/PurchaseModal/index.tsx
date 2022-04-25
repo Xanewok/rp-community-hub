@@ -14,7 +14,7 @@ import {
   Input,
 } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { JsonRpcProvider } from 'ethers/providers'
 
 import style from './index.module.css'
@@ -62,12 +62,18 @@ interface ModalProps {
   onClose: () => void
 }
 
+const DISCORD_REGEX = /@?[^#@:]{2,32}#[0-9]{4}$/
+
 const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
 
   const { account, library } = useEthers()
 
-  const [resolver, setResolver] = useState<Record<string, string>>({})
+  const [discordName, setDiscordName] = useState('Zarc#2492')
+  const isDiscordNameValid = useMemo(
+    () => DISCORD_REGEX.test(discordName),
+    [discordName]
+  )
 
   // Open the modal if we are fed some rolls to show
 
@@ -80,24 +86,16 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent
-        alignItems={'center'}
-        alignSelf={'center'}
-        // minHeight="48em"
-        // mt="1"
-        // mb="0"
-        // px="16px"
-        // py="16px"
+        alignSelf="center"
         color="purple.900"
         bg="purple.100"
         borderRadius="1px"
         boxShadow="0 -3px 0 0 #352561, 0 3px 0 0 #181030, -3px 0 0 0 #2c2051, 3px 0 0 0 #2c2051, 0 0 0 3px #0b0817, 0 -6px 0 0 #0b0817, 0 6px 0 0 #0b0817, -6px 0 0 0 #0b0817, 6px 0 0 0 #0b0817"
       >
-        {/* <ModalHeader textAlign="center"></ModalHeader> */}
-        {/* <ModalCloseButton /> */}
+        <ModalCloseButton />
         <ModalBody
           w="100%"
           p={0}
-          // m={10}
           display="flex"
           flexDirection="column"
           backgroundImage="/tiles.png"
@@ -123,7 +121,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               <Img src="/banner-r.png"></Img>
             </Box>
           </Flex>
-          <Flex py={10} px={10} direction="column" justify="center">
+          <Flex pt={8} pb={5} px={10} direction="column" justify="center">
             <Text mx="auto" px="15%" textAlign="center" fontWeight="500">
               You&apos;re almost done! Please submit your Discord ID to verify
               eligibility and complete your purchase. Make sure to include your
@@ -148,9 +146,10 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                 h="26px"
                 background="indigo.600"
                 boxShadow="0 -2px 0 0 #352561, 0 2px 0 0 #181030, -2px 0 0 0 #2c2051, 2px 0 0 0 #2c2051, 0 0 0 2px #0b0817, 0 -4px 0 0 #0b0817, 0 4px 0 0 #0b0817, -4px 0 0 0 #0b0817, 4px 0 0 0 #0b0817"
-              >
-                {/* Zarc#4293 */}
-              </Input>
+                value={discordName}
+                onChange={(ev) => setDiscordName(ev.target.value)}
+                isInvalid={!isDiscordNameValid}
+              />
               <Button ml={3} h="26px" w="33%">
                 Redeem
               </Button>
