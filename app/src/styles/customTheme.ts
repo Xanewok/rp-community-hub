@@ -10,7 +10,6 @@ const customTheme = extendTheme({
   global: {
     'html, body': {
       lineHeight: 'tall',
-      color: 'white',
       textColor: 'white',
     },
   },

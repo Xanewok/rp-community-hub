@@ -9,9 +9,6 @@ const GlobalStyle: React.FC = (props) => (
           cursor: default;
         }
         body {
-          background: url('/tilebg.png');
-          background-repeat: no-repeat;
-          background-size: cover;
           color: 'white';
           text-rendering: geometricPrecision;
           font-smooth: never;
