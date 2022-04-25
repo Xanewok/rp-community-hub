@@ -1,4 +1,13 @@
-import { Box, Button, Flex, Heading, Img, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Img,
+  Text,
+  useToast,
+} from '@chakra-ui/react'
+import { useCallback } from 'react'
 
 interface MarketItemProps {
   imgSrc: string
@@ -10,9 +19,23 @@ interface MarketItemProps {
 
 export const MarketItem: React.FC<MarketItemProps> = (props) => {
   const { name, imgSrc, spots, allocatedSpots, price } = props
+
+  const toast = useToast()
+  const showErrorToast = useCallback(
+    (err: any) => {
+      console.error(JSON.stringify(err))
+      const error = err.error || err
+      toast({
+        description: `${error.message}`,
+        status: 'error',
+        duration: 3000,
+      })
+    },
+    [toast]
+  )
+
   return (
     <Flex
-      // h="500pxw"
       w={['325px', '500px']}
       p={5}
       bg="#16112d"
@@ -68,7 +91,14 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
                 ></Img>
               </Flex>
             </Flex>
-            <Button mt="2" w="max(50%, 100px)" fontSize="xl">
+            <Button
+              mt="2"
+              w="max(50%, 100px)"
+              fontSize="xl"
+              onClick={() => {
+                showErrorToast(new Error('lol nope; not yet'))
+              }}
+            >
               Redeem
             </Button>
           </Flex>

@@ -7,9 +7,10 @@ import {
   Box,
   Text,
   Grid,
+  useToast,
 } from '@chakra-ui/react'
 import { useEthers, useGasPrice } from '@usedapp/core'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
 import Status from '../Status'
@@ -77,15 +78,6 @@ export const Marketplace: React.FC = () => {
         <Text mb={7} fontSize="2xl" textColor="#5E578A" lineHeight="32px">
           Spend your hard-earned CFTI on prizes!
         </Text>
-        {/* <Heading
-          fontWeight="normal"
-          textColor="#5E578A"
-          lineHeight={3}
-          mb={7}
-          fontSize="2xl"
-        >
-          Spend your hard-earned CFTI on prizes!
-        </Heading> */}
         <Flex gap={4} mb={10}>
           <TabItem
             value="Raffles"
