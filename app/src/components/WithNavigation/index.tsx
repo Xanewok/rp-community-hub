@@ -118,6 +118,8 @@ export const WithNavigation: React.FC = (props) => {
                   "
                 />
                 <SideNavLink type="market" selected />
+                <SideNavLink type="roll" />
+                <SideNavLink type="collect" />
               </UnorderedList>
             </Box>
 
