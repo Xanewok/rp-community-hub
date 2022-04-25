@@ -11,6 +11,7 @@ const customTheme = extendTheme({
     'html, body': {
       lineHeight: 'tall',
       textColor: 'white',
+      backgroundImage: '/tiles.png'
     },
   },
   fontSizes: {
