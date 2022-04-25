@@ -269,12 +269,6 @@ const Status = ({ connected }: StatusProps) => {
               </Text>
             </Flex>
           </Tooltip>
-          {/* <DeathRoll
-            startingRoll={rolls.startingRoll}
-            rolls={rolls.rolls}
-            pending={rolls.pending}
-            onClosed={clearRolls}
-          /> */}
         </Flex>
       )}
     </BannerBox>

@@ -1,19 +1,17 @@
 import {
   Flex,
   Heading,
-  Img,
-  Button,
-  Container,
   Box,
   Text,
   Grid,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react'
-import { useEthers, useGasPrice } from '@usedapp/core'
+import { useGasPrice } from '@usedapp/core'
 import { useCallback, useState } from 'react'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
-import Status from '../Status'
+import PurchaseModal from '../PurchaseModal'
 
 const TabItem: React.FC<{
   value: string
@@ -49,11 +47,29 @@ const TabItem: React.FC<{
 export const Marketplace: React.FC = () => {
   const gasPrice = useGasPrice()
 
-  const { account } = useEthers()
-
   const [activeTab, setActiveTab] = useState<
     'raffles' | 'whitelists' | 'rewards'
   >('raffles')
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const toast = useToast()
+  const showErrorToast = useCallback(
+    (err: any) => {
+      console.error(JSON.stringify(err))
+      const error = err.error || err
+      toast({
+        description: `${error.message}`,
+        status: 'error',
+        duration: 3000,
+      })
+    },
+    [toast]
+  )
+
+  const onRedeem = useCallback(() => {
+    onOpen()
+  }, [onOpen])
 
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
@@ -107,6 +123,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={30}
                 price={500}
+                onRedeem={onRedeem}
               >
                 A collection of 10,000 utility-enabled PFPs that feature a
                 richly diverse and unique pool of rarity-powered traits.
@@ -119,6 +136,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={30}
                 price={500}
+                onRedeem={onRedeem}
               >
                 Shinsei Galverse is a collection of 8,888 Gals shooting across
                 space and time to bring a project of peace to all cultures and
@@ -130,6 +148,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={30}
                 price={1000}
+                onRedeem={onRedeem}
               >
                 Murakami.Flowers is a work in which artist Takashi Murakami’s
                 representative artwork, flowers, are expressed as dot art
@@ -143,6 +162,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={0}
                 spots={1}
                 price={9999}
+                onRedeem={onRedeem}
               >
                 ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
               </MarketItem>
@@ -152,6 +172,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={6}
                 spots={10}
                 price={500}
+                onRedeem={onRedeem}
               >
                 Everai is a brand of Heroes. Our mission is to build a
                 long-lasting metaverse brand. Built for the people, with the
@@ -164,6 +185,7 @@ export const Marketplace: React.FC = () => {
                 allocatedSpots={7}
                 spots={30}
                 price={500}
+                onRedeem={onRedeem}
               >
                 The 0N1 Force are 7,777 generative side-profile characters with
                 over 100 hand-drawn features fighting for their existence.
@@ -176,6 +198,7 @@ export const Marketplace: React.FC = () => {
           )}
         </Grid>
       </Box>
+      <PurchaseModal isOpen={isOpen} onClose={onClose} />
     </Box>
   )
 }

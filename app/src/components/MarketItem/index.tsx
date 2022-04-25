@@ -15,24 +15,11 @@ interface MarketItemProps {
   spots: number
   price: number
   allocatedSpots: number
+  onRedeem: () => void
 }
 
 export const MarketItem: React.FC<MarketItemProps> = (props) => {
-  const { name, imgSrc, spots, allocatedSpots, price } = props
-
-  const toast = useToast()
-  const showErrorToast = useCallback(
-    (err: any) => {
-      console.error(JSON.stringify(err))
-      const error = err.error || err
-      toast({
-        description: `${error.message}`,
-        status: 'error',
-        duration: 3000,
-      })
-    },
-    [toast]
-  )
+  const { name, imgSrc, spots, allocatedSpots, price, onRedeem } = props
 
   return (
     <Flex
@@ -42,7 +29,12 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
       boxShadow="0 -3px 0 0 #231b4d,0 3px 0 0 #231b4d,-3px 0 0 0 #231b4d,3px 0 0 0 #231b4d,0 0 0 3px #0a0414,0 -6px 0 0 #0a0414,0 6px 0 0 #0a0414,-6px 0 0 0 #0a0414,6px 0 0 0 #0a0414"
     >
       <Flex direction="row">
-        <Box w="200px" h="200px" style={{ aspectRatio: '1/1' }} mr={4}>
+        <Box
+          w={['100px', '200px']}
+          h="200px"
+          style={{ aspectRatio: '1/1' }}
+          mr={4}
+        >
           <Img
             boxShadow="0 -3px 0 0 #3e2e6c,0 3px 0 0 #3e2e6c,-3px 0 0 0 #3e2e6c,3px 0 0 0 #3e2e6c"
             src={imgSrc}
@@ -91,14 +83,7 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
                 ></Img>
               </Flex>
             </Flex>
-            <Button
-              mt="2"
-              w="max(50%, 100px)"
-              fontSize="xl"
-              onClick={() => {
-                showErrorToast(new Error('lol nope; not yet'))
-              }}
-            >
+            <Button mt="2" w="max(50%, 100px)" fontSize="xl" onClick={onRedeem}>
               Redeem
             </Button>
           </Flex>

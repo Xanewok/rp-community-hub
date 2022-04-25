@@ -1,0 +1,165 @@
+import {
+  Text,
+  Button,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalHeader,
+  ModalCloseButton,
+  ModalContent,
+  ModalBody,
+  Flex,
+  Img,
+  Box,
+  Input,
+} from '@chakra-ui/react'
+import { useEthers } from '@usedapp/core'
+import { useEffect, useState } from 'react'
+import { JsonRpcProvider } from 'ethers/providers'
+
+import style from './index.module.css'
+
+// LICENSE: All right reserved to the https://raid.party for the spinner asset.
+const Spinner = () => (
+  <svg
+    style={{
+      marginTop: '5rem',
+      width: '5rem',
+      height: '5rem',
+      color: 'white',
+      animation: `${style.spin} 1s linear infinite`,
+    }}
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <circle
+      opacity="0.25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    ></circle>
+    <path
+      opacity="0.75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    ></path>
+  </svg>
+)
+
+async function renderAddress(
+  provider: JsonRpcProvider,
+  address: any
+): Promise<string> {
+  const lookup = await provider.lookupAddress(address)
+  return lookup ? lookup : `${address.slice(0, 6)}...${address.slice(-4)}`
+}
+
+interface ModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+const PurchaseModal: React.FC<ModalProps> = (props) => {
+  const { isOpen, onClose } = props
+
+  const { account, library } = useEthers()
+
+  const [resolver, setResolver] = useState<Record<string, string>>({})
+
+  // Open the modal if we are fed some rolls to show
+
+  // Close the modal whenever we change accounts
+  // useEffect(onClose, [account, onClose])
+  // Reset the state on modal open/close
+  // useEffect(() => {}, [isOpen])
+
+  return (
+    <Modal size="xl" isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent
+        alignItems={'center'}
+        alignSelf={'center'}
+        // minHeight="48em"
+        // mt="1"
+        // mb="0"
+        // px="16px"
+        // py="16px"
+        color="purple.900"
+        bg="purple.100"
+        borderRadius="1px"
+        boxShadow="0 -3px 0 0 #352561, 0 3px 0 0 #181030, -3px 0 0 0 #2c2051, 3px 0 0 0 #2c2051, 0 0 0 3px #0b0817, 0 -6px 0 0 #0b0817, 0 6px 0 0 #0b0817, -6px 0 0 0 #0b0817, 6px 0 0 0 #0b0817"
+      >
+        {/* <ModalHeader textAlign="center"></ModalHeader> */}
+        {/* <ModalCloseButton /> */}
+        <ModalBody
+          w="100%"
+          p={0}
+          // m={10}
+          display="flex"
+          flexDirection="column"
+          backgroundImage="/tiles.png"
+          backgroundSize="cover"
+          backgroundAttachment="fixed"
+        >
+          <Flex w="100%" justify="center" position="absolute" top={-6}>
+            <Box w={16}>
+              <Img src="/banner-l.png"></Img>
+            </Box>
+            <Flex
+              w="60%"
+              backgroundRepeat="repeat-x"
+              backgroundSize="contain"
+              backgroundImage="/banner-m.png"
+              justify="center"
+              fontWeight="bold"
+              textColor="white"
+            >
+              Confirm your purchase
+            </Flex>
+            <Box w={16}>
+              <Img src="/banner-r.png"></Img>
+            </Box>
+          </Flex>
+          <Flex py={10} px={10} direction="column" justify="center">
+            <Text mx="auto" px="15%" textAlign="center" fontWeight="500">
+              You&apos;re almost done! Please submit your Discord ID to verify
+              eligibility and complete your purchase. Make sure to include your
+              unique 4-digit identifier as seen below!
+            </Text>
+            <Text
+              mx="auto"
+              py={3}
+              pb={5}
+              fontWeight="bold"
+              alignSelf="center"
+              textColor="red.400"
+            >
+              This transaction will cost 500{' '}
+              <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
+            </Text>
+            <Flex direction="row">
+              <Input
+                rounded={0}
+                mr={3}
+                border={0}
+                h="26px"
+                background="indigo.600"
+                boxShadow="0 -2px 0 0 #352561, 0 2px 0 0 #181030, -2px 0 0 0 #2c2051, 2px 0 0 0 #2c2051, 0 0 0 2px #0b0817, 0 -4px 0 0 #0b0817, 0 4px 0 0 #0b0817, -4px 0 0 0 #0b0817, 4px 0 0 0 #0b0817"
+              >
+                {/* Zarc#4293 */}
+              </Input>
+              <Button ml={3} h="26px" w="33%">
+                Redeem
+              </Button>
+            </Flex>
+          </Flex>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  )
+}
+
+export default PurchaseModal
