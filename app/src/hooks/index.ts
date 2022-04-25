@@ -3,6 +3,7 @@ import { useNextSeed } from './useNextSeed'
 import { useSigner } from './useSigner'
 import { usePendingRewards } from './usePendingRewards'
 import { useLocalStorage } from './useLocalStorage'
+import { useUserHero } from './useUserHero'
 
 export {
   useInterval,
@@ -10,4 +11,5 @@ export {
   useSigner,
   usePendingRewards,
   useLocalStorage,
+  useUserHero,
 }
