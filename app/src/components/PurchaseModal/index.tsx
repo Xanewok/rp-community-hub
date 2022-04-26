@@ -12,9 +12,11 @@ import {
   Img,
   Box,
   Input,
+  useToast,
+  Link,
 } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { JsonRpcProvider } from 'ethers/providers'
 
 import style from './index.module.css'
@@ -69,6 +71,20 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
   const { cftiCost } = props
 
+  const toast = useToast()
+  const showErrorToast = useCallback(
+    (err: any) => {
+      console.error(JSON.stringify(err))
+      const error = err.error || err
+      toast({
+        description: `${error.message}`,
+        status: 'error',
+        duration: 3000,
+      })
+    },
+    [toast]
+  )
+
   const { account, library } = useEthers()
 
   const [discordName, setDiscordName] = useState('Zarc#2492')
@@ -76,6 +92,20 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     () => DISCORD_REGEX.test(discordName),
     [discordName]
   )
+
+  const onClick = useCallback(async () => {
+    const signer = library?.getSigner()
+    if (!signer) return
+    else {
+      try {
+        await signer.signMessage(`Discord: ${discordName}`)
+      } catch (e) {
+        showErrorToast(e)
+      }
+    }
+  }, [library, discordName, showErrorToast])
+
+  // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party
 
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
@@ -152,14 +182,8 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                 onChange={(ev) => setDiscordName(ev.target.value)}
                 isInvalid={!isDiscordNameValid}
               />
-              <Button
-                ml={3}
-                h="26px"
-                w="33%"
-                onClick={() => {
-                  // TODO:
-                }}
-              >
+              <Link href="https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party">WIP</Link>
+              <Button ml={3} h="26px" w="33%" onClick={onClick}>
                 Redeem
               </Button>
             </Flex>
