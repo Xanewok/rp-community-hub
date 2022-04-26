@@ -1,5 +1,5 @@
 import { Flex, Box, Img, UnorderedList, Text, ListItem } from '@chakra-ui/react'
-import { useEthers } from '@usedapp/core'
+import { useEthers, useLocalStorage } from '@usedapp/core'
 import { useEffect, useState } from 'react'
 import { useUserHero } from '../../hooks'
 import { SideNavLink } from '../SideNavLink'
@@ -15,6 +15,7 @@ export const WithNavigation: React.FC = (props) => {
   }, [library, account])
 
   const heroId = useUserHero(account)
+  const [discordData, setDiscordData] = useLocalStorage("discordData")
 
   return (
     <Flex flexDirection={['column', 'column', 'row']} h="100vh">
@@ -144,6 +145,7 @@ export const WithNavigation: React.FC = (props) => {
                   fontWeight="bold"
                   textColor="white"
                   lineHeight="32px"
+                  mt="-8px"
                 >
                   {name || 'None'}
                 </Text>
@@ -152,7 +154,17 @@ export const WithNavigation: React.FC = (props) => {
                   fontSize="2xl"
                   textColor="#8986a9"
                   lineHeight="32px"
-                  mt="-4px"
+                  mt="-8px"
+                >
+                  {account && `${account.slice(0, 6)}...${account.slice(-4)}`}
+                </Text>
+                <Text
+                  as="span"
+                  // display="inline-flex"
+                  fontSize="md"
+                  textColor="#8986a9"
+                  lineHeight="32px"
+                  mt="-8px"
                 >
                   {account && `${account.slice(0, 6)}...${account.slice(-4)}`}
                 </Text>

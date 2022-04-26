@@ -105,7 +105,10 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     }
   }, [library, discordName, showErrorToast])
 
+  const raffleId = 1
+
   // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party
+  // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183nabn&scope=identify
 
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
@@ -182,7 +185,11 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                 onChange={(ev) => setDiscordName(ev.target.value)}
                 isInvalid={!isDiscordNameValid}
               />
-              <Link href="https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party">WIP</Link>
+              <Link
+                href={`https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party%3FraffleId%3D{raffleId}`}
+              >
+                WIP
+              </Link>
               <Button ml={3} h="26px" w="33%" onClick={onClick}>
                 Redeem
               </Button>

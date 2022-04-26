@@ -8,7 +8,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { useGasPrice } from '@usedapp/core'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
 import PurchaseModal from '../PurchaseModal'
@@ -52,6 +52,10 @@ export const Marketplace: React.FC = () => {
   >('raffles')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  useEffect(() => {}, [])
+
+  console.log({ url: window.location })
 
   const toast = useToast()
   const showErrorToast = useCallback(
