@@ -91,7 +91,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
         // We're using Implicit Grant, which returns the token in a hash rather
         // than query params
         // See: https://discord.com/developers/docs/topics/oauth2#implicit-grant
-        window.location.replace(window.location.toString().replace('#', '?'))
+        // window.location.replace(window.location.toString().replace('#', '?'))
         const params = new URLSearchParams(
           window.location.hash.replace('#', '?')
         )
