@@ -15,8 +15,7 @@ export const WithNavigation: React.FC = (props) => {
   }, [library, account])
 
   const heroId = useUserHero(account)
-  const [discordData] = useLocalStorage("discordData")
-
+  const [discordData] = useLocalStorage('discordData')
 
   return (
     <Flex flexDirection={['column', 'column', 'row']} h="100vh">
@@ -24,9 +23,11 @@ export const WithNavigation: React.FC = (props) => {
         flexShrink={0}
         zIndex={50}
         position="relative"
+        overflowY={'scroll'}
+        style={{ scrollbarWidth: 'none' }}
         w={[null, null, '25%', '20%']}
         maxW={[null, null, null, '263px']}
-        bg="red.500"
+        bg="indigo.600"
       >
         <Box
           as="nav"
@@ -130,6 +131,7 @@ export const WithNavigation: React.FC = (props) => {
                 w={16}
                 h={16}
                 minW="64px"
+                mt={5}
                 mr={3}
                 bg="#130f26"
                 boxShadow="0 -3px 0 0 #3e2e6c,0 3px 0 0 #3e2e6c,-3px 0 0 0 #3e2e6c,3px 0 0 0 #3e2e6c"
@@ -167,7 +169,8 @@ export const WithNavigation: React.FC = (props) => {
                   lineHeight="32px"
                   mt="-8px"
                 >
-                  {discordData && `${discordData.username}#${discordData.discriminator}`}
+                  {discordData &&
+                    `${discordData.username}#${discordData.discriminator}`}
                 </Text>
               </Flex>
             </Flex>
