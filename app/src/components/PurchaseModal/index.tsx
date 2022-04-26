@@ -10,14 +10,16 @@ import {
   Img,
   Box,
   Input,
-  useToast,
-  Link,
 } from '@chakra-ui/react'
-import { useEthers, useLocalStorage } from '@usedapp/core'
+import { useEthers } from '@usedapp/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { JsonRpcProvider } from 'ethers/providers'
 
+import { supabase } from '../../utils/supabaseClient'
+
 import style from './index.module.css'
+import { useUser } from '@supabase/supabase-auth-helpers/react'
+import useErrorToast from '../../hooks/useErrorToast'
 
 // LICENSE: All right reserved to the https://raid.party for the spinner asset.
 const Spinner = () => (
@@ -69,52 +71,18 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
   const { cftiCost } = props
 
-  const toast = useToast()
-  const showErrorToast = useCallback(
-    (err: any) => {
-      console.error(JSON.stringify(err))
-      const error = err.error || err
-      toast({
-        description: `${error.message}`,
-        status: 'error',
-        duration: 3000,
-      })
-    },
-    [toast]
+  const showErrorToast = useErrorToast()
+
+  const user = useUser()
+  const connectedDiscordName = useMemo(
+    () => user.user?.app_metadata.name,
+    [user]
   )
-
-  const [discordData, setDiscordData] = useLocalStorage('discordData')
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (window.location.pathname.endsWith('/auth/callback')) {
-        // We're using Implicit Grant, which returns the token in a hash rather
-        // than query params
-        // See: https://discord.com/developers/docs/topics/oauth2#implicit-grant
-        // window.location.replace(window.location.toString().replace('#', '?'))
-        const params = new URLSearchParams(
-          window.location.hash.replace('#', '?')
-        )
-        const tokenType = params.get('token_type')
-        const accessToken = params.get('access_token')
-        // Clean up the passed parameters from the callback
-        window.history.pushState({}, document.title, '/')
-
-        fetch('https://discordapp.com/api/users/@me', {
-          headers: { authorization: `${tokenType} ${accessToken}` },
-        })
-          .then((res) => res.json())
-          .then(({ id, username, discriminator }) => {
-            setDiscordData({ id, username, discriminator })
-          })
-      }
-    }
-  }, [setDiscordData])
 
   const { account, library } = useEthers()
 
   const [discordName, setDiscordName] = useState(
-    `${discordData?.username || 'Zarc'}#${discordData?.discriminator || 2493}`
+    connectedDiscordName || 'Zarc#2493'
   )
   const isDiscordNameValid = useMemo(
     () => DISCORD_REGEX.test(discordName),
@@ -141,10 +109,8 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   useEffect(onClose, [account, onClose])
   // Reset the state on modal open/close
   useEffect(() => {
-    setDiscordName(
-      `${discordData?.username || 'Zarc'}#${discordData?.discriminator || 2493}`
-    )
-  }, [discordData, isOpen])
+    setDiscordName(connectedDiscordName || 'Zarc#2493')
+  }, [connectedDiscordName, isOpen])
 
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
@@ -214,11 +180,58 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                 onChange={(ev) => setDiscordName(ev.target.value)}
                 isInvalid={!isDiscordNameValid}
               />
-              <Link
-                href={`https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party%2Fauth%2Fcallback`}
+              <Button
+                ml={3}
+                h="26px"
+                onClick={async () => {
+                  const { user, session, error } = await supabase.auth.signIn({
+                    provider: 'discord',
+                  })
+                  console.log({ user, session, error })
+                }}
               >
-                Login with Discord
-              </Link>
+                Connect Discord
+              </Button>
+              <Button
+                ml={3}
+                h="26px"
+                onClick={async () => {
+                  const signer = library?.getSigner()
+                  const user = supabase.auth.user()
+                  if (!signer || !library || !user) return
+                  try {
+                    const message = {
+                      audience: 'Raid Party Marketplace',
+                      user_id: user.id,
+                      eth: account,
+                    }
+                    const signature = await signer.signMessage(
+                      JSON.stringify(message)
+                    )
+                    fetch('/api/ethConnect', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'same-origin',
+                      body: JSON.stringify({
+                        user_id: user?.id,
+                        message,
+                        signature,
+                      }),
+                    })
+                    await supabase.from('profiles').upsert(
+                      {
+                        id: user?.id,
+                        eth: account,
+                      },
+                      { returning: 'minimal' }
+                    )
+                  } catch (e) {
+                    showErrorToast(e)
+                  }
+                }}
+              >
+                Connect wallet
+              </Button>
               <Button ml={3} h="26px" w="33%" onClick={onClick}>
                 Redeem
               </Button>
