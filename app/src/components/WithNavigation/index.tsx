@@ -19,7 +19,7 @@ export const WithNavigation: React.FC = (props) => {
 
 
   return (
-    <Flex flexDirection={['column', 'column', 'row']} h="100%">
+    <Flex flexDirection={['column', 'column', 'row']} h="100vh">
       <Box
         flexShrink={0}
         zIndex={50}
