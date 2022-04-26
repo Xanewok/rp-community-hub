@@ -7,9 +7,10 @@ const GlobalStyle: React.FC = (props) => (
         html {
           scoll-behavior: smooth;
           cursor: default;
+          width: 100%;
+          height: 100%;
         }
         body {
-          color: 'white';
           text-rendering: geometricPrecision;
           font-smooth: never;
         }
