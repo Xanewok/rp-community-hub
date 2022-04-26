@@ -98,7 +98,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
         const tokenType = params.get('token_type')
         const accessToken = params.get('access_token')
         console.log({ tokenType, accessToken })
-        fetch('https://discord.com/api/users/@me', {
+        fetch('https://discordapp.com/api/users/@me', {
           headers: { authorization: `${tokenType} ${accessToken}` },
         })
           .then((res) => res.json())
