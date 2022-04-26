@@ -15,7 +15,8 @@ export const WithNavigation: React.FC = (props) => {
   }, [library, account])
 
   const heroId = useUserHero(account)
-  const [discordData, setDiscordData] = useLocalStorage("discordData")
+  const [discordData] = useLocalStorage("discordData")
+
 
   return (
     <Flex flexDirection={['column', 'column', 'row']} h="100vh">
@@ -166,7 +167,7 @@ export const WithNavigation: React.FC = (props) => {
                   lineHeight="32px"
                   mt="-8px"
                 >
-                  {account && `${account.slice(0, 6)}...${account.slice(-4)}`}
+                  {discordData && `${discordData.username}#${discordData.discriminator}`}
                 </Text>
               </Flex>
             </Flex>

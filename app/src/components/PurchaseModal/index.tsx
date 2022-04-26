@@ -15,7 +15,7 @@ import {
   useToast,
   Link,
 } from '@chakra-ui/react'
-import { useEthers } from '@usedapp/core'
+import { useEthers, useLocalStorage } from '@usedapp/core'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { JsonRpcProvider } from 'ethers/providers'
 
@@ -97,17 +97,19 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
         )
         const tokenType = params.get('token_type')
         const accessToken = params.get('access_token')
-        console.log({ tokenType, accessToken })
+        // Clean up the passed parameters from the callback
+        window.history.pushState(
+          {},
+          document.title,
+          window.location.pathname.replace('/auth/callback', '')
+        )
+
         fetch('https://discordapp.com/api/users/@me', {
           headers: { authorization: `${tokenType} ${accessToken}` },
         })
           .then((res) => res.json())
-          .then((user) => {
-            console.log(
-              'Got response from the Discord API: ',
-              JSON.stringify(user)
-            )
-            console.log({ user })
+          .then(({ id, username, discriminator }) => {
+            setDiscordData({ id, username, discriminator })
           })
       }
     }
@@ -135,6 +137,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
 
   const raffleId = 1
 
+  const [, setDiscordData] = useLocalStorage('discordData')
   // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party
   // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183nabn&scope=identify
 
