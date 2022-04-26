@@ -1,10 +1,8 @@
 import {
   Text,
   Button,
-  useDisclosure,
   Modal,
   ModalOverlay,
-  ModalHeader,
   ModalCloseButton,
   ModalContent,
   ModalBody,
@@ -98,11 +96,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
         const tokenType = params.get('token_type')
         const accessToken = params.get('access_token')
         // Clean up the passed parameters from the callback
-        window.history.pushState(
-          {},
-          document.title,
-          window.location.pathname.replace('/auth/callback', '')
-        )
+        window.history.pushState({}, document.title, '/')
 
         fetch('https://discordapp.com/api/users/@me', {
           headers: { authorization: `${tokenType} ${accessToken}` },
@@ -117,7 +111,11 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
 
   const { account, library } = useEthers()
 
-  const [discordName, setDiscordName] = useState('Zarc#2492')
+  const [discordData, setDiscordData] = useLocalStorage('discordData')
+
+  const [discordName, setDiscordName] = useState(
+    `${discordData?.username || 'Zarc'}#${discordData?.discriminator || 2493}`
+  )
   const isDiscordNameValid = useMemo(
     () => DISCORD_REGEX.test(discordName),
     [discordName]
@@ -135,17 +133,13 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     }
   }, [library, discordName, showErrorToast])
 
-  const raffleId = 1
-
-  const [, setDiscordData] = useLocalStorage('discordData')
-  // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party
-  // https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183nabn&scope=identify
-
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
   // Reset the state on modal open/close
   useEffect(() => {
-    setDiscordName('Zarc#2493')
+    setDiscordName(
+      `${discordData?.username || 'Zarc'}#${discordData?.discriminator || 2493}`
+    )
   }, [isOpen])
 
   return (
