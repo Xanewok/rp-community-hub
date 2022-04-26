@@ -83,6 +83,8 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     [toast]
   )
 
+  const [discordData, setDiscordData] = useLocalStorage('discordData')
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (window.location.pathname.endsWith('/auth/callback')) {
@@ -107,11 +109,9 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
           })
       }
     }
-  }, [])
+  }, [setDiscordData])
 
   const { account, library } = useEthers()
-
-  const [discordData, setDiscordData] = useLocalStorage('discordData')
 
   const [discordName, setDiscordName] = useState(
     `${discordData?.username || 'Zarc'}#${discordData?.discriminator || 2493}`
@@ -122,6 +122,10 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   )
 
   const onClick = useCallback(async () => {
+    if (!isDiscordNameValid) {
+      showErrorToast(new Error('Discord username is in wrong format'))
+    }
+
     const signer = library?.getSigner()
     if (!signer) return
     else {
@@ -131,7 +135,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
         showErrorToast(e)
       }
     }
-  }, [library, discordName, showErrorToast])
+  }, [isDiscordNameValid, library, showErrorToast, discordName])
 
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
@@ -140,7 +144,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     setDiscordName(
       `${discordData?.username || 'Zarc'}#${discordData?.discriminator || 2493}`
     )
-  }, [isOpen])
+  }, [discordData, isOpen])
 
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
@@ -213,7 +217,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               <Link
                 href={`https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party%2Fauth%2Fcallback`}
               >
-                WIP
+                Login with Discord
               </Link>
               <Button ml={3} h="26px" w="33%" onClick={onClick}>
                 Redeem
