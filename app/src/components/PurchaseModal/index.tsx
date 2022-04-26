@@ -186,7 +186,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                 isInvalid={!isDiscordNameValid}
               />
               <Link
-                href={`https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party%3FraffleId%3D{raffleId}`}
+                href={`https://discord.com/api/oauth2/authorize?response_type=token&client_id=968298862294995017&state=15773059ghq9183habn&scope=identify&redirect_uri=https%3A%2F%2Fmarket.roll.party`}
               >
                 WIP
               </Link>
