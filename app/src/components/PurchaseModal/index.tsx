@@ -87,21 +87,29 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (window.location.origin.endsWith('/auth/callback')) {
+      if (window.location.pathname.endsWith('/auth/callback')) {
+        // We're using Implicit Grant, which returns the token in a hash rather
+        // than query params
+        // See: https://discord.com/developers/docs/topics/oauth2#implicit-grant
         window.location.replace(window.location.toString().replace('#', '?'))
-      }
-      const params = new URLSearchParams(window.location.search)
-      const tokenType = params.get('token_type')
-      const accessToken = params.get('access_token')
-      console.log({ tokenType, accessToken })
-      fetch('https://discord.com/api/useres/@me', {
-        headers: { authorization: `${tokenType} ${accessToken}` },
-      })
-        .then((res) => res.json())
-        .then((user) => {
-          console.log("Got response from the Discord API: ", JSON.stringify(user))
-          console.log({user})
+        const params = new URLSearchParams(
+          window.location.hash.replace('#', '?')
+        )
+        const tokenType = params.get('token_type')
+        const accessToken = params.get('access_token')
+        console.log({ tokenType, accessToken })
+        fetch('https://discord.com/api/users/@me', {
+          headers: { authorization: `${tokenType} ${accessToken}` },
         })
+          .then((res) => res.json())
+          .then((user) => {
+            console.log(
+              'Got response from the Discord API: ',
+              JSON.stringify(user)
+            )
+            console.log({ user })
+          })
+      }
     }
   }, [])
 
