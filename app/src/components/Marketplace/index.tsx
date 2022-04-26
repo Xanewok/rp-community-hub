@@ -55,8 +55,6 @@ export const Marketplace: React.FC = () => {
 
   useEffect(() => {}, [])
 
-  console.log({ url: window.location })
-
   const toast = useToast()
   const showErrorToast = useCallback(
     (err: any) => {
