@@ -21,7 +21,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     IParty public immutable _party;
     IRpSeeder public immutable _rpSeeder;
 
-    Raffle[] public _raffles;
+    Raffle[] _raffles;
 
     uint32 _raffleCount;
 
@@ -122,6 +122,18 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     }
 
     // Utility functions
+
+    function getRaffleCount() public view returns (uint256) {
+        return _raffleCount;
+    }
+
+    function getUserTicketsBought(uint256 index, address user)
+        public
+        view
+        returns (uint256)
+    {
+        return _raffles[index].ticketsBought[user];
+    }
 
     function requireNotSeeded(uint256 roundNum) private view {
         // Mitigate possible front-running - close the sign-ups about a minute
