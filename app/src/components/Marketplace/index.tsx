@@ -91,9 +91,9 @@ export const Marketplace: React.FC = () => {
       <Box
         w="100%"
         minHeight="100%"
+        p={10}
         backgroundAttachment="fixed"
         backgroundSize="cover"
-        p={10}
         backgroundImage="/tiles.png"
       >
         <Heading textColor="white" lineHeight="36px" mb={0}>

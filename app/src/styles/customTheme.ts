@@ -1,6 +1,13 @@
 import { theme, extendTheme } from '@chakra-ui/react'
 
 const customTheme = extendTheme({
+  styles: {
+    global: () => {
+      body: {
+        bg: ""
+      }
+    }
+  },
   fonts: {
     ...theme.fonts,
     heading: `'VP', ${theme.fonts.heading}`,
@@ -11,7 +18,9 @@ const customTheme = extendTheme({
     'html, body': {
       lineHeight: 'tall',
       textColor: 'white',
-      backgroundImage: '/tiles.png'
+      color: 'indigo.600',
+      bg: ""
+      // backgroundImage: 'url(/tiles.png)'
     },
   },
   fontSizes: {

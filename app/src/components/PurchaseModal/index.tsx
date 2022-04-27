@@ -7,57 +7,19 @@ import {
   ModalContent,
   ModalBody,
   Flex,
+  HStack,
   Img,
-  Box,
   Input,
+  Box,
+  useNumberInput,
 } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { JsonRpcProvider } from 'ethers/providers'
+import { useEffect, useMemo, useState } from 'react'
 
 import { supabase } from '../../utils/supabaseClient'
 
-import style from './index.module.css'
 import { useUser } from '@supabase/supabase-auth-helpers/react'
 import useErrorToast from '../../hooks/useErrorToast'
-
-// LICENSE: All right reserved to the https://raid.party for the spinner asset.
-const Spinner = () => (
-  <svg
-    style={{
-      marginTop: '5rem',
-      width: '5rem',
-      height: '5rem',
-      color: 'white',
-      animation: `${style.spin} 1s linear infinite`,
-    }}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      opacity="0.25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    ></circle>
-    <path
-      opacity="0.75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-)
-
-async function renderAddress(
-  provider: JsonRpcProvider,
-  address: any
-): Promise<string> {
-  const lookup = await provider.lookupAddress(address)
-  return lookup ? lookup : `${address.slice(0, 6)}...${address.slice(-4)}`
-}
 
 interface ModalProps {
   isOpen: boolean
@@ -65,52 +27,55 @@ interface ModalProps {
   cftiCost: number
 }
 
-const DISCORD_REGEX = /@?[^#@:]{2,32}#[0-9]{4}$/
-
 const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
   const { cftiCost } = props
 
-  const showErrorToast = useErrorToast()
+  const {
+    getInputProps,
+    getIncrementButtonProps,
+    getDecrementButtonProps,
+    valueAsNumber: itemCount,
+  } = useNumberInput({
+    step: 1,
+    defaultValue: 1,
+    min: 1,
+    max: 6,
+    precision: 0,
+  })
 
-  const user = useUser()
-  const connectedDiscordName = useMemo(
-    () => user.user?.app_metadata.name,
-    [user]
-  )
+  const showErrorToast = useErrorToast()
 
   const { account, library } = useEthers()
 
-  const [discordName, setDiscordName] = useState(
-    connectedDiscordName || 'Zarc#2493'
+  const user = useUser()
+  const connectedDiscordName = useMemo(
+    () => user.user?.user_metadata.name,
+    [user]
   )
-  const isDiscordNameValid = useMemo(
-    () => DISCORD_REGEX.test(discordName),
-    [discordName]
-  )
+  const [isLoggedWithEthereum, setLoggedWithEthereum] = useState(false)
+  useEffect(() => {
+    if (!user.user?.id) return
 
-  const onClick = useCallback(async () => {
-    if (!isDiscordNameValid) {
-      showErrorToast(new Error('Discord username is in wrong format'))
-    }
-
-    const signer = library?.getSigner()
-    if (!signer) return
-    else {
-      try {
-        await signer.signMessage(`Discord: ${discordName}`)
-      } catch (e) {
-        showErrorToast(e)
-      }
-    }
-  }, [isDiscordNameValid, library, showErrorToast, discordName])
+    supabase
+      .from('profiles')
+      .select('id,eth')
+      .eq('id', user.user?.id)
+      .eq('eth', account)
+      .limit(1)
+      .then((value) => {
+        if (value.error) {
+          showErrorToast(value.error)
+        } else {
+          setLoggedWithEthereum(value.data.length > 0)
+        }
+      })
+  }, [account, connectedDiscordName, showErrorToast, user.user?.id])
 
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
   // Reset the state on modal open/close
-  useEffect(() => {
-    setDiscordName(connectedDiscordName || 'Zarc#2493')
-  }, [connectedDiscordName, isOpen])
+  useEffect(() => {}, [connectedDiscordName, isOpen])
 
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
@@ -165,76 +130,92 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               alignSelf="center"
               textColor="red.400"
             >
-              This transaction will cost {cftiCost}{' '}
+              This transaction will cost {cftiCost * itemCount}{' '}
               <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
             </Text>
-            <Flex direction="row">
-              <Input
-                rounded={0}
-                mr={3}
-                border={0}
-                h="26px"
-                background="indigo.600"
-                boxShadow="0 -2px 0 0 #352561, 0 2px 0 0 #181030, -2px 0 0 0 #2c2051, 2px 0 0 0 #2c2051, 0 0 0 2px #0b0817, 0 -4px 0 0 #0b0817, 0 4px 0 0 #0b0817, -4px 0 0 0 #0b0817, 4px 0 0 0 #0b0817"
-                value={discordName}
-                onChange={(ev) => setDiscordName(ev.target.value)}
-                isInvalid={!isDiscordNameValid}
-              />
-              <Button
-                ml={3}
-                h="26px"
-                onClick={async () => {
-                  const { user, session, error } = await supabase.auth.signIn({
-                    provider: 'discord',
-                  })
-                  console.log({ user, session, error })
-                }}
-              >
-                Connect Discord
-              </Button>
-              <Button
-                ml={3}
-                h="26px"
-                onClick={async () => {
-                  const signer = library?.getSigner()
-                  const user = supabase.auth.user()
-                  if (!signer || !library || !user) return
-                  try {
-                    const message = {
-                      audience: 'Raid Party Marketplace',
-                      user_id: user.id,
-                      eth: account,
-                    }
-                    const signature = await signer.signMessage(
-                      JSON.stringify(message)
-                    )
-                    fetch('/api/ethConnect', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      credentials: 'same-origin',
-                      body: JSON.stringify({
-                        user_id: user?.id,
-                        message,
-                        signature,
-                      }),
-                    })
-                    await supabase.from('profiles').upsert(
+            <Flex direction="row" justify="space-evenly">
+              {!!connectedDiscordName || (
+                <Button
+                  onClick={async () => {
+                    const { user, session, error } = await supabase.auth.signIn(
                       {
-                        id: user?.id,
-                        eth: account,
-                      },
-                      { returning: 'minimal' }
+                        provider: 'discord',
+                      }
                     )
-                  } catch (e) {
-                    showErrorToast(e)
-                  }
-                }}
-              >
-                Connect wallet
-              </Button>
-              <Button ml={3} h="26px" w="33%" onClick={onClick}>
-                Redeem
-              </Button>
+                    console.log({ user, session, error })
+                  }}
+                >
+                  Connect Discord
+                </Button>
+              )}
+              {!!connectedDiscordName &&
+                (!!isLoggedWithEthereum || (
+                  <Button
+                    onClick={async () => {
+                      const signer = library?.getSigner()
+                      const user = supabase.auth.user()
+                      if (!signer || !library || !user) return
+                      try {
+                        const message = {
+                          audience: 'Raid Party Marketplace',
+                          user_id: user.id,
+                          eth: account,
+                        }
+                        const signature = await signer.signMessage(
+                          JSON.stringify(message)
+                        )
+                        await fetch('/api/ethConnect', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          credentials: 'same-origin',
+                          body: JSON.stringify({
+                            message,
+                            signature,
+                          }),
+                        })
+                        const { error } = await supabase
+                          .from('profiles')
+                          .upsert(
+                            {
+                              id: user?.id,
+                              eth: account,
+                            },
+                            { returning: 'minimal' }
+                          )
+                        if (!error) {
+                          setLoggedWithEthereum(true)
+                        }
+                      } catch (e) {
+                        showErrorToast(e)
+                      }
+                    }}
+                  >
+                    Connect wallet
+                  </Button>
+                ))}
+              {!!connectedDiscordName && !!isLoggedWithEthereum && (
+                <>
+                  <Flex direction="row">
+                    <Button
+                      style={{ width: '26px' }}
+                      h="40px"
+                      {...getDecrementButtonProps()}
+                    >
+                      -
+                    </Button>
+                    <Input
+                      maxW={16}
+                      mx={3}
+                      textAlign="center"
+                      {...getInputProps()}
+                    />
+                    <Button {...getIncrementButtonProps()}>+</Button>
+                  </Flex>
+                  <Button w="33%" onClick={() => {
+                    showErrorToast(new Error("so close yet so far"))
+                  }}>Redeem</Button>
+                </>
+              )}
             </Flex>
           </Flex>
         </ModalBody>

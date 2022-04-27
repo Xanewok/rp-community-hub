@@ -192,7 +192,13 @@ export const WithNavigation: React.FC = (props) => {
                       boxShadow={
                         ' 0 -2px 0 0 #3e2e6c,0 2px 0 0 #2d265a,-2px 0 0 0 #281c49,2px 0 0 0 #281c49,0 0 0 2px #0f0c1b,0 -4px 0 0 #0f0c1b,0 4px 0 0 #0b0915,-4px 0 0 0 #0b0915,4px 0 0 0 #0b0915;'
                       }
-                      onClick={() => supabase.auth.signOut()}
+                      onClick={async () => {
+                        await supabase.auth.signOut()
+                        // FIXME: Make UserProvider handle the logged out case
+                        // more gracefully and actually handle logging out *sigh*
+                        await fetch('/api/auth/logout', { method: 'POST' })
+                        location.reload()
+                      }}
                     >
                       X
                     </Box>
