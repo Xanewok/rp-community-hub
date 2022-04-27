@@ -13,6 +13,7 @@ import { useNextSeed } from '../../hooks/useNextSeed'
 import { useRaffle, useRaffleCount } from '../../hooks/useRaffles'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
+import { NextSeed } from '../NextSeed'
 import PurchaseModal from '../PurchaseModal'
 
 const TabItem: React.FC<{
@@ -117,6 +118,7 @@ export const Marketplace: React.FC = () => {
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
       <Flex position="absolute" top={10} right={10} zIndex={10}>
+        <NextSeed />
         <InfoShield
           value={`⛽ ${Math.trunc((Number(gasPrice) || 0) / 10 ** 9)}`}
         />
