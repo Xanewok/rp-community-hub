@@ -1,11 +1,12 @@
 import { useCall } from '@usedapp/core'
-import { PARTY_CONTRACT } from '../constants'
+import { useContracts } from '../constants'
 
 export const useUserHero = (address: string | null | undefined) => {
+  const { Party } = useContracts()
   const { value, error } =
     useCall(
       address && {
-        contract: PARTY_CONTRACT,
+        contract: Party,
         method: 'getUserHero', // Method to be called
         args: [address], // Method arguments
       }

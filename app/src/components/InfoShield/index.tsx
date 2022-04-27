@@ -1,6 +1,6 @@
 import { Flex, Img, Text } from '@chakra-ui/react'
 import { useEthers, useTokenBalance } from '@usedapp/core'
-import { TOKEN_ADDRESS } from '../../constants'
+import { useContracts } from '../../constants'
 
 type InfoShieldProps =
   | { type: 'cftiBalance'; value?: undefined }
@@ -8,7 +8,8 @@ type InfoShieldProps =
 
 export const InfoShield: React.FC<InfoShieldProps> = (props) => {
   const { account } = useEthers()
-  const balance = useTokenBalance(TOKEN_ADDRESS['CFTI'], account)
+  const { Confetti } = useContracts()
+  const balance = useTokenBalance(Confetti.address, account)
 
   const roundTo = (value: number, decimals: number) =>
     Math.floor(value * 10 ** decimals) / 10 ** decimals

@@ -2,17 +2,18 @@ import { Button } from '@chakra-ui/react'
 import { useEthers, useTokenAllowance } from '@usedapp/core'
 import { ethers } from 'ethers'
 import { useMemo } from 'react'
-import { CONFETTI_CONTRACT, TOKEN_ADDRESS } from '../../constants'
+import { useContracts } from '../../constants'
 
-const SPENDER = TOKEN_ADDRESS['COLLECTOR']
 const MAX_UINT256 = ethers.constants.MaxUint256
 
 // 1. If the user has already approved the contract, just
 export const ApproveCfti = (props: { owner: any }) => {
   const { owner } = props
+  const { Confetti, RaffleParty } = useContracts()
 
   const { library, account } = useEthers()
-  const allowance = useTokenAllowance(TOKEN_ADDRESS['CFTI'], owner, SPENDER)
+  const spender = RaffleParty.address
+  const allowance = useTokenAllowance(Confetti.address, owner, spender)
   // TODO: Set that up in a smarter way
   const requiredAllowance = 1000 * 10 ** 18
 
@@ -31,15 +32,12 @@ export const ApproveCfti = (props: { owner: any }) => {
         onClick: () => {
           const signer = library?.getSigner(account)
           if (signer) {
-            CONFETTI_CONTRACT.connect(signer).approve(
-              TOKEN_ADDRESS['COLLECTOR'],
-              MAX_UINT256
-            )
+            Confetti.connect(signer).approve(spender, MAX_UINT256)
           }
         },
       }
     }
-  }, [allowance, requiredAllowance, account, owner, library])
+  }, [allowance, requiredAllowance, account, owner, library, Confetti, spender])
 
   return (
     <Button
