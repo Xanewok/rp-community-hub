@@ -1,4 +1,4 @@
-import { supabase } from '../../utils/supabaseClient'
+import { supabaseWithGlobalFetch as supabase } from '../../utils/supabaseClient'
 import Web3 from 'web3'
 
 const web3 = new Web3()
@@ -30,9 +30,7 @@ export default async function hello(req: any, res: any) {
       .send('Signer is different than the address in the message')
   }
 
-  const { error } = await supabase
-    .from('profiles')
-    .upsert({ id: user_id, eth })
+  const { error } = await supabase.from('profiles').upsert({ id: user_id, eth })
 
   if (error) {
     return res.status(400).json({ error })
