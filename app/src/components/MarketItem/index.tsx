@@ -16,6 +16,7 @@ interface MarketItemProps {
   price: number
   allocatedSpots: number
   onRedeem: () => void
+  roundsLeft: number
 }
 
 export const MarketItem: React.FC<MarketItemProps> = (props) => {
@@ -82,6 +83,17 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
                   src="/cfti.png"
                 ></Img>
               </Flex>
+              <Text
+                  as="span"
+                  textColor="#AE9ED1"
+                  fontWeight="500"
+                  fontSize="lg"
+                  ml={3}
+                >
+                  {props.roundsLeft <= 0
+                    ? 'Finished'
+                    : `Ends in ${props.roundsLeft} seed rounds`}
+                </Text>
             </Flex>
             <Button mt="2" w="max(50%, 100px)" fontSize="xl" onClick={onRedeem}>
               Redeem

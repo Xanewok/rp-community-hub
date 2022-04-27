@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { useGasPrice } from '@usedapp/core'
 import { Fragment, useCallback, useEffect, useState } from 'react'
+import { useNextSeed } from '../../hooks/useNextSeed'
 import { useRaffle, useRaffleCount } from '../../hooks/useRaffles'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
@@ -45,18 +46,31 @@ const TabItem: React.FC<{
   </Box>
 )
 
+const roundTo = (value: number, decimals: number) =>
+  Math.floor(value * 10 ** decimals) / 10 ** decimals
+
+const formatNumber = (value: any, decimals: number) =>
+  isNaN(Number(value)) ? NaN : roundTo(Number(value) / 10 ** 18, decimals)
+
 const RaffleItem: React.FC<{ id: number }> = (props) => {
   const raffle = useRaffle(props.id)
+  const currentRound = Number(useNextSeed()) - 1
   console.log({ raffle })
+  // TODO: Verify the data shape on the blockchain
+  const { cost, totalTicketsBought, maxEntries, endingSeedRound } = raffle
+  // TODO: Fetch the data from our backend
+  const { name, imgSrc } = { name: 'Raffle item', imgSrc: '/moonbirds.png' }
+  const roundsLeft = Math.max(0, Number(endingSeedRound) - currentRound)
 
   return (
     <MarketItem
       name="Raffle item"
       imgSrc="/moonbirds.png"
-      allocatedSpots={6}
-      spots={30}
-      price={500}
+      allocatedSpots={Number(totalTicketsBought)}
+      spots={Number(maxEntries)}
+      price={formatNumber(cost, 0)}
       onRedeem={() => {}}
+      roundsLeft={roundsLeft}
     >
       {JSON.stringify(raffle)}
     </MarketItem>
@@ -158,6 +172,7 @@ export const Marketplace: React.FC = () => {
                 spots={30}
                 price={500}
                 onRedeem={() => onRedeem(500)}
+                roundsLeft={3}
               >
                 A collection of 10,000 utility-enabled PFPs that feature a
                 richly diverse and unique pool of rarity-powered traits.
@@ -171,6 +186,7 @@ export const Marketplace: React.FC = () => {
                 spots={30}
                 price={500}
                 onRedeem={() => onRedeem(500)}
+                roundsLeft={3}
               >
                 Shinsei Galverse is a collection of 8,888 Gals shooting across
                 space and time to bring a project of peace to all cultures and
@@ -183,6 +199,7 @@ export const Marketplace: React.FC = () => {
                 spots={30}
                 price={1000}
                 onRedeem={() => onRedeem(1000)}
+                roundsLeft={3}
               >
                 Murakami.Flowers is a work in which artist Takashi Murakami’s
                 representative artwork, flowers, are expressed as dot art
@@ -197,6 +214,7 @@ export const Marketplace: React.FC = () => {
                 spots={1}
                 price={9999}
                 onRedeem={() => onRedeem(9999)}
+                roundsLeft={100}
               >
                 ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
               </MarketItem>
@@ -207,6 +225,7 @@ export const Marketplace: React.FC = () => {
                 spots={10}
                 price={500}
                 onRedeem={() => onRedeem(500)}
+                roundsLeft={5}
               >
                 Everai is a brand of Heroes. Our mission is to build a
                 long-lasting metaverse brand. Built for the people, with the
@@ -220,6 +239,7 @@ export const Marketplace: React.FC = () => {
                 spots={30}
                 price={500}
                 onRedeem={() => onRedeem(500)}
+                roundsLeft={5}
               >
                 The 0N1 Force are 7,777 generative side-profile characters with
                 over 100 hand-drawn features fighting for their existence.
