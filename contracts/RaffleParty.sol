@@ -21,9 +21,9 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     IParty public immutable _party;
     IRpSeeder public immutable _rpSeeder;
 
-    Raffle[] _raffles;
+    Raffle[] public _raffles;
 
-    uint32 _raffleCount;
+    uint32 public _raffleCount;
 
     bytes32 public constant RAFFLE_CREATOR = keccak256("RAFFLE_CREATOR");
 

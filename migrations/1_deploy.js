@@ -19,20 +19,19 @@ module.exports = async function (deployer, network, accounts) {
     // RpSeeder with TestSeederV2 and TestSeedStorage
     IRpSeeder.address = "0xa70d55E48a3a7e83039fd11F00C7D6Caa5b8Bef5";
 
-    RaffleParty.address = "0x4d7f4879709eff007C06146F719c076f42f99B36";
+    RaffleParty.address = "0xB2DAa2fF1f58E1aF2499F65AEfaefb9484C48F34";
+    const admin = accounts[0];
+    await deployer.deploy(
+      RaffleParty,
+      IConfetti.address,
+      IParty.address,
+      ISeederV2.address,
+      accounts[0]
+    );
   } else if (chainId == 0x01) {
     IConfetti.address = "0xCfef8857E9C80e3440A823971420F7Fa5F62f020";
     ISeederV2.address = "0x2Ed251752DA7F24F33CFbd38438748BB8eeb44e1";
     IParty.address = "0xd311bDACB151b72BddFEE9cBdC414Af22a5E38dc";
     IRpSeeder.address = "0xD9bc167E6C37b29F65E708C4Bb1D299937dFF718";
-
-    // const admin = accounts[0];
-    // await deployer.deploy(
-    //   RaffleParty,
-    //   IConfetti.address,
-    //   IParty.address,
-    //   ISeederV2.address,
-    //   accounts[0]
-    // );
   }
 };

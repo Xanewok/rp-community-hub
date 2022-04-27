@@ -8,7 +8,8 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { useGasPrice } from '@usedapp/core'
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
+import { useRaffle, useRaffleCount } from '../../hooks/useRaffles'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
 import PurchaseModal from '../PurchaseModal'
@@ -44,6 +45,24 @@ const TabItem: React.FC<{
   </Box>
 )
 
+const RaffleItem: React.FC<{ id: number }> = (props) => {
+  const raffle = useRaffle(props.id)
+  console.log({ raffle })
+
+  return (
+    <MarketItem
+      name="Raffle item"
+      imgSrc="/moonbirds.png"
+      allocatedSpots={6}
+      spots={30}
+      price={500}
+      onRedeem={() => {}}
+    >
+      {JSON.stringify(raffle)}
+    </MarketItem>
+  )
+}
+
 export const Marketplace: React.FC = () => {
   const gasPrice = useGasPrice()
 
@@ -78,6 +97,8 @@ export const Marketplace: React.FC = () => {
     },
     [onOpen]
   )
+
+  const raffleCount = useRaffleCount()
 
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
@@ -123,6 +144,11 @@ export const Marketplace: React.FC = () => {
           gap={10}
           gridTemplateColumns="repeat(auto-fill,minmax(500px,1fr))"
         >
+          {Array(raffleCount)
+            .map((e, idx) => idx)
+            .map((id) => (
+              <RaffleItem key={id} id={id} />
+            ))}
           {activeTab === 'raffles' ? (
             <>
               <MarketItem
