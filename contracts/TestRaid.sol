@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./IRaid.sol";
+
 interface Mintable {
     function mint(address recipient, uint256 amount) external;
 }
 
-contract TestRaid {
+contract TestRaid is IRaid {
     Mintable immutable _confetti;
     mapping(address => uint256) _pendingRewards;
 

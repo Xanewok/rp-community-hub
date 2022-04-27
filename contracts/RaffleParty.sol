@@ -9,10 +9,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "./IParty.sol";
 import "./IRPSeeder.sol";
-
-interface IConfetti {
-    function burnFrom(address account, uint256 amount) external;
-}
+import "./IConfetti.sol";
 
 /**
  * @title
