@@ -3,7 +3,6 @@ import { useEthers, useTokenAllowance } from '@usedapp/core'
 import { ethers } from 'ethers'
 import { useMemo } from 'react'
 import { CONFETTI_CONTRACT, TOKEN_ADDRESS } from '../../constants'
-import { usePendingRewards } from '../../hooks'
 
 const SPENDER = TOKEN_ADDRESS['COLLECTOR']
 const MAX_UINT256 = ethers.constants.MaxUint256
@@ -14,10 +13,11 @@ export const ApproveCfti = (props: { owner: any }) => {
 
   const { library, account } = useEthers()
   const allowance = useTokenAllowance(TOKEN_ADDRESS['CFTI'], owner, SPENDER)
-  const pendingRewards = usePendingRewards(owner)
+  // TODO: Set that up in a smarter way
+  const requiredAllowance = 1000 * 10 ** 18
 
   const state = useMemo(() => {
-    if (allowance?.gte(pendingRewards) && allowance?.gt(0)) {
+    if (allowance?.gte(requiredAllowance) && allowance?.gt(0)) {
       return { msg: 'Approved', disabled: true }
     } else if (
       !account ||
@@ -39,7 +39,7 @@ export const ApproveCfti = (props: { owner: any }) => {
         },
       }
     }
-  }, [allowance, pendingRewards, account, owner, library])
+  }, [allowance, requiredAllowance, account, owner, library])
 
   return (
     <Button
