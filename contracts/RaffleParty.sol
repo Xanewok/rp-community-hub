@@ -23,67 +23,79 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
 
     Raffle[] public _raffles;
 
-    uint32 public _raffleCount;
-
     bytes32 public constant RAFFLE_CREATOR = keccak256("RAFFLE_CREATOR");
 
     event RaffleCreated(uint256 indexed raffleId, address indexed creator);
 
     struct Raffle {
-        uint256 cost;
-        uint256 endingSeedRound;
-        uint64 maxEntries;
-        mapping(address => uint256) ticketsBought;
+        uint128 cost;
+        uint64 endingSeedRound;
+        uint32 maxEntries;
+        uint32 totalTicketsBought;
+        mapping(address => uint64) ticketsBought;
         address[] participants;
-        uint256 totalTicketsBought;
     }
 
     constructor(
         address confetti,
         address party,
-        address rpSeeder,
-        address admin
+        address rpSeeder
     ) {
-        _setupRole(RAFFLE_CREATOR, admin);
+        _setupRole(RAFFLE_CREATOR, owner());
 
-        _raffleCount = 0;
         _party = IParty(party);
         _confetti = IConfetti(confetti);
         _rpSeeder = IRpSeeder(rpSeeder);
     }
 
     function createRaffle(
-        uint64 maxEntries,
-        uint256 cost,
-        uint256 endingSeedRound
+        uint128 cost,
+        uint32 maxEntries,
+        uint64 endingSeedRound
     ) public onlyRole(RAFFLE_CREATOR) whenNotPaused {
-        requireNotSeeded(endingSeedRound);
+        // Mitigate possible front-running - disallow the txn about a minute
+        // before the seeder can request randomness. The RP seeder is pre-configured
+        // to require 3 block confirmations, so 60 seconds makes sense (< 3 * 14s)
+        require(getSeed(endingSeedRound) == 0, "Raffle finished");
+        require(
+            endingSeedRound > _rpSeeder.getBatch() ||
+                _rpSeeder.getNextAvailableBatch() > (block.timestamp + 60),
+            "Not enough time before next seed"
+        );
 
-        Raffle storage newRaffle = _raffles[_raffleCount];
-
-        newRaffle.maxEntries = maxEntries;
+        Raffle storage newRaffle = _raffles.push();
+        // Max entries being 0 means unlimited raffle tickets
+        newRaffle.maxEntries = maxEntries == 0 ? type(uint32).max : maxEntries;
         newRaffle.cost = cost;
         newRaffle.endingSeedRound = endingSeedRound;
 
-        emit RaffleCreated(_raffleCount, _msgSender());
-
-        _raffleCount += 1;
+        emit RaffleCreated(_raffles.length, _msgSender());
     }
 
-    function buyTickets(uint256 raffleId, uint256 count) public whenNotPaused {
-        Raffle storage raffle = _raffles[raffleId];
-        requireNotSeeded(raffle.endingSeedRound);
-        require(raffle.totalTicketsBought < raffle.maxEntries, "Sold out");
+    function buyTickets(uint256 raffleId, uint32 count) public whenNotPaused {
+        Raffle storage raffle = getRaffleSafe(raffleId);
+        require(getSeed(raffle.endingSeedRound) == 0, "Raffle finished");
+        // Mitigate possible front-running - disallow the txn about a minute
+        // before the seeder can request randomness. The RP seeder is pre-configured
+        // to require 3 block confirmations, so 60 seconds makes sense (< 3 * 14s)
+        require(
+            raffle.endingSeedRound > _rpSeeder.getBatch() ||
+                _rpSeeder.getNextAvailableBatch() > (block.timestamp + 60),
+            "Not enough time before next seed"
+        );
+        // TODO: Investigate making this check dynamic/different per raffle
         require(_party.getUserHero(_msgSender()) != 0, "No hero staked");
 
-        uint256 ticketCount = Math.min(
-            raffle.maxEntries - raffle.totalTicketsBought,
-            count
-        );
+        uint32 ticketsLeft = raffle.maxEntries - raffle.totalTicketsBought;
+        require(ticketsLeft > 0, "Sold out");
+        // We can't buy more tickets than there are left
+        uint32 ticketCount = count > ticketsLeft ? ticketsLeft : count;
 
         // TODO: Figure out exact tokenomics
         uint256 cost = ticketCount * raffle.cost;
-        _confetti.burnFrom(_msgSender(), cost);
+        if (cost > 0) {
+            _confetti.burnFrom(_msgSender(), cost);
+        }
         if (raffle.ticketsBought[_msgSender()] == 0) {
             raffle.participants.push(_msgSender());
         }
@@ -99,7 +111,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         view
         returns (address[] memory)
     {
-        Raffle storage raffle = _raffles[raffleId];
+        Raffle storage raffle = getRaffleSafe(raffleId);
         uint256 seed = getSeed(raffle.endingSeedRound);
         require(seed != 0, "Raffle not finished");
 
@@ -123,8 +135,44 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
 
     // Utility functions
 
+    function getRaffleSafe(uint256 raffleId)
+        private
+        view
+        returns (Raffle storage)
+    {
+        require(raffleId < _raffles.length, "Raffle doesn't exist");
+        return _raffles[raffleId];
+    }
+
     function getRaffleCount() public view returns (uint256) {
-        return _raffleCount;
+        return _raffles.length;
+    }
+
+    function getRaffleParticipants(uint256 raffleId)
+        public
+        view
+        returns (address[] memory)
+    {
+        return getRaffleSafe(raffleId).participants;
+    }
+
+    function getRaffleView(uint256 raffleId)
+        public
+        view
+        returns (
+            uint128 cost,
+            uint64 endingSeedRound,
+            uint32 maxEntries,
+            uint32 totalTicketsBought
+        )
+    {
+        Raffle storage raffle = getRaffleSafe(raffleId);
+        return (
+            raffle.cost,
+            raffle.endingSeedRound,
+            raffle.maxEntries,
+            raffle.totalTicketsBought
+        );
     }
 
     function getUserTicketsBought(uint256 index, address user)
@@ -132,18 +180,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         view
         returns (uint256)
     {
-        return _raffles[index].ticketsBought[user];
-    }
-
-    function requireNotSeeded(uint256 roundNum) private view {
-        // Mitigate possible front-running - close the sign-ups about a minute
-        // before the seeder can request randomness. The RP seeder is pre-configured
-        // to require 3 block confirmations, so 60 seconds makes sense (< 3 * avg block time of 14s)
-        require(getSeed(roundNum) == 0, "Already seeded");
-        require(
-            _rpSeeder.getNextAvailableBatch() > (block.timestamp + 60),
-            "Seed imminent; sign-up is closed"
-        );
+        return getRaffleSafe(index).ticketsBought[user];
     }
 
     /// @notice Return generated random words for a given seed round

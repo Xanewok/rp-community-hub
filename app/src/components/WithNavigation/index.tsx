@@ -29,7 +29,13 @@ export const WithNavigation: React.FC = (props) => {
   const discordName = useMemo(() => user.user?.user_metadata.name, [user])
 
   return (
-    <Flex flexDirection={['column', 'column', 'row']} h="100vh">
+    <Flex
+      flexDirection={['column', 'column', 'row']}
+      h="100vh"
+      backgroundAttachment="fixed"
+      backgroundSize="cover"
+      backgroundImage="/tiles.png"
+    >
       <Box
         flexShrink={0}
         zIndex={50}

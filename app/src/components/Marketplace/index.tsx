@@ -6,11 +6,13 @@ import {
   Grid,
   useDisclosure,
   useToast,
+  Button,
 } from '@chakra-ui/react'
-import { useGasPrice } from '@usedapp/core'
+import { useEthers, useGasPrice } from '@usedapp/core'
 import { Fragment, useCallback, useEffect, useState } from 'react'
+import { useContracts } from '../../constants'
 import { useNextSeed } from '../../hooks/useNextSeed'
-import { useRaffle, useRaffleCount } from '../../hooks/useRaffles'
+import { useRaffleView, useRaffleCount } from '../../hooks/useRaffles'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
 import { NextSeed } from '../NextSeed'
@@ -54,9 +56,9 @@ const formatNumber = (value: any, decimals: number) =>
   isNaN(Number(value)) ? NaN : roundTo(Number(value) / 10 ** 18, decimals)
 
 const RaffleItem: React.FC<{ id: number }> = (props) => {
-  const raffle = useRaffle(props.id)
+  const raffle = useRaffleView(props.id)
+  console.log({raffle})
   const currentRound = Number(useNextSeed()) - 1
-  console.log({ raffle })
   // TODO: Verify the data shape on the blockchain
   const { cost, totalTicketsBought, maxEntries, endingSeedRound } = raffle
   // TODO: Fetch the data from our backend
@@ -69,11 +71,11 @@ const RaffleItem: React.FC<{ id: number }> = (props) => {
       imgSrc="/moonbirds.png"
       allocatedSpots={Number(totalTicketsBought)}
       spots={Number(maxEntries)}
-      price={formatNumber(cost, 0)}
+      price={formatNumber(cost, 2)}
       onRedeem={() => {}}
       roundsLeft={roundsLeft}
     >
-      {JSON.stringify(raffle)}
+      Data
     </MarketItem>
   )
 }
@@ -81,13 +83,14 @@ const RaffleItem: React.FC<{ id: number }> = (props) => {
 export const Marketplace: React.FC = () => {
   const gasPrice = useGasPrice()
 
+  const { account, library } = useEthers()
+  const { RaffleParty } = useContracts()
+
   const [activeTab, setActiveTab] = useState<
     'raffles' | 'whitelists' | 'rewards'
   >('raffles')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  useEffect(() => {}, [])
 
   const toast = useToast()
   const showErrorToast = useCallback(
@@ -114,6 +117,7 @@ export const Marketplace: React.FC = () => {
   )
 
   const raffleCount = useRaffleCount()
+  console.log({ raffleCount })
 
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
@@ -160,8 +164,20 @@ export const Marketplace: React.FC = () => {
           gap={10}
           gridTemplateColumns="repeat(auto-fill,minmax(500px,1fr))"
         >
-          {Array(raffleCount)
-            .map((e, idx) => idx)
+          <Button
+            onClick={async () => {
+              const signer = library?.getSigner()
+              if (!account || !signer) return
+              const lol = await RaffleParty.connect(signer)
+                .createRaffle('100000000000000000', 5, 10)
+                .catch(showErrorToast)
+              console.log({ lol })
+            }}
+          >
+            Click me
+          </Button>
+          {Array({ length: raffleCount })
+            .map((_val, idx) => idx)
             .map((id) => (
               <RaffleItem key={id} id={id} />
             ))}
