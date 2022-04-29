@@ -58,7 +58,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   } = useNumberInput({
     step: 1,
     defaultValue: 1,
-    min: 1,
+    min: Math.min(1, ticketsLeft),
     max: ticketsLeft,
     precision: 0,
   })
@@ -233,6 +233,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                       mx={3}
                       textAlign="center"
                       {...getInputProps()}
+                      key={`ticketsLeft-${ticketsLeft}`}
                     />
                     <Button {...getIncrementButtonProps()}>+</Button>
                   </Flex>

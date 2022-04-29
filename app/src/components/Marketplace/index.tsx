@@ -101,7 +101,10 @@ const RaffleItem: React.FC<{
   const { cost, totalTicketsBought, maxEntries, endingSeedRound } =
     // TODO: Fix the type shape
     raffle as unknown as any
-  const roundsLeft = Math.max(0, Number(endingSeedRound) - Number(currentRound) + 1)
+  const roundsLeft = Math.max(
+    0,
+    Number(endingSeedRound) - Number(currentRound) + 1
+  )
 
   return (
     <MarketItem
@@ -229,10 +232,15 @@ export const Marketplace: React.FC = () => {
                 onClick={async () => {
                   const signer = library?.getSigner()
                   if (!account || !signer) return
+                  const maxEntries = Math.trunc(Math.random() * 10) + 5
+                  const auxZeroes = Math.trunc(Math.random() * 3)
+                  const tail = Array.from({ length: auxZeroes })
+                    .map(() => '0')
+                    .join('')
                   await RaffleParty.connect(signer)
                     .createRaffle(
-                      '100000000000000000',
-                      10,
+                      '100000000000000000' + tail,
+                      maxEntries,
                       Number(currentRound) + 3
                     )
                     .catch(showErrorToast)
