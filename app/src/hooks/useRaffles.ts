@@ -11,9 +11,24 @@ export const useRaffleView = (raffleId: number) => {
     }) ?? {}
   if (error) {
     console.error(error.message)
-    return 0
+    return undefined
   }
-  return value ? value : {}
+  return (value ? value : {}) as object
+}
+
+export const useRaffleUri = (raffleId: number) => {
+  const { RaffleParty } = useContracts()
+  const { value, error } =
+    useCall({
+      contract: RaffleParty,
+      method: 'raffleURI', // Method to be called
+      args: [raffleId], // Method arguments
+    }) ?? {}
+  if (error) {
+    console.error(error.message)
+    return undefined
+  }
+  return value
 }
 
 export const useRaffleWinners = (raffleId: number) => {

@@ -20,16 +20,19 @@ import { supabase } from '../../utils/supabaseClient'
 
 import { useUser } from '@supabase/supabase-auth-helpers/react'
 import useErrorToast from '../../hooks/useErrorToast'
+import { useContracts } from '../../constants'
+import { ApproveCfti } from '../ApproveCfti'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
+  raffleId?: number
   cftiCost: number
 }
 
 const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
-  const { cftiCost } = props
+  const { cftiCost, raffleId } = props
 
   const {
     getInputProps,
@@ -47,6 +50,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   const showErrorToast = useErrorToast()
 
   const { account, library } = useEthers()
+  const { RaffleParty } = useContracts()
 
   const user = useUser()
   const connectedDiscordName = useMemo(
@@ -211,9 +215,21 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                     />
                     <Button {...getIncrementButtonProps()}>+</Button>
                   </Flex>
-                  <Button w="33%" onClick={() => {
-                    showErrorToast(new Error("so close yet so far"))
-                  }}>Redeem</Button>
+                  <ApproveCfti />
+                  <Button
+                    w="33%"
+                    onClick={async () => {
+                      const signer = library?.getSigner()
+                      if (!account || !signer || typeof raffleId !== 'number')
+                        return
+
+                      await RaffleParty.connect(signer)
+                        .buyTickets(raffleId, itemCount)
+                        .catch(showErrorToast)
+                    }}
+                  >
+                    Buy tickets
+                  </Button>
                 </>
               )}
             </Flex>

@@ -7,7 +7,6 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react'
-import { useCallback } from 'react'
 
 interface MarketItemProps {
   imgSrc: string
@@ -84,19 +83,25 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
                 ></Img>
               </Flex>
               <Text
-                  as="span"
-                  textColor="#AE9ED1"
-                  fontWeight="500"
-                  fontSize="lg"
-                  ml={3}
-                >
-                  {props.roundsLeft <= 0
-                    ? 'Finished'
-                    : `Ends in ${props.roundsLeft} seed rounds`}
-                </Text>
+                as="span"
+                textColor="#AE9ED1"
+                fontWeight="500"
+                fontSize="lg"
+                ml={3}
+              >
+                {props.roundsLeft <= 0
+                  ? 'Finished'
+                  : `Ends in ${props.roundsLeft} seed rounds`}
+              </Text>
             </Flex>
-            <Button mt="2" w="max(50%, 100px)" fontSize="xl" onClick={onRedeem}>
-              Redeem
+            <Button
+              mt="2"
+              w="max(50%, 100px)"
+              fontSize="xl"
+              isDisabled={allocatedSpots >= spots || props.roundsLeft <= 0}
+              onClick={onRedeem}
+            >
+              {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
             </Button>
           </Flex>
         </Flex>

@@ -3,13 +3,14 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
+import "./IConfetti.sol";
 import "./IParty.sol";
 import "./IRPSeeder.sol";
-import "./IConfetti.sol";
 
 /**
  * @title
@@ -17,13 +18,19 @@ import "./IConfetti.sol";
  * @dev
  */
 contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
+    using Strings for uint256;
+
     IConfetti public immutable _confetti;
     IParty public immutable _party;
     IRpSeeder public immutable _rpSeeder;
 
     Raffle[] public _raffles;
 
-    bytes32 public constant RAFFLE_CREATOR = keccak256("RAFFLE_CREATOR");
+    string private _baseRaffleURI;
+
+    bytes32 public constant RAFFLE_CREATOR_ROLE =
+        keccak256("RAFFLE_CREATOR_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
     event RaffleCreated(uint256 indexed raffleId, address indexed creator);
 
@@ -39,20 +46,27 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     constructor(
         address confetti,
         address party,
-        address rpSeeder
+        address rpSeeder,
+        string memory baseRaffleURI
     ) {
-        _setupRole(RAFFLE_CREATOR, owner());
+        _setupRole(RAFFLE_CREATOR_ROLE, owner());
+        _setupRole(PAUSER_ROLE, owner());
 
         _party = IParty(party);
         _confetti = IConfetti(confetti);
         _rpSeeder = IRpSeeder(rpSeeder);
+        _baseRaffleURI = baseRaffleURI;
     }
 
     function createRaffle(
         uint128 cost,
         uint32 maxEntries,
         uint64 endingSeedRound
-    ) public onlyRole(RAFFLE_CREATOR) whenNotPaused {
+    ) public
+    // NOTE: cba to add a hot wallet role admin setup so just allow everyone
+    // to create raffles during the Rinkeby testing period
+    // onlyRole(RAFFLE_CREATOR_ROLE)
+    whenNotPaused {
         // Mitigate possible front-running - disallow the txn about a minute
         // before the seeder can request randomness. The RP seeder is pre-configured
         // to require 3 block confirmations, so 60 seconds makes sense (< 3 * 14s)
@@ -91,7 +105,6 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         // We can't buy more tickets than there are left
         uint32 ticketCount = count > ticketsLeft ? ticketsLeft : count;
 
-        // TODO: Figure out exact tokenomics
         uint256 cost = ticketCount * raffle.cost;
         if (cost > 0) {
             _confetti.burnFrom(_msgSender(), cost);
@@ -100,6 +113,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
             raffle.participants.push(_msgSender());
         }
         raffle.ticketsBought[_msgSender()] += ticketCount;
+        raffle.totalTicketsBought += ticketCount;
     }
 
     /// @dev This is a naive, expensive version that should be only read off-chain.
@@ -133,7 +147,28 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         return shuffledAddresses(tickets, seed);
     }
 
-    // Utility functions
+    function setBaseRaffleURI(string memory uri) external {
+        _baseRaffleURI = uri;
+    }
+
+    function raffleURI(uint256 raffleId) external view returns (string memory) {
+        getRaffleSafe(raffleId);
+
+        return
+            bytes(_baseRaffleURI).length > 0
+                ? string(abi.encodePacked(_baseRaffleURI, raffleId.toString()))
+                : "";
+    }
+
+    function pause() external onlyRole(PAUSER_ROLE) whenNotPaused {
+        _pause();
+    }
+
+    function unpause() external onlyRole(PAUSER_ROLE) whenPaused {
+        _unpause();
+    }
+
+    // Accessors
 
     function getRaffleSafe(uint256 raffleId)
         private
@@ -182,6 +217,8 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     {
         return getRaffleSafe(index).ticketsBought[user];
     }
+
+    // Utility functions
 
     /// @notice Return generated random words for a given seed round
     function getSeed(uint256 roundNum) public view returns (uint256) {

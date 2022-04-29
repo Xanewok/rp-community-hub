@@ -7,15 +7,15 @@ import { useContracts } from '../../constants'
 const MAX_UINT256 = ethers.constants.MaxUint256
 
 // 1. If the user has already approved the contract, just
-export const ApproveCfti = (props: { owner: any }) => {
-  const { owner } = props
+export const ApproveCfti = (props: { owner?: any }) => {
   const { Confetti, RaffleParty } = useContracts()
 
   const { library, account } = useEthers()
+  const owner = props.owner || account
   const spender = RaffleParty.address
   const allowance = useTokenAllowance(Confetti.address, owner, spender)
   // TODO: Set that up in a smarter way
-  const requiredAllowance = 1000 * 10 ** 18
+  const requiredAllowance = MAX_UINT256
 
   const state = useMemo(() => {
     if (allowance?.gte(requiredAllowance) && allowance?.gt(0)) {

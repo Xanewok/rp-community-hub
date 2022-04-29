@@ -6,7 +6,7 @@ import { useNextSeed } from '../../hooks'
 
 export const NextSeed: React.FC = (props) => {
   const { account, library } = useEthers()
-  const { SeederV2 } = useContracts()
+  const { RpSeeder } = useContracts()
 
   const nextSeedBatch = Number(useNextSeed())
   const [timeTillSeed, setTimeTillSeed] = useState(NaN)
@@ -20,9 +20,9 @@ export const NextSeed: React.FC = (props) => {
     if (isDisabled) return
     const signer = account && library?.getSigner(account)
     if (signer) {
-      SeederV2.connect(signer).executeRequestMulti()
+      RpSeeder.connect(signer).executeRequestMulti()
     }
-  }, [isDisabled, SeederV2, account, library])
+  }, [isDisabled, RpSeeder, account, library])
 
   return (
     <Flex

@@ -17,6 +17,7 @@ contract TestSeederV2 is ISeederV2 {
 
     constructor(address testSeedStorage_) {
         testSeedStorage = ITestSeedStorage(testSeedStorage_);
+        batch = 1;
     }
 
     function setBatch(uint256 batch_) external {

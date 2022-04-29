@@ -9,10 +9,15 @@ import {
   Button,
 } from '@chakra-ui/react'
 import { useEthers, useGasPrice } from '@usedapp/core'
+import assert from 'assert'
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useContracts } from '../../constants'
-import { useNextSeed } from '../../hooks/useNextSeed'
-import { useRaffleView, useRaffleCount } from '../../hooks/useRaffles'
+import { useCurrentSeedRound, useNextSeed } from '../../hooks/useNextSeed'
+import {
+  useRaffleView,
+  useRaffleCount,
+  useRaffleUri,
+} from '../../hooks/useRaffles'
 import { InfoShield } from '../InfoShield'
 import { MarketItem } from '../MarketItem'
 import { NextSeed } from '../NextSeed'
@@ -55,27 +60,62 @@ const roundTo = (value: number, decimals: number) =>
 const formatNumber = (value: any, decimals: number) =>
   isNaN(Number(value)) ? NaN : roundTo(Number(value) / 10 ** 18, decimals)
 
-const RaffleItem: React.FC<{ id: number }> = (props) => {
-  const raffle = useRaffleView(props.id)
-  console.log({raffle})
-  const currentRound = Number(useNextSeed()) - 1
-  // TODO: Verify the data shape on the blockchain
-  const { cost, totalTicketsBought, maxEntries, endingSeedRound } = raffle
-  // TODO: Fetch the data from our backend
-  const { name, imgSrc } = { name: 'Raffle item', imgSrc: '/moonbirds.png' }
-  const roundsLeft = Math.max(0, Number(endingSeedRound) - currentRound)
+type Erc721Metadata = {
+  name: string
+  description: string
+  image: string
+}
+
+const RaffleItem: React.FC<{
+  id: number
+  openModalWithData: (data: { raffleId: number; cost: number }) => void
+}> = ({ id, openModalWithData }) => {
+  const raffle = useRaffleView(id)
+  const metadataUri = useRaffleUri(id % 6)
+
+  console.log({ metadataUri })
+  const currentRound = useCurrentSeedRound()
+
+  const [data, setData] = useState<Erc721Metadata>()
+  useEffect(() => {
+    if (!metadataUri) return
+    fetch(`${metadataUri}`)
+      .then(async (res) => {
+        assert(res.ok)
+        const { name, description, image } = await res.json()
+        if (!name || !description || !image) {
+          throw new Error("Responde doesn't contain raffle data")
+        }
+        setData({ name, description, image })
+      })
+      .catch((err) => console.error(err))
+  }, [metadataUri])
+
+  const { account, library } = useEthers()
+  const { RaffleParty } = useContracts()
+
+  console.log({ id, data, raffle })
+  // TODO: Handle errors
+  if (!data || !raffle) return null
+
+  const { cost, totalTicketsBought, maxEntries, endingSeedRound } =
+    // TODO: Fix the type shape
+    raffle as unknown as any
+  const roundsLeft = Math.max(0, Number(endingSeedRound) - Number(currentRound))
 
   return (
     <MarketItem
-      name="Raffle item"
-      imgSrc="/moonbirds.png"
+      name={`${data.name} (${id})`}
+      imgSrc={data.image}
       allocatedSpots={Number(totalTicketsBought)}
       spots={Number(maxEntries)}
       price={formatNumber(cost, 2)}
-      onRedeem={() => {}}
+      onRedeem={() =>
+        openModalWithData({ raffleId: id, cost: Number(cost) / 10 ** 18 })
+      }
       roundsLeft={roundsLeft}
     >
-      Data
+      {data.description}
     </MarketItem>
   )
 }
@@ -84,11 +124,13 @@ export const Marketplace: React.FC = () => {
   const gasPrice = useGasPrice()
 
   const { account, library } = useEthers()
-  const { RaffleParty } = useContracts()
+  const { Confetti, RaffleParty, Party } = useContracts()
 
   const [activeTab, setActiveTab] = useState<
     'raffles' | 'whitelists' | 'rewards'
   >('raffles')
+
+  const currentRound = useCurrentSeedRound()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -107,16 +149,18 @@ export const Marketplace: React.FC = () => {
   )
 
   const [cftiCost, setCftiCost] = useState(0)
+  const [raffleId, setRaffleId] = useState<number>()
 
-  const onRedeem = useCallback(
-    (cost: number) => {
-      setCftiCost(cost)
+  const openModalWithData = useCallback(
+    (data: { raffleId: number; cost: number }) => {
+      setRaffleId(data.raffleId)
+      setCftiCost(data.cost)
       onOpen()
     },
     [onOpen]
   )
 
-  const raffleCount = useRaffleCount()
+  let raffleCount = useRaffleCount()
   console.log({ raffleCount })
 
   return (
@@ -164,113 +208,91 @@ export const Marketplace: React.FC = () => {
           gap={10}
           gridTemplateColumns="repeat(auto-fill,minmax(500px,1fr))"
         >
-          <Button
-            onClick={async () => {
-              const signer = library?.getSigner()
-              if (!account || !signer) return
-              const lol = await RaffleParty.connect(signer)
-                .createRaffle('100000000000000000', 5, 10)
-                .catch(showErrorToast)
-              console.log({ lol })
-            }}
+          <Box
+            pb={5}
+            boxShadow="0 -2px 0 0 #2b2258,0 2px 0 0 #2b2258,-2px 0 0 0 #2b2258,2px 0 0 0 #2b2258,0 0 0 2px #0a0414,0 -4px 0 0 #0a0414,0 4px 0 0 #0a0414,-4px 0 0 0 #0a0414,4px 0 0 0 #0a0414;"
           >
-            Click me
-          </Button>
-          {Array({ length: raffleCount })
-            .map((_val, idx) => idx)
-            .map((id) => (
-              <RaffleItem key={id} id={id} />
-            ))}
-          {activeTab === 'raffles' ? (
-            <>
-              <MarketItem
-                name="Moonbirds"
-                imgSrc="/moonbirds.png"
-                allocatedSpots={6}
-                spots={30}
-                price={500}
-                onRedeem={() => onRedeem(500)}
-                roundsLeft={3}
+            <Heading textColor="white" textAlign="center">
+              Toy box
+            </Heading>
+            <Flex direction="row" justify="center">
+              <Button mx={5} isDisabled={true}>
+                Current seed round: {Number(currentRound)}
+              </Button>
+              <Button
+                mx={5}
+                onClick={async () => {
+                  const signer = library?.getSigner()
+                  if (!account || !signer) return
+                  const lol = await RaffleParty.connect(signer)
+                    .createRaffle(
+                      '100000000000000000',
+                      10,
+                      Number(currentRound) + 3
+                    )
+                    .catch(showErrorToast)
+                  console.log({ lol })
+                }}
               >
-                A collection of 10,000 utility-enabled PFPs that feature a
-                richly diverse and unique pool of rarity-powered traits.
-                What&apos;s more, each Moonbird unlocks private club membership
-                and additional benefits the longer you hold them.
-              </MarketItem>
-              <MarketItem
-                name="Shinsei Galverse"
-                imgSrc="/galverse.png"
-                allocatedSpots={6}
-                spots={30}
-                price={500}
-                onRedeem={() => onRedeem(500)}
-                roundsLeft={3}
+                Create raffle
+              </Button>
+              <Button
+                mx={5}
+                onClick={async () => {
+                  const signer = library?.getSigner()
+                  if (!account || !signer) return
+                  const heroId = Math.trunc(Math.random() * 4226)
+                  await Party.connect(signer)
+                    .setUserHero(heroId)
+                    .catch(showErrorToast)
+                }}
               >
-                Shinsei Galverse is a collection of 8,888 Gals shooting across
-                space and time to bring a project of peace to all cultures and
-                people.
-              </MarketItem>
-              <MarketItem
-                name="Murakami Flowers"
-                imgSrc="/murakami.png"
-                allocatedSpots={6}
-                spots={30}
-                price={1000}
-                onRedeem={() => onRedeem(1000)}
-                roundsLeft={3}
+                Stake hero
+              </Button>
+              <Button
+                mx={5}
+                onClick={async () => {
+                  const signer = library?.getSigner()
+                  if (!account || !signer) return
+                  await Party.connect(signer)
+                    .setUserHero(0)
+                    .catch(showErrorToast)
+                }}
               >
-                Murakami.Flowers is a work in which artist Takashi Murakami’s
-                representative artwork, flowers, are expressed as dot art
-                evocative of Japanese TV games created in the 1970s. Each field
-                has 108 flower images, resulting in 11,664 flower images in
-                total.
-              </MarketItem>
-              <MarketItem
-                name="Zarc"
-                imgSrc="/zarc.jpg"
-                allocatedSpots={0}
-                spots={1}
-                price={9999}
-                onRedeem={() => onRedeem(9999)}
-                roundsLeft={100}
+                Unstake hero
+              </Button>
+              <Button
+                mx={5}
+                onClick={async () => {
+                  const signer = library?.getSigner()
+                  if (!account || !signer || !account) return
+                  await Confetti.connect(signer)
+                    .mint(account, '1000000000000000000000')
+                    .catch(showErrorToast)
+                }}
               >
-                ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-              </MarketItem>
-              <MarketItem
-                name="Everai Heroes"
-                imgSrc="/everai.jpg"
-                allocatedSpots={6}
-                spots={10}
-                price={500}
-                onRedeem={() => onRedeem(500)}
-                roundsLeft={5}
-              >
-                Everai is a brand of Heroes. Our mission is to build a
-                long-lasting metaverse brand. Built for the people, with the
-                people. Everai holders will be granted exclusive access to
-                drops, experiences, and much more.
-              </MarketItem>
-              <MarketItem
-                name="ON1 Force"
-                imgSrc="/oni.png"
-                allocatedSpots={7}
-                spots={30}
-                price={500}
-                onRedeem={() => onRedeem(500)}
-                roundsLeft={5}
-              >
-                The 0N1 Force are 7,777 generative side-profile characters with
-                over 100 hand-drawn features fighting for their existence.
-                Strength, spirit, and style are what you’ll need to survive in
-                The Ethereal Enclave.
-              </MarketItem>
-            </>
-          ) : (
-            []
-          )}
+                Mint 1k $TCFTI
+              </Button>
+            </Flex>
+          </Box>
+          {}
+          {activeTab === 'raffles'
+            ? Array.from({ length: raffleCount }).map((_, idx) => (
+                <RaffleItem
+                  key={idx}
+                  id={idx}
+                  openModalWithData={openModalWithData}
+                />
+              ))
+            : []}
         </Grid>
       </Box>
-      <PurchaseModal cftiCost={cftiCost} isOpen={isOpen} onClose={onClose} />
+      <PurchaseModal
+        raffleId={raffleId}
+        cftiCost={cftiCost}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
     </Box>
   )
 }
