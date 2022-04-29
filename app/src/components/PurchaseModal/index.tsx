@@ -13,7 +13,7 @@ import {
   Box,
   useNumberInput,
 } from '@chakra-ui/react'
-import { useEthers } from '@usedapp/core'
+import { useEthers, useTokenAllowance } from '@usedapp/core'
 import { useEffect, useMemo, useState } from 'react'
 
 import { supabase } from '../../utils/supabaseClient'
@@ -23,16 +23,32 @@ import useErrorToast from '../../hooks/useErrorToast'
 import { useContracts } from '../../constants'
 import { ApproveCfti } from '../ApproveCfti'
 
+import { BigNumber } from '@ethersproject/bignumber'
+import { id } from 'ethers/utils'
+import { useRaffleView } from '../../hooks/useRaffles'
+
+const roundTo = (value: number, decimals: number) =>
+  Math.floor(value * 10 ** decimals) / 10 ** decimals
+
+const formatNumber = (value: any, decimals: number) =>
+  isNaN(Number(value)) ? NaN : roundTo(Number(value) / 10 ** 18, decimals)
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
   raffleId?: number
-  cftiCost: number
+  cftiCost: any
 }
 
 const PurchaseModal: React.FC<ModalProps> = (props) => {
   const { isOpen, onClose } = props
-  const { cftiCost, raffleId } = props
+  const { raffleId } = props
+
+  // TODO: Handle this
+  const raffle = useRaffleView(raffleId || 0)
+  const cftiCost = raffle?.cost || NaN
+  const ticketsLeft =
+    Number(raffle?.maxEntries) - Number(raffle?.totalTicketsBought)
 
   const {
     getInputProps,
@@ -43,14 +59,20 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     step: 1,
     defaultValue: 1,
     min: 1,
-    max: 6,
+    max: ticketsLeft,
     precision: 0,
   })
 
   const showErrorToast = useErrorToast()
 
   const { account, library } = useEthers()
-  const { RaffleParty } = useContracts()
+  const { RaffleParty, Confetti } = useContracts()
+
+  const allowance = useTokenAllowance(
+    Confetti.address,
+    account,
+    RaffleParty.address
+  )
 
   const user = useUser()
   const connectedDiscordName = useMemo(
@@ -78,8 +100,6 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
 
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
-  // Reset the state on modal open/close
-  useEffect(() => {}, [connectedDiscordName, isOpen])
 
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
@@ -122,9 +142,10 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
           </Flex>
           <Flex pt={8} pb={5} px={10} direction="column" justify="center">
             <Text mx="auto" px="15%" textAlign="center" fontWeight="500">
-              You&apos;re almost done! Please submit your Discord ID to verify
-              eligibility and complete your purchase. Make sure to include your
-              unique 4-digit identifier as seen below!
+              You&apos;re almost done! Approve the Marketplace to spend your
+              $CFTI and choose how many tickets you&apos;d like to buy. In the
+              future, you will need to submit your Discord ID in order to
+              participate in raffles.
             </Text>
             <Text
               mx="auto"
@@ -134,11 +155,11 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               alignSelf="center"
               textColor="red.400"
             >
-              This transaction will cost {cftiCost * itemCount}{' '}
+              This transaction will cost {formatNumber(cftiCost * itemCount, 2)}{' '}
               <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
             </Text>
             <Flex direction="row" justify="space-evenly">
-              {!!connectedDiscordName || (
+              {/* {!!connectedDiscordName || (
                 <Button
                   onClick={async () => {
                     const { user, session, error } = await supabase.auth.signIn(
@@ -196,9 +217,9 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                   >
                     Connect wallet
                   </Button>
-                ))}
-              {!!connectedDiscordName && !!isLoggedWithEthereum && (
-                <>
+                ))} */}
+              {
+                /* !!connectedDiscordName && !!isLoggedWithEthereum && */ <>
                   <Flex direction="row">
                     <Button
                       style={{ width: '26px' }}
@@ -215,23 +236,26 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                     />
                     <Button {...getIncrementButtonProps()}>+</Button>
                   </Flex>
-                  <ApproveCfti />
-                  <Button
-                    w="33%"
-                    onClick={async () => {
-                      const signer = library?.getSigner()
-                      if (!account || !signer || typeof raffleId !== 'number')
-                        return
+                  {allowance?.lt(BigNumber.from(10).pow(27)) ? (
+                    <ApproveCfti />
+                  ) : (
+                    <Button
+                      w="33%"
+                      onClick={async () => {
+                        const signer = library?.getSigner()
+                        if (!account || !signer || typeof raffleId !== 'number')
+                          return
 
-                      await RaffleParty.connect(signer)
-                        .buyTickets(raffleId, itemCount)
-                        .catch(showErrorToast)
-                    }}
-                  >
-                    Buy tickets
-                  </Button>
+                        await RaffleParty.connect(signer)
+                          .buyTickets(raffleId, itemCount)
+                          .catch(showErrorToast)
+                      }}
+                    >
+                      Buy tickets
+                    </Button>
+                  )}
                 </>
-              )}
+              }
             </Flex>
           </Flex>
         </ModalBody>

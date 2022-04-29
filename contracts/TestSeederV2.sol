@@ -9,27 +9,26 @@ interface ITestSeedStorage {
 
 // Originally deployed at https://etherscan.io/address/0x2Ed251752DA7F24F33CFbd38438748BB8eeb44e1
 contract TestSeederV2 is ISeederV2 {
-    ITestSeedStorage testSeedStorage;
-    uint256 batch;
+    ITestSeedStorage _testSeedStorage;
+    uint256 _batch;
     mapping(uint256 => bytes32) batchToReqId;
-    uint256 _lastBatchTimestamp = 1649198305;
+    uint256 _lastBatchTimestamp;
     uint256 _batchCadence = 90;
 
-    constructor(address testSeedStorage_) {
-        testSeedStorage = ITestSeedStorage(testSeedStorage_);
-        batch = 1;
+    constructor(address testSeedStorage) {
+        _testSeedStorage = ITestSeedStorage(testSeedStorage);
     }
 
-    function setBatch(uint256 batch_) external {
-        batch = batch_;
+    function setBatch(uint256 batch) external {
+        _batch = batch;
     }
 
-    function setBatchCadence(uint256 batchCadence_) external {
-        _batchCadence = batchCadence_;
+    function setBatchCadence(uint256 batchCadence) external {
+        _batchCadence = batchCadence;
     }
 
-    function setBatchToReqId(uint256 batch_, bytes32 reqId) external {
-        batchToReqId[batch_] = reqId;
+    function setBatchToReqId(uint256 batch, bytes32 reqId) external {
+        batchToReqId[batch] = reqId;
     }
 
     function setLastBatchTimestamp(uint256 value) external {
@@ -41,27 +40,30 @@ contract TestSeederV2 is ISeederV2 {
     }
 
     function executeRequestMulti() external {
-        // Poor man's randomness generator - ONLY use this when testing
-        testSeedStorage.setRandomness(
-            batchToReqId[batch],
+        // NOTE: Poor man's randomness generator - use this **ONLY** when testing
+        // Simulate generating a randomness request for the current round...
+        batchToReqId[_batch] = keccak256(
+            abi.encodePacked(block.timestamp, _batch)
+        );
+        // ...and immediatelly fulfilling it
+        _testSeedStorage.setRandomness(
+            batchToReqId[_batch],
             uint256(keccak256(abi.encodePacked(block.timestamp, block.number)))
         );
-
-        batch = batch + 1;
-        batchToReqId[batch] = keccak256(abi.encodePacked(batch));
+        _batch += 1;
         _lastBatchTimestamp = block.timestamp;
     }
 
     function getBatch() external view override returns (uint256) {
-        return batch;
+        return _batch;
     }
 
-    function getReqByBatch(uint256 batch_)
+    function getReqByBatch(uint256 batch)
         external
         view
         override
         returns (bytes32)
     {
-        return batchToReqId[batch_];
+        return batchToReqId[batch];
     }
 }

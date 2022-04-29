@@ -87,6 +87,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     }
 
     function buyTickets(uint256 raffleId, uint32 count) public whenNotPaused {
+        require(count > 0, "Need to buy at least 1 ticket");
         Raffle storage raffle = getRaffleSafe(raffleId);
         require(getSeed(raffle.endingSeedRound) == 0, "Raffle finished");
         // Mitigate possible front-running - disallow the txn about a minute
@@ -135,13 +136,16 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         // function.
         // This way, the storage cost would be 2*|participants| rather than
         // |totalTickets|
+        uint256 ticketsAssigned = 0;
         address[] memory tickets = new address[](raffle.totalTicketsBought);
         for (uint256 i = 0; i < raffle.participants.length; i++) {
             address participant = raffle.participants[i];
+
             uint256 ticketsBought = raffle.ticketsBought[participant];
             for (uint256 j = 0; j < ticketsBought; j++) {
-                tickets[i + j] = participant;
+                tickets[ticketsAssigned + j] = participant;
             }
+            ticketsAssigned += ticketsBought;
         }
 
         return shuffledAddresses(tickets, seed);

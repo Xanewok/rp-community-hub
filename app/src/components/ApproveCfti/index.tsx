@@ -4,6 +4,8 @@ import { ethers } from 'ethers'
 import { useMemo } from 'react'
 import { useContracts } from '../../constants'
 
+import { BigNumber } from '@ethersproject/bignumber'
+
 const MAX_UINT256 = ethers.constants.MaxUint256
 
 // 1. If the user has already approved the contract, just
@@ -15,7 +17,7 @@ export const ApproveCfti = (props: { owner?: any }) => {
   const spender = RaffleParty.address
   const allowance = useTokenAllowance(Confetti.address, owner, spender)
   // TODO: Set that up in a smarter way
-  const requiredAllowance = MAX_UINT256
+  const requiredAllowance = BigNumber.from(10).pow(27)
 
   const state = useMemo(() => {
     if (allowance?.gte(requiredAllowance) && allowance?.gt(0)) {
@@ -40,12 +42,7 @@ export const ApproveCfti = (props: { owner?: any }) => {
   }, [allowance, requiredAllowance, account, owner, library, Confetti, spender])
 
   return (
-    <Button
-      size="xs"
-      p="0 1px 6px 1px"
-      onClick={state.onClick}
-      disabled={state.disabled}
-    >
+    <Button onClick={state.onClick} disabled={state.disabled}>
       {state.msg}
     </Button>
   )

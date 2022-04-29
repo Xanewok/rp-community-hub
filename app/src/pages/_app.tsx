@@ -19,6 +19,7 @@ const MotionBox = motion(Box)
 const config: Config = {
   autoConnect: true,
   networks: [Mainnet, Rinkeby],
+  multicallVersion: 2,
 }
 
 function NextApp({ Component, pageProps, router }: AppProps): JSX.Element {

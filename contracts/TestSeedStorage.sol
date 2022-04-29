@@ -7,6 +7,12 @@ import './ISeedStorage.sol';
 contract TestSeedStorage is ISeedStorage {
     mapping(bytes32 => uint256) randomness;
 
+    constructor() {
+        // For some reason the first offset is non-null - is it because of the
+        // storage ABI layout? Are we pointing to ourselves?
+        randomness[0x0] = 0;
+    }
+
     function setRandomness(bytes32 key, uint256 value) external {
         randomness[key] = value;
     }

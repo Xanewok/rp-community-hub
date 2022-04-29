@@ -8,7 +8,7 @@ import {
   useToast,
   Button,
 } from '@chakra-ui/react'
-import { useEthers, useGasPrice } from '@usedapp/core'
+import { ChainId, useEthers, useGasPrice, useNetwork } from '@usedapp/core'
 import assert from 'assert'
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { useContracts } from '../../constants'
@@ -101,7 +101,7 @@ const RaffleItem: React.FC<{
   const { cost, totalTicketsBought, maxEntries, endingSeedRound } =
     // TODO: Fix the type shape
     raffle as unknown as any
-  const roundsLeft = Math.max(0, Number(endingSeedRound) - Number(currentRound))
+  const roundsLeft = Math.max(0, Number(endingSeedRound) - Number(currentRound) + 1)
 
   return (
     <MarketItem
@@ -110,9 +110,7 @@ const RaffleItem: React.FC<{
       allocatedSpots={Number(totalTicketsBought)}
       spots={Number(maxEntries)}
       price={formatNumber(cost, 2)}
-      onRedeem={() =>
-        openModalWithData({ raffleId: id, cost: Number(cost) / 10 ** 18 })
-      }
+      onRedeem={() => openModalWithData({ raffleId: id, cost })}
       roundsLeft={roundsLeft}
     >
       {data.description}
@@ -161,7 +159,9 @@ export const Marketplace: React.FC = () => {
   )
 
   let raffleCount = useRaffleCount()
-  console.log({ raffleCount })
+  const {
+    network: { chainId },
+  } = useNetwork()
 
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
@@ -215,6 +215,11 @@ export const Marketplace: React.FC = () => {
             <Heading textColor="white" textAlign="center">
               Toy box
             </Heading>
+            {chainId != ChainId.Rinkeby && (
+              <Heading textColor="red" textAlign="center" mt={-5}>
+                Please switch to the Rinkeby testnet
+              </Heading>
+            )}
             <Flex direction="row" justify="center">
               <Button mx={5} isDisabled={true}>
                 Current seed round: {Number(currentRound)}
@@ -224,14 +229,13 @@ export const Marketplace: React.FC = () => {
                 onClick={async () => {
                   const signer = library?.getSigner()
                   if (!account || !signer) return
-                  const lol = await RaffleParty.connect(signer)
+                  await RaffleParty.connect(signer)
                     .createRaffle(
                       '100000000000000000',
                       10,
                       Number(currentRound) + 3
                     )
                     .catch(showErrorToast)
-                  console.log({ lol })
                 }}
               >
                 Create raffle

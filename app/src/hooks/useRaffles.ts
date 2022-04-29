@@ -1,19 +1,21 @@
 import { useCall } from '@usedapp/core'
 import { useContracts } from '../constants'
 
-export const useRaffleView = (raffleId: number) => {
+export const useRaffleView = (raffleId: number | undefined) => {
   const { RaffleParty } = useContracts()
   const { value, error } =
-    useCall({
-      contract: RaffleParty,
-      method: 'getRaffleView', // Method to be called
-      args: [raffleId], // Method arguments
-    }) ?? {}
+    useCall(
+      typeof raffleId == 'number' && {
+        contract: RaffleParty,
+        method: 'getRaffleView', // Method to be called
+        args: [raffleId], // Method arguments
+      }
+    ) ?? {}
   if (error) {
     console.error(error.message)
     return undefined
   }
-  return (value ? value : {}) as object
+  return (value ? value : {}) as Record<string, any>
 }
 
 export const useRaffleUri = (raffleId: number) => {
