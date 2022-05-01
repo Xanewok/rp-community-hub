@@ -73,7 +73,6 @@ const RaffleItem: React.FC<{
   const raffle = useRaffleView(id)
   const metadataUri = useRaffleUri(id % 6)
 
-  console.log({ metadataUri })
   const currentRound = useCurrentSeedRound()
 
   const [data, setData] = useState<Erc721Metadata>()
@@ -94,10 +93,6 @@ const RaffleItem: React.FC<{
   const { account, library } = useEthers()
   const { RaffleParty } = useContracts()
 
-  console.log({ id, data, raffle })
-  // TODO: Handle errors
-  if (!data || !raffle) return null
-
   const { cost, totalTicketsBought, maxEntries, endingSeedRound } =
     // TODO: Fix the type shape
     raffle as unknown as any
@@ -105,6 +100,19 @@ const RaffleItem: React.FC<{
     0,
     Number(endingSeedRound) - Number(currentRound) + 1
   )
+
+  const [winners, setWinners] = useState('')
+  useEffect(() => {
+    if (roundsLeft > 0) return
+    // TODO: Unify what's on chain and what's not (URI-wise)
+    fetch(`/api/raffle/${id}/winners`).then(async (res) => {
+      setWinners(res.ok ? `Winners: ${await res.text()}` : '')
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundsLeft, id])
+
+  // TODO: Handle errors
+  if (!data || !raffle) return null
 
   return (
     <MarketItem
@@ -115,6 +123,7 @@ const RaffleItem: React.FC<{
       price={formatNumber(cost, 2)}
       onRedeem={() => openModalWithData({ raffleId: id, cost })}
       roundsLeft={roundsLeft}
+      buttonTooltip={winners}
     >
       {data.description}
     </MarketItem>

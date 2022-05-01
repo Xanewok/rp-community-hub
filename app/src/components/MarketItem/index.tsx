@@ -5,8 +5,10 @@ import {
   Heading,
   Img,
   Text,
+  Tooltip,
   useToast,
 } from '@chakra-ui/react'
+import { useEffect } from 'react'
 
 interface MarketItemProps {
   imgSrc: string
@@ -16,6 +18,7 @@ interface MarketItemProps {
   allocatedSpots: number
   onRedeem: () => void
   roundsLeft: number
+  buttonTooltip: string
 }
 
 export const MarketItem: React.FC<MarketItemProps> = (props) => {
@@ -94,15 +97,17 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
                   : `Ends in ${props.roundsLeft} seed rounds`}
               </Text>
             </Flex>
-            <Button
-              mt="2"
-              w="max(50%, 100px)"
-              fontSize="xl"
-              isDisabled={allocatedSpots >= spots || props.roundsLeft <= 0}
-              onClick={onRedeem}
-            >
-              {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
-            </Button>
+            <Tooltip shouldWrapChildren label={props.buttonTooltip}>
+              <Button
+                mt="2"
+                w="max(50%, 100px)"
+                fontSize="xl"
+                isDisabled={allocatedSpots >= spots || props.roundsLeft <= 0}
+                onClick={onRedeem}
+              >
+                {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
+              </Button>
+            </Tooltip>
           </Flex>
         </Flex>
       </Flex>
