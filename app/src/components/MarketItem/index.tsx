@@ -8,7 +8,6 @@ import {
   Tooltip,
   useToast,
 } from '@chakra-ui/react'
-import { useEffect } from 'react'
 
 interface MarketItemProps {
   imgSrc: string
