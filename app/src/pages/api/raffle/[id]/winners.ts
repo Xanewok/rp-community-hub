@@ -53,6 +53,6 @@ export default async function handler(
   if (error) {
     return res.status(400).send(error.message)
   } else {
-    return res.status(200).json(data)
+    return res.status(200).json(data || [])
   }
 }

@@ -1,5 +1,5 @@
-import { Button, Flex, Img, Text, Tooltip } from '@chakra-ui/react'
-import { useEthers, useInterval, useTokenBalance } from '@usedapp/core'
+import { Button, Flex, Img, Text, Tooltip, useInterval } from '@chakra-ui/react'
+import { useEthers, useTokenBalance } from '@usedapp/core'
 import { useState, useCallback } from 'react'
 import { useContracts } from '../../constants'
 import { useNextSeed } from '../../hooks'

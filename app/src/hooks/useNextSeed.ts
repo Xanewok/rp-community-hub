@@ -5,7 +5,7 @@ export const useNextSeed = () => {
   const { RpSeeder } = useContracts()
   const { value, error } =
     useCall({
-      contract: RpSeeder,
+      contract: RpSeeder as any,
       method: 'getNextAvailableBatch',
       args: [],
     }) ?? {}
@@ -21,7 +21,7 @@ export const useCurrentSeedRound = () => {
   const { RpSeeder } = useContracts()
   const { value, error } =
     useCall({
-      contract: RpSeeder,
+      contract: RpSeeder as any,
       method: 'getBatch',
       args: [],
     }) ?? {}

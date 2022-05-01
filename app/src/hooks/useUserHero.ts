@@ -6,7 +6,7 @@ export const useUserHero = (address: string | null | undefined) => {
   const { value, error } =
     useCall(
       address && {
-        contract: Party,
+        contract: Party as any,
         method: 'getUserHero', // Method to be called
         args: [address], // Method arguments
       }

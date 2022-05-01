@@ -103,7 +103,7 @@ const RaffleItem: React.FC<{
 
   const [winners, setWinners] = useState('')
   useEffect(() => {
-    if (roundsLeft > 0) return
+    if (roundsLeft <= 0) return
     // TODO: Unify what's on chain and what's not (URI-wise)
     fetch(`/api/raffle/${id}/winners`).then(async (res) => {
       setWinners(res.ok ? `Winners: ${await res.text()}` : '')

@@ -6,7 +6,7 @@ export const useRaffleView = (raffleId: number | undefined) => {
   const { value, error } =
     useCall(
       typeof raffleId == 'number' && {
-        contract: RaffleParty,
+        contract: RaffleParty as any,
         method: 'getRaffleView', // Method to be called
         args: [raffleId], // Method arguments
       }
@@ -22,7 +22,7 @@ export const useRaffleUri = (raffleId: number) => {
   const { RaffleParty } = useContracts()
   const { value, error } =
     useCall({
-      contract: RaffleParty,
+      contract: RaffleParty as any,
       method: 'raffleURI', // Method to be called
       args: [raffleId], // Method arguments
     }) ?? {}
@@ -37,7 +37,7 @@ export const useRaffleWinners = (raffleId: number) => {
   const { RaffleParty } = useContracts()
   const { value, error } =
     useCall({
-      contract: RaffleParty,
+      contract: RaffleParty as any,
       method: 'raffleWinners', // Method to be called
       args: [raffleId], // Method arguments
     }) ?? {}
@@ -52,7 +52,7 @@ export const useRaffleParticipants = (raffleId: number) => {
   const { RaffleParty } = useContracts()
   const { value, error } =
     useCall({
-      contract: RaffleParty,
+      contract: RaffleParty as any,
       method: 'getRaffleParticipants', // Method to be called
       args: [raffleId], // Method arguments
     }) ?? {}
@@ -67,7 +67,7 @@ export const useRaffleCount = () => {
   const { RaffleParty } = useContracts()
   const { value, error } =
     useCall({
-      contract: RaffleParty,
+      contract: RaffleParty as any,
       method: 'getRaffleCount', // Method to be called
       args: [], // Method arguments
     }) ?? {}
