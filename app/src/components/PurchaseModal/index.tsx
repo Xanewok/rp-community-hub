@@ -159,7 +159,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
             </Text>
             <Flex direction="row" justify="space-evenly">
-              {/* {!!connectedDiscordName || (
+              {!!connectedDiscordName || (
                 <Button
                   onClick={async () => {
                     const { user, session, error } = await supabase.auth.signIn(
@@ -170,7 +170,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                     console.log({ user, session, error })
                   }}
                 >
-                  Connect Discord
+                  Login with Discord
                 </Button>
               )}
               {!!connectedDiscordName &&
@@ -217,9 +217,9 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                   >
                     Connect wallet
                   </Button>
-                ))} */}
-              {
-                /* !!connectedDiscordName && !!isLoggedWithEthereum && */ <>
+                ))}
+              {!!connectedDiscordName && !!isLoggedWithEthereum && (
+                <>
                   <Flex direction="row">
                     <Button
                       style={{ width: '26px' }}
@@ -256,7 +256,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                     </Button>
                   )}
                 </>
-              }
+              )}
             </Flex>
           </Flex>
         </ModalBody>

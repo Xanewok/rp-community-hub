@@ -10,14 +10,14 @@ import { useMemo } from 'react'
 
 type KnownContracts = 'Confetti' | 'Party' | 'RpSeeder' | 'RaffleParty'
 
-const CONTRACT_ABI = {
+export const CONTRACT_ABI = {
   Confetti: IConfetti.abi,
   Party: TestParty.abi,
   RpSeeder: RpSeeder.abi,
   RaffleParty: RaffleParty.abi,
 } as const
 
-const CONTRACT_ADDRESS = {
+export const CONTRACT_ADDRESS = {
   [ChainId.Mainnet]: {
     Confetti: '0xCfef8857E9C80e3440A823971420F7Fa5F62f020',
     Party: '0xd311bDACB151b72BddFEE9cBdC414Af22a5E38dc',

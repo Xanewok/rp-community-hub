@@ -1,9 +1,10 @@
 -- Table containing Ethereum wallets for Discord-logged-in users
 create table public.profiles (
   id uuid references auth.users not null,
-  eth text not null,
+  eth text,
+  discord_id text unique not null,
 
-  primary key (id, eth)
+  primary key (id)
 );
 
 alter table public.profiles enable row level security;
@@ -19,6 +20,23 @@ create policy "Users can insert their own profile."
 create policy "Users can update own profile."
   on profiles for update
   using ( auth.uid() = id );
+
+-- trigger the function every time a user is created
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.profiles (id, discord_id, eth)
+  values (new.id, new.raw_user_meta_data::jsonb->'sub', null);
+  return new;
+end;
+$$;
+
+create  trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
 -- Basic role system for users (most notably moderators to create raffles)
 create table role_types (
