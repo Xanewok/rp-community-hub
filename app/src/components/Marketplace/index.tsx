@@ -109,12 +109,12 @@ const RaffleItem: React.FC<{
       // TODO: Unify what's on chain and what's not (URI-wise)
       fetch(`/api/raffle/${id}/winners`).then(async (res) => {
         setWinners(
-          res.ok ? `Winners: ${await res.text()}` : 'Error getting winners'
+          res.ok ? `Winners: ${await res.text()}` : ''
         )
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roundsLeft, id])
+  }, [roundsLeft])
 
   // TODO: Handle errors
   if (!data || !raffle) return null
