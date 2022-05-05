@@ -1,8 +1,7 @@
 import { AppProps } from 'next/app'
 
 import { DefaultSeo } from 'next-seo'
-import { Box, ChakraProvider } from '@chakra-ui/react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { ChakraProvider } from '@chakra-ui/react'
 import { Mainnet, Rinkeby, DAppProvider, Config } from '@usedapp/core'
 import { useRouter } from 'next/router'
 import { UserProvider } from '@supabase/supabase-auth-helpers/react'
@@ -13,8 +12,6 @@ import '../styles/css/fonts.css'
 import SEO from '../../next-seo.config'
 import GlobalStyle from '../styles'
 import customTheme from '../styles/customTheme'
-
-const MotionBox = motion(Box)
 
 const config: Config = {
   autoConnect: true,
@@ -30,23 +27,7 @@ function NextApp({ Component, pageProps, router }: AppProps): JSX.Element {
         <ChakraProvider resetCSS theme={customTheme}>
           <DefaultSeo {...SEO} />
           <GlobalStyle>
-            <AnimatePresence exitBeforeEnter>
-              <MotionBox
-                key={router.route}
-                animate="enter"
-                as="main"
-                exit="exit"
-                flexGrow={1}
-                initial="initial"
-                variants={{
-                  initial: { opacity: 0, y: -10 },
-                  enter: { opacity: 1, y: 0 },
-                  exit: { opacity: 0, y: 10 },
-                }}
-              >
-                <Component {...pageProps} />
-              </MotionBox>
-            </AnimatePresence>
+            <Component {...pageProps} />
           </GlobalStyle>
         </ChakraProvider>
       </UserProvider>
