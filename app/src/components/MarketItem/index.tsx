@@ -6,7 +6,6 @@ import {
   Img,
   Text,
   Tooltip,
-  useToast,
 } from '@chakra-ui/react'
 
 interface MarketItemProps {
@@ -25,90 +24,94 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
 
   return (
     <Flex
-      w={['325px', '500px']}
-      p={5}
+      maxHeight={[null, null, '500px']}
+      p={3}
       bg="#16112d"
+      justify="center"
       boxShadow="0 -3px 0 0 #231b4d,0 3px 0 0 #231b4d,-3px 0 0 0 #231b4d,3px 0 0 0 #231b4d,0 0 0 3px #0a0414,0 -6px 0 0 #0a0414,0 6px 0 0 #0a0414,-6px 0 0 0 #0a0414,6px 0 0 0 #0a0414"
     >
-      <Flex direction="row">
-        <Box
-          w={['100px', '200px']}
-          h="200px"
-          style={{ aspectRatio: '1/1' }}
-          mr={4}
+      <Flex direction="column" alignItems="center">
+        <Heading
+          textColor="white"
+          fontSize="3xl"
+          mb={3}
+          mt={-3}
+          wordBreak="break-word"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
         >
+          {name}
+        </Heading>
+        <Box w="175px" style={{ aspectRatio: '1/1' }}>
           <Img
             boxShadow="0 -3px 0 0 #3e2e6c,0 3px 0 0 #3e2e6c,-3px 0 0 0 #3e2e6c,3px 0 0 0 #3e2e6c"
             src={imgSrc}
           />
         </Box>
-        <Flex h="100%" direction="column">
-          <Heading textColor="white" lineHeight="24px" mb={3} mt={-2}>
-            {name}
-          </Heading>
-          <Flex h="100%" direction="column" justify="space-between">
+        <Text
+          my={2}
+          h="100%"
+          textColor="#AE9ED1"
+          fontWeight="500"
+          fontSize="lg"
+          wordBreak="break-word"
+          align="justify"
+          overflowY="auto"
+          pt={2}
+        >
+          {props.children}
+        </Text>
+        <Flex direction="row" my={2}>
+          <Text
+            as="span"
+            textColor="#AE9ED1"
+            fontWeight="500"
+            fontSize="lg"
+            mr={3}
+          >
+            {`${allocatedSpots}/${spots}`}
+          </Text>
+          <Flex>
             <Text
-              noOfLines={3}
+              as="span"
               textColor="#AE9ED1"
               fontWeight="500"
               fontSize="lg"
-              wordBreak="break-word"
+              pb={1}
+              mr={1.5}
             >
-              {props.children}
+              {price}
             </Text>
-            <Flex direction="row" mt={1}>
-              <Text
-                as="span"
-                textColor="#AE9ED1"
-                fontWeight="500"
-                fontSize="lg"
-                mr={3}
-              >
-                {`${allocatedSpots}/${spots}`}
-              </Text>
-              <Flex>
-                <Text
-                  as="span"
-                  textColor="#AE9ED1"
-                  fontWeight="500"
-                  fontSize="lg"
-                  pb={1}
-                  mr={1.5}
-                >
-                  {price}
-                </Text>
-                <Img
-                  w="26px"
-                  h="26px"
-                  style={{ imageRendering: 'pixelated' }}
-                  src="/cfti.png"
-                ></Img>
-              </Flex>
-              <Text
-                as="span"
-                textColor="#AE9ED1"
-                fontWeight="500"
-                fontSize="lg"
-                ml={3}
-              >
-                {props.roundsLeft <= 0
-                  ? 'Finished'
-                  : `Ends in ${props.roundsLeft} seed rounds`}
-              </Text>
-            </Flex>
-            <Tooltip shouldWrapChildren label={props.buttonTooltip}>
-              <Button
-                mt="2"
-                w="max(50%, 100px)"
-                fontSize="xl"
-                isDisabled={allocatedSpots >= spots || props.roundsLeft <= 0}
-                onClick={onRedeem}
-              >
-                {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
-              </Button>
-            </Tooltip>
+            <Img
+              w="26px"
+              h="26px"
+              style={{ imageRendering: 'pixelated' }}
+              src="/cfti.png"
+            ></Img>
           </Flex>
+          <Text
+            as="span"
+            textColor="#AE9ED1"
+            fontWeight="500"
+            fontSize="lg"
+            ml={3}
+          >
+            {props.roundsLeft <= 0
+              ? 'Finished'
+              : `Ends in ${props.roundsLeft} seed rounds`}
+          </Text>
         </Flex>
+        <Tooltip shouldWrapChildren label={props.buttonTooltip}>
+          <Button
+            my={1}
+            minH="40px"
+            fontSize="xl"
+            isDisabled={allocatedSpots >= spots || props.roundsLeft <= 0}
+            onClick={onRedeem}
+          >
+            {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
+          </Button>
+        </Tooltip>
       </Flex>
     </Flex>
   )

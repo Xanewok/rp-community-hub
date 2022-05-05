@@ -71,7 +71,8 @@ const RaffleItem: React.FC<{
   openModalWithData: (data: { raffleId: number; cost: number }) => void
 }> = ({ id, openModalWithData }) => {
   const raffle = useRaffleView(id)
-  const metadataUri = useRaffleUri(id % 6)
+  // const metadataUri = useRaffleUri(id % 6)
+  const metadataUri = `/api/raffle/${id % 6}`
 
   const currentRound = useCurrentSeedRound()
 
@@ -221,12 +222,10 @@ export const Marketplace: React.FC = () => {
             onClick={() => setActiveTab('rewards')}
           />
         </Flex>
-        <Grid
-          gap={10}
-          gridTemplateColumns="repeat(auto-fill,minmax(500px,1fr))"
-        >
-          <Box
+                  <Box
             pb={5}
+            mb={5}
+            // w="250px"
             boxShadow="0 -2px 0 0 #2b2258,0 2px 0 0 #2b2258,-2px 0 0 0 #2b2258,2px 0 0 0 #2b2258,0 0 0 2px #0a0414,0 -4px 0 0 #0a0414,0 4px 0 0 #0a0414,-4px 0 0 0 #0a0414,4px 0 0 0 #0a0414;"
           >
             <Heading textColor="white" textAlign="center">
@@ -301,7 +300,11 @@ export const Marketplace: React.FC = () => {
               </Button>
             </Flex>
           </Box>
-          {}
+        <Grid
+          gap={10}
+          gridTemplateColumns="repeat(auto-fill,minmax(250px,1fr))"
+        >
+
           {activeTab === 'raffles'
             ? Array.from({ length: raffleCount }).map((_, idx) => (
                 <RaffleItem
