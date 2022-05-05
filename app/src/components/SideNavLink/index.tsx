@@ -52,11 +52,11 @@ export const SideNavLink = (props: { type: LinkType; selected?: boolean }) => (
 )
 
 const LINKS: Record<LinkType, string | undefined> = {
-  raid: 'https://app.raid.party/',
-  wallet: 'https://app.raid.party/my-wallet',
-  summon: 'https://app.raid.party/summon',
-  enhance: 'https://app.raid.party/enhance',
-  guild: 'https://app.raid.party/guild',
+  raid: 'https://play.raid.party/',
+  wallet: 'https://play.raid.party/my-wallet',
+  summon: 'https://play.raid.party/summon',
+  enhance: 'https://play.raid.party/enhance',
+  guild: 'https://play.raid.party/guild',
   market: undefined,
   roll: 'https://roll.party',
   collect: 'https://collect.roll.party',
