@@ -39,7 +39,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         uint64 endingSeedRound;
         uint32 maxEntries;
         uint32 totalTicketsBought;
-        mapping(address => uint64) ticketsBought;
+        mapping(address => uint32) ticketsBought;
         address[] participants;
     }
 
@@ -62,11 +62,13 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         uint128 cost,
         uint32 maxEntries,
         uint64 endingSeedRound
-    ) public
-    // NOTE: cba to add a hot wallet role admin setup so just allow everyone
-    // to create raffles during the Rinkeby testing period
-    // onlyRole(RAFFLE_CREATOR_ROLE)
-    whenNotPaused {
+    )
+        public
+        // NOTE: cba to add a hot wallet role admin setup so just allow everyone
+        // to create raffles during the Rinkeby testing period
+        // onlyRole(RAFFLE_CREATOR_ROLE)
+        whenNotPaused
+    {
         // Mitigate possible front-running - disallow the txn about a minute
         // before the seeder can request randomness. The RP seeder is pre-configured
         // to require 3 block confirmations, so 60 seconds makes sense (< 3 * 14s)
@@ -83,7 +85,7 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         newRaffle.cost = cost;
         newRaffle.endingSeedRound = endingSeedRound;
 
-        emit RaffleCreated(_raffles.length, _msgSender());
+        emit RaffleCreated(_raffles.length - 1, _msgSender());
     }
 
     function buyTickets(uint256 raffleId, uint32 count) public whenNotPaused {
@@ -243,8 +245,9 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         for (uint256 i = 0; i < addresses.length - 1; i++) {
             // Randomly pick a value from i (incl.) till the end of the array
             // To further increase randomness entropy, add the current player address
+            // and the current iteration
             pick =
-                uint256(keccak256(abi.encodePacked(addresses[i], seed))) %
+                uint256(keccak256(abi.encodePacked(i, addresses[i], seed))) %
                 (addresses.length - i);
 
             (shuffled[i], shuffled[i + pick]) = (
