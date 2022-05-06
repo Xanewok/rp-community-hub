@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import { useEthers, useTokenAllowance } from '@usedapp/core'
 import { ethers } from 'ethers'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useContracts } from '../../constants'
 
 import { BigNumber } from '@ethersproject/bignumber'
@@ -18,6 +18,7 @@ export const ApproveCfti = (props: { owner?: any }) => {
   const allowance = useTokenAllowance(Confetti.address, owner, spender)
   // TODO: Set that up in a smarter way
   const requiredAllowance = BigNumber.from(10).pow(27)
+  const [loading, setLoading] = useState(false)
 
   const state = useMemo(() => {
     if (allowance?.gte(requiredAllowance) && allowance?.gt(0)) {
@@ -31,10 +32,20 @@ export const ApproveCfti = (props: { owner?: any }) => {
       return {
         msg: 'Approve $CFTI',
         disabled: false,
-        onClick: () => {
+        onClick: async () => {
           const signer = library?.getSigner(account)
           if (signer) {
-            Confetti.connect(signer).approve(spender, MAX_UINT256)
+            try {
+              const tx = await Confetti.connect(signer).approve(
+                spender,
+                MAX_UINT256
+              )
+              setLoading(true)
+              await tx.wait()
+            } catch (e) {
+            } finally {
+              setLoading(false)
+            }
           }
         },
       }
@@ -42,7 +53,11 @@ export const ApproveCfti = (props: { owner?: any }) => {
   }, [allowance, requiredAllowance, account, owner, library, Confetti, spender])
 
   return (
-    <Button onClick={state.onClick} disabled={state.disabled}>
+    <Button
+      isLoading={loading}
+      onClick={state.onClick}
+      disabled={state.disabled}
+    >
       {state.msg}
     </Button>
   )

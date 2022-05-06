@@ -101,6 +101,8 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
 
+  const [loading, setLoading] = useState(false)
+
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -176,6 +178,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               {!!connectedDiscordName &&
                 (!!isLoggedWithEthereum || (
                   <Button
+                    isLoading={loading}
                     onClick={async () => {
                       const signer = library?.getSigner()
                       const user = supabase.auth.user()
@@ -189,6 +192,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                         const signature = await signer.signMessage(
                           JSON.stringify(message)
                         )
+                        setLoading(true)
                         await fetch('/api/ethConnect', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
@@ -212,6 +216,8 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                         }
                       } catch (e) {
                         showErrorToast(e)
+                      } finally {
+                        setLoading(false)
                       }
                     }}
                   >

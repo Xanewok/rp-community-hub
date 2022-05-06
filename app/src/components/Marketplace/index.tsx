@@ -120,7 +120,7 @@ const RaffleItem: React.FC<{
 
   return (
     <MarketItem
-      name={`${data.name} (${id})`}
+      name={data.name}
       imgSrc={data.image}
       allocatedSpots={Number(totalTicketsBought)}
       spots={Number(maxEntries)}
