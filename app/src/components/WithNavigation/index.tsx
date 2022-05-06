@@ -40,7 +40,7 @@ export const WithNavigation: React.FC = (props) => {
         flexShrink={0}
         zIndex={50}
         position="relative"
-        overflowY={'scroll'}
+        overflowY="auto"
         style={{ scrollbarWidth: 'none' }}
         w={[null, null, '25%', '20%']}
         maxW={[null, null, null, '263px']}
