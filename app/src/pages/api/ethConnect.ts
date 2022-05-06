@@ -32,7 +32,7 @@ export default async function hello(req: any, res: any) {
 
   const { error } = await supabase
     .from('wallets')
-    .upsert({ profile, eth }, { onConflict: 'eth', returning: 'minimal' })
+    .upsert({ profile, eth }, { ignoreDuplicates: true, returning: 'minimal' })
 
   if (error) {
     return res.status(400).json({ error })
