@@ -102,7 +102,7 @@ const RaffleItem: React.FC<{
     Array<{ discord_id: string; eth: string }>
   >([])
   useEffect(() => {
-    if (isNaN(roundsLeft) || roundsLeft > 0) {
+    if (!metadataUri || isNaN(roundsLeft) || roundsLeft > 0) {
       setWinners([])
     } else {
       fetch(`${metadataUri}/winners`).then(async (res) => {
