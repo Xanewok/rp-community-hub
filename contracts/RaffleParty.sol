@@ -94,6 +94,23 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
         emit RaffleCreated(_raffles.length - 1, _msgSender());
     }
 
+    function setRaffleEndingSeed(uint256 raffleId, uint32 endingSeedRound)
+        public
+        // NOTE: cba to add a hot wallet role admin setup so just allow everyone
+        // to create raffles during the Rinkeby testing period
+        // onlyRole(RAFFLE_CREATOR_ROLE)
+        whenNotPaused
+    {
+        require(getSeed(endingSeedRound) == 0, "Raffle finished");
+        require(
+            endingSeedRound > _rpSeeder.getBatch() ||
+                _rpSeeder.getNextAvailableBatch() > (block.timestamp + 60),
+            "Not enough time before next seed"
+        );
+
+        getRaffleSafe(raffleId).endingSeedRound = endingSeedRound;
+    }
+
     function buyTickets(uint256 raffleId, uint32 count) public whenNotPaused {
         require(count > 0, "Need to buy at least 1 ticket");
         Raffle storage raffle = getRaffleSafe(raffleId);
