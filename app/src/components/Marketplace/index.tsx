@@ -71,7 +71,8 @@ const RaffleItem: React.FC<{
   openModalWithData: (data: { raffleId: number; cost: number }) => void
 }> = ({ id, openModalWithData }) => {
   const raffle = useRaffleView(id)
-  const metadataUri = useRaffleUri(id)
+  // const metadataUri = useRaffleUri(id % 6)
+  const metadataUri = `/api/raffle/${id % 6}`
 
   const currentRound = useCurrentSeedRound()
 
@@ -102,11 +103,9 @@ const RaffleItem: React.FC<{
     Array<{ discord_id: string; eth: string }>
   >([])
   useEffect(() => {
-    console.log({ roundsLeft, id })
     if (isNaN(roundsLeft) || roundsLeft > 0) {
       setWinners([])
     } else {
-      console.log('Fetching winners, ', { roundsLeft, id })
       fetch(`${metadataUri}/winners`).then(async (res) => {
         const response = await res
           .json()
@@ -124,7 +123,6 @@ const RaffleItem: React.FC<{
       ),
     [account, winners]
   )
-  console.log({ winners, isWinner, id })
 
   // TODO: Handle errors
   if (!data || !raffle) return null

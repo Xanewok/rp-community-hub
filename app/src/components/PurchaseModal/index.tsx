@@ -82,13 +82,14 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
     [user]
   )
   const [isLoggedWithEthereum, setLoggedWithEthereum] = useState(false)
+  const [refreshEthKey, setRefreshEthKey] = useState(0)
   useEffect(() => {
     if (!user.user?.id) return
 
     supabase
-      .from('profiles')
-      .select('id,eth')
-      .eq('id', user.user?.id)
+      .from('wallets')
+      .select('profile,eth')
+      .eq('profile', user.user?.id)
       .eq('eth', account)
       .limit(1)
       .then((value) => {
@@ -98,7 +99,13 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
           setLoggedWithEthereum(value.data.length > 0)
         }
       })
-  }, [account, connectedDiscordName, showErrorToast, user.user?.id])
+  }, [
+    account,
+    connectedDiscordName,
+    showErrorToast,
+    user.user?.id,
+    refreshEthKey,
+  ])
 
   // Close the modal whenever we change accounts
   useEffect(onClose, [account, onClose])
@@ -169,7 +176,6 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                         await supabase.auth.signIn({
                           provider: 'discord',
                         })
-                      console.log({ user, session, error })
                     }}
                   >
                     1. Login with Discord
@@ -187,14 +193,14 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                       try {
                         const message = {
                           audience: 'Raid Party Marketplace',
-                          user_id: user.id,
+                          profile: user.id,
                           eth: account,
                         }
                         const signature = await signer.signMessage(
                           JSON.stringify(message)
                         )
                         setLoading(true)
-                        await fetch('/api/ethConnect', {
+                        const res = await fetch('/api/ethConnect', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           credentials: 'same-origin',
@@ -203,20 +209,10 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                             signature,
                           }),
                         })
-                        const { data, error } = await supabase
-                          .from('profiles')
-                          .upsert(
-                            {
-                              id: user?.id,
-                              discord_id: user?.user_metadata.sub,
-                              eth: account,
-                            },
-                            { returning: 'minimal' }
-                          )
-                        if (!error) {
-                          setLoggedWithEthereum(true)
+                        if (!res.ok) {
+                          throw await res.json()
                         } else {
-                          throw error
+                          setRefreshEthKey(Math.random())
                         }
                       } catch (e) {
                         showErrorToast(e)

@@ -27,11 +27,10 @@ export default async function handler(
   const { id } = req.query
 
   let winners: string[]
-  let winnerCount = 1;
+  let winnerCount = 1
   try {
-
-    const raffleView = await RAFFLE_PARTY.getRaffleView(id);
-    winnerCount = raffleView.winnerCount;
+    const raffleView = await RAFFLE_PARTY.getRaffleView(id)
+    winnerCount = raffleView.winnerCount
 
     const raffleWinners = await RAFFLE_PARTY.raffleWinners(id)
     if (Array.isArray(raffleWinners)) {
@@ -51,8 +50,8 @@ export default async function handler(
   const winnersSet = new Set(winners)
 
   const { data, error } = await supabase
-    .from('profiles')
-    .select('discord_id, eth')
+    .from('wallets')
+    .select('profile ( discord_id ), eth')
     .in('eth', [...winnersSet])
     .limit(winnerCount)
 

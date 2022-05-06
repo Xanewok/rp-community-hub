@@ -14,12 +14,12 @@ export default async function hello(req: any, res: any) {
       .send('Missing fields `user_id`, `payload`, `signature`')
   }
 
-  const { user_id, eth } = message
-  if (typeof user_id != 'string' || typeof eth != 'string') {
+  const { profile, eth } = message
+  if (typeof profile != 'string' || typeof eth != 'string') {
     return res
       .status(400)
       .send(
-        'Either of `user_id`, `eth` strings not found in the signed message'
+        'Either of `profile`, `eth` strings not found in the signed message'
       )
   }
 
@@ -30,7 +30,7 @@ export default async function hello(req: any, res: any) {
       .send('Signer is different than the address in the message')
   }
 
-  const { error } = await supabase.from('profiles').upsert({ id: user_id, eth })
+  const { error } = await supabase.from('wallets').upsert({ profile, eth })
 
   if (error) {
     return res.status(400).json({ error })
