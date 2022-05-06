@@ -2,26 +2,21 @@ import { theme, extendTheme } from '@chakra-ui/react'
 
 const customTheme = extendTheme({
   styles: {
-    global: () => {
-      body: {
-        bg: ""
-      }
-    }
+    global: {
+      'html, body': {
+        textColor: 'white',
+        color: 'indigo.600',
+        bg: '',
+        textRendering: "geometricPrecision",
+        fontSmooth: "never",
+      },
+    },
   },
   fonts: {
     ...theme.fonts,
     heading: `'VP', ${theme.fonts.heading}`,
     body: `'VP', ${theme.fonts.body}`,
     mono: 'Menlo, monospace',
-  },
-  global: {
-    'html, body': {
-      lineHeight: 'tall',
-      textColor: 'white',
-      color: 'indigo.600',
-      bg: ""
-      // backgroundImage: 'url(/tiles.png)'
-    },
   },
   fontSizes: {
     xs: '0.75rem',

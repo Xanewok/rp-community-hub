@@ -10,7 +10,6 @@ import { supabaseClient } from '@supabase/supabase-auth-helpers/nextjs'
 import '../styles/css/fonts.css'
 
 import SEO from '../../next-seo.config'
-import GlobalStyle from '../styles'
 import customTheme from '../styles/customTheme'
 
 const config: Config = {
@@ -26,9 +25,7 @@ function NextApp({ Component, pageProps, router }: AppProps): JSX.Element {
       <UserProvider supabaseClient={supabaseClient} pathname={pathname}>
         <ChakraProvider resetCSS theme={customTheme}>
           <DefaultSeo {...SEO} />
-          <GlobalStyle>
             <Component {...pageProps} />
-          </GlobalStyle>
         </ChakraProvider>
       </UserProvider>
     </DAppProvider>
