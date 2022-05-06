@@ -7,8 +7,19 @@ const customTheme = extendTheme({
         textColor: 'white',
         color: 'indigo.600',
         bg: '',
-        textRendering: "geometricPrecision",
-        fontSmooth: "never",
+        textRendering: 'geometricPrecision',
+        fontSmooth: 'never',
+      },
+      '::-webkit-scrollbar:hover': {
+        width: '16px',
+      },
+      '::-webkit-scrollbar': {
+        width: '3px',
+      },
+      'div::-webkit-scrollbar-thumb': {
+        backgroundColor: 'rgba(155, 155, 155, 0.5)',
+        borderRadius: '10px',
+        border: 'transparent',
       },
     },
   },
