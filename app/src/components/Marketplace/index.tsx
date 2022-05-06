@@ -246,15 +246,17 @@ export const Marketplace: React.FC = () => {
                   const signer = library?.getSigner()
                   if (!account || !signer) return
                   const maxEntries = Math.trunc(Math.random() * 10) + 5
+                  const winnerCount = Math.trunc(Math.random() * 5) + 1
                   const auxZeroes = Math.trunc(Math.random() * 3)
                   const tail = Array.from({ length: auxZeroes })
                     .map(() => '0')
                     .join('')
                   await RaffleParty.connect(signer)
                     .createRaffle(
+                      Number(currentRound) + 3,
                       '100000000000000000' + tail,
                       maxEntries,
-                      Number(currentRound) + 3
+                      winnerCount
                     )
                     .catch(showErrorToast)
                 }}
