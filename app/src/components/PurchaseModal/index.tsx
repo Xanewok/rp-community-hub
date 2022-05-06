@@ -101,7 +101,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   }, [account, connectedDiscordName, showErrorToast, user.user?.id])
 
   // Close the modal whenever we change accounts
-  // useEffect(onClose, [account, onClose])
+  useEffect(onClose, [account, onClose])
   useEffect(() => {
     if (ticketsLeft <= 0) {
       onClose()

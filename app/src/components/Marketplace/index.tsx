@@ -71,8 +71,7 @@ const RaffleItem: React.FC<{
   openModalWithData: (data: { raffleId: number; cost: number }) => void
 }> = ({ id, openModalWithData }) => {
   const raffle = useRaffleView(id)
-  // const metadataUri = useRaffleUri(id % 6)
-  const metadataUri = `/api/raffle/${id % 6}`
+  const metadataUri = useRaffleUri(id)
 
   const currentRound = useCurrentSeedRound()
 
@@ -84,7 +83,7 @@ const RaffleItem: React.FC<{
         assert(res.ok)
         const { name, description, image } = await res.json()
         if (!name || !description || !image) {
-          throw new Error("Responde doesn't contain raffle data")
+          throw new Error("Response doesn't contain raffle data")
         }
         setData({ name, description, image })
       })
@@ -97,19 +96,17 @@ const RaffleItem: React.FC<{
   const { cost, totalTicketsBought, maxEntries, endingSeedRound } =
     // TODO: Fix the type shape
     raffle as unknown as any
-  const roundsLeft = Math.max(
-    0,
-    Number(endingSeedRound) - Number(currentRound) + 1
-  )
+  const roundsLeft = Math.max(0, endingSeedRound - currentRound + 1)
 
   const [winners, setWinners] = useState<
     Array<{ discord_id: string; eth: string }>
   >([])
   useEffect(() => {
-    if (roundsLeft > 0) {
+    console.log({ roundsLeft, id })
+    if (isNaN(roundsLeft) || roundsLeft > 0) {
       setWinners([])
     } else {
-      // TODO: Unify what's on chain and what's not (URI-wise)
+      console.log('Fetching winners, ', { roundsLeft, id })
       fetch(`${metadataUri}/winners`).then(async (res) => {
         const response = await res
           .json()
@@ -132,17 +129,27 @@ const RaffleItem: React.FC<{
   // TODO: Handle errors
   if (!data || !raffle) return null
 
+  const soldOut = totalTicketsBought > maxEntries
+
   return (
     <MarketItem
       name={data.name}
       imgSrc={data.image}
-      allocatedSpots={Number(totalTicketsBought)}
-      spots={Number(maxEntries)}
+      description={data.description}
+      allocatedSpots={totalTicketsBought}
+      spots={maxEntries}
       price={formatNumber(cost, 2)}
-      onRedeem={() => openModalWithData({ raffleId: id, cost })}
       roundsLeft={roundsLeft}
     >
-      {data.description}
+      <Button
+        my={1}
+        minH="40px"
+        fontSize="xl"
+        isDisabled={soldOut || roundsLeft <= 0}
+        onClick={() => openModalWithData({ raffleId: id, cost })}
+      >
+        {isWinner ? 'You won!' : soldOut ? 'Sold out' : 'Buy tickets'}
+      </Button>
     </MarketItem>
   )
 }

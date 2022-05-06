@@ -9,17 +9,17 @@ import {
 } from '@chakra-ui/react'
 
 interface MarketItemProps {
-  imgSrc: string
   name: string
+  imgSrc: string
+  description: string
   spots: number
   price: number
   allocatedSpots: number
-  onRedeem: () => void
   roundsLeft: number
 }
 
 export const MarketItem: React.FC<MarketItemProps> = (props) => {
-  const { name, imgSrc, spots, allocatedSpots, price, onRedeem } = props
+  const { name, imgSrc, description, spots, allocatedSpots, price } = props
 
   return (
     <Flex
@@ -58,7 +58,7 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
           overflowY="auto"
           pt={2}
         >
-          {props.children}
+          {description}
         </Text>
         <Flex direction="row" my={2}>
           <Text
@@ -100,15 +100,7 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
               : `Ends in ${props.roundsLeft} seed rounds`}
           </Text>
         </Flex>
-          <Button
-            my={1}
-            minH="40px"
-            fontSize="xl"
-            isDisabled={allocatedSpots >= spots || props.roundsLeft <= 0}
-            onClick={onRedeem}
-          >
-            {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
-          </Button>
+        {props.children}
       </Flex>
     </Flex>
   )
