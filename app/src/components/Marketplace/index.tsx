@@ -126,7 +126,7 @@ const RaffleItem: React.FC<{
   // TODO: Handle errors
   if (!data || !raffle) return null
 
-  const soldOut = totalTicketsBought > maxEntries
+  const soldOut = totalTicketsBought >= maxEntries
 
   return (
     <MarketItem
