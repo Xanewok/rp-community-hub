@@ -22,7 +22,7 @@ export const CONTRACT_ADDRESS = {
     Confetti: '0xCfef8857E9C80e3440A823971420F7Fa5F62f020',
     Party: '0xd311bDACB151b72BddFEE9cBdC414Af22a5E38dc',
     RpSeeder: '0x2ed251752da7f24f33cfbd38438748bb8eeb44e1',
-    RaffleParty: '0x0000000000000000000000000000000000000000',
+    RaffleParty: '0xd3babf32a741b03e5c72a3def7961cb6f43746e7',
   },
   [ChainId.Rinkeby]: {
     Confetti: '0x0B4f94A0a8ad26F3f151AC581ac7156eB04Ab61C',
