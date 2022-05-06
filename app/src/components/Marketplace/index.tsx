@@ -109,9 +109,7 @@ const RaffleItem: React.FC<{
     } else {
       // TODO: Unify what's on chain and what's not (URI-wise)
       fetch(`/api/raffle/${id}/winners`).then(async (res) => {
-        setWinners(
-          res.ok ? `Winners: ${await res.text()}` : ''
-        )
+        setWinners(res.ok ? `Winners: ${await res.text()}` : '')
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -222,20 +220,21 @@ export const Marketplace: React.FC = () => {
             onClick={() => setActiveTab('rewards')}
           />
         </Flex>
-                  <Box
+        {![ChainId.Rinkeby, ChainId.Mainnet].includes(chainId || 0) && (
+          <Heading textColor="red" textAlign="center" mt={-5}>
+            Please switch to either Ethereum mainnet or the Rinkeby testnet
+          </Heading>
+        )}
+        {chainId == ChainId.Rinkeby && (
+          <Box
             pb={5}
             mb={5}
-            // w="250px"
             boxShadow="0 -2px 0 0 #2b2258,0 2px 0 0 #2b2258,-2px 0 0 0 #2b2258,2px 0 0 0 #2b2258,0 0 0 2px #0a0414,0 -4px 0 0 #0a0414,0 4px 0 0 #0a0414,-4px 0 0 0 #0a0414,4px 0 0 0 #0a0414;"
           >
             <Heading textColor="white" textAlign="center">
-              Toy box
+              Testing tools
             </Heading>
-            {chainId != ChainId.Rinkeby && (
-              <Heading textColor="red" textAlign="center" mt={-5}>
-                Please switch to the Rinkeby testnet
-              </Heading>
-            )}
+
             <Flex direction="row" justify="center">
               <Button mx={5} isDisabled={true}>
                 Current seed round: {Number(currentRound)}
@@ -302,11 +301,11 @@ export const Marketplace: React.FC = () => {
               </Button>
             </Flex>
           </Box>
+        )}
         <Grid
           gap={10}
           gridTemplateColumns="repeat(auto-fill,minmax(250px,1fr))"
         >
-
           {activeTab === 'raffles'
             ? Array.from({ length: raffleCount }).map((_, idx) => (
                 <RaffleItem
