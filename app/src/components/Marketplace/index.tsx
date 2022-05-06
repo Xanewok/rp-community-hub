@@ -71,8 +71,7 @@ const RaffleItem: React.FC<{
   openModalWithData: (data: { raffleId: number; cost: number }) => void
 }> = ({ id, openModalWithData }) => {
   const raffle = useRaffleView(id)
-  // const metadataUri = useRaffleUri(id % 6)
-  const metadataUri = `/api/raffle/${id % 6}`
+  const metadataUri = useRaffleUri(id)
 
   const currentRound = useCurrentSeedRound()
 
