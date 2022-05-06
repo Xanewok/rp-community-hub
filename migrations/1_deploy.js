@@ -36,6 +36,14 @@ module.exports = async function (deployer, network, accounts) {
     ISeederV2.address = "0x2Ed251752DA7F24F33CFbd38438748BB8eeb44e1";
     IParty.address = "0xd311bDACB151b72BddFEE9cBdC414Af22a5E38dc";
     IRpSeeder.address = "0xD9bc167E6C37b29F65E708C4Bb1D299937dFF718";
+    await deployer.deploy(
+      RaffleParty,
+      IConfetti.address,
+      IParty.address,
+      IRpSeeder.address,
+      accounts[0],
+      "https://market.roll.party/api/raffle/"
+    );
   } else if (network == "development" || chainId == 1337) {
     await deployer.deploy(TestSeedStorage);
     await deployer.deploy(TestSeederV2, TestSeedStorage.address);
