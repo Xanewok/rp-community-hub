@@ -17,7 +17,7 @@ import "./IRPSeeder.sol";
  * @author xanewok.eth
  * @dev
  */
-contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
+contract RaffleParty is Context, Pausable, AccessControlEnumerable {
     using Strings for uint256;
 
     IConfetti public immutable _confetti;
@@ -36,10 +36,11 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
 
     struct Raffle {
         uint128 cost;
-        uint64 endingSeedRound;
+        uint32 endingSeedRound;
+        uint32 winnerCount;
         uint32 maxEntries;
         uint32 totalTicketsBought;
-        mapping(address => uint64) ticketsBought;
+        mapping(address => uint32) ticketsBought;
         address[] participants;
     }
 
@@ -47,10 +48,13 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         address confetti,
         address party,
         address rpSeeder,
+        address admin,
         string memory baseRaffleURI
     ) {
-        _setupRole(RAFFLE_CREATOR_ROLE, owner());
-        _setupRole(PAUSER_ROLE, owner());
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+
+        _setupRole(RAFFLE_CREATOR_ROLE, admin);
+        _setupRole(PAUSER_ROLE, admin);
 
         _party = IParty(party);
         _confetti = IConfetti(confetti);
@@ -59,14 +63,17 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
     }
 
     function createRaffle(
+        uint32 endingSeedRound,
         uint128 cost,
         uint32 maxEntries,
-        uint64 endingSeedRound
-    ) public
-    // NOTE: cba to add a hot wallet role admin setup so just allow everyone
-    // to create raffles during the Rinkeby testing period
-    // onlyRole(RAFFLE_CREATOR_ROLE)
-    whenNotPaused {
+        uint32 winnerCount
+    )
+        public
+        // NOTE: cba to add a hot wallet role admin setup so just allow everyone
+        // to create raffles during the Rinkeby testing period
+        // onlyRole(RAFFLE_CREATOR_ROLE)
+        whenNotPaused
+    {
         // Mitigate possible front-running - disallow the txn about a minute
         // before the seeder can request randomness. The RP seeder is pre-configured
         // to require 3 block confirmations, so 60 seconds makes sense (< 3 * 14s)
@@ -78,12 +85,30 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         );
 
         Raffle storage newRaffle = _raffles.push();
-        // Max entries being 0 means unlimited raffle tickets
+        // Max entries being 0 means "unlimited" raffle tickets
         newRaffle.maxEntries = maxEntries == 0 ? type(uint32).max : maxEntries;
         newRaffle.cost = cost;
         newRaffle.endingSeedRound = endingSeedRound;
+        newRaffle.winnerCount = winnerCount;
 
-        emit RaffleCreated(_raffles.length, _msgSender());
+        emit RaffleCreated(_raffles.length - 1, _msgSender());
+    }
+
+    function setRaffleEndingSeed(uint256 raffleId, uint32 endingSeedRound)
+        public
+        // NOTE: cba to add a hot wallet role admin setup so just allow everyone
+        // to create raffles during the Rinkeby testing period
+        // onlyRole(RAFFLE_CREATOR_ROLE)
+        whenNotPaused
+    {
+        require(getSeed(endingSeedRound) == 0, "Raffle finished");
+        require(
+            endingSeedRound > _rpSeeder.getBatch() ||
+                _rpSeeder.getNextAvailableBatch() > (block.timestamp + 60),
+            "Not enough time before next seed"
+        );
+
+        getRaffleSafe(raffleId).endingSeedRound = endingSeedRound;
     }
 
     function buyTickets(uint256 raffleId, uint32 count) public whenNotPaused {
@@ -113,8 +138,13 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         if (raffle.ticketsBought[_msgSender()] == 0) {
             raffle.participants.push(_msgSender());
         }
-        raffle.ticketsBought[_msgSender()] += ticketCount;
-        raffle.totalTicketsBought += ticketCount;
+        // SAFETY: We always buy up to `maxEntries` tickets in total thanks to
+        // the clamping done when calculating `ticketCount` above and all of
+        // these types are `uint32`
+        unchecked {
+            raffle.ticketsBought[_msgSender()] += ticketCount;
+            raffle.totalTicketsBought += ticketCount;
+        }
     }
 
     /// @dev This is a naive, expensive version that should be only read off-chain.
@@ -136,16 +166,20 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         // function.
         // This way, the storage cost would be 2*|participants| rather than
         // |totalTickets|
-        uint256 ticketsAssigned = 0;
         address[] memory tickets = new address[](raffle.totalTicketsBought);
-        for (uint256 i = 0; i < raffle.participants.length; i++) {
-            address participant = raffle.participants[i];
+        // SAFETY: The local ticket counters are `uint256`, while the ticket
+        // counters in the storage are `uint32`; same goes for the loop indices.
+        uint256 ticketsAssigned = 0;
+        unchecked {
+            for (uint256 i = 0; i < raffle.participants.length; i++) {
+                address participant = raffle.participants[i];
 
-            uint256 ticketsBought = raffle.ticketsBought[participant];
-            for (uint256 j = 0; j < ticketsBought; j++) {
-                tickets[ticketsAssigned + j] = participant;
+                uint256 ticketsBought = raffle.ticketsBought[participant];
+                for (uint256 j = 0; j < ticketsBought; j++) {
+                    tickets[ticketsAssigned + j] = participant;
+                }
+                ticketsAssigned += ticketsBought;
             }
-            ticketsAssigned += ticketsBought;
         }
 
         return shuffledAddresses(tickets, seed);
@@ -195,13 +229,42 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         return getRaffleSafe(raffleId).participants;
     }
 
+    function getRaffleParticipantsPaged(
+        uint256 raffleId,
+        uint32 skipPages,
+        uint32 pageSize
+    ) public view returns (address[] memory) {
+        address[] memory participants = getRaffleSafe(raffleId).participants;
+
+        if (pageSize == 0) {
+            return participants;
+        } else {
+            // Starting index, including
+            uint256 start = Math.min(skipPages * pageSize, participants.length);
+            // End index, excluding
+            uint256 end = Math.min(start + pageSize, participants.length);
+            address[] memory returned = new address[](end - start);
+            // SAFETY: `start` won't ever be bigger than `type(uint64).max`, `end`
+            // won't be bigger than `type(uint64).max + type(uint32).max`, and so
+            // `start + i` is bounded by about `type(uint64).max`; `i` has to fit
+            // in `uint32`.
+            unchecked {
+                for (uint256 i = 0; i < returned.length; i++) {
+                    returned[i] = participants[start + i];
+                }
+            }
+            return returned;
+        }
+    }
+
     function getRaffleView(uint256 raffleId)
         public
         view
         returns (
             uint128 cost,
-            uint64 endingSeedRound,
+            uint32 endingSeedRound,
             uint32 maxEntries,
+            uint32 winnerCount,
             uint32 totalTicketsBought
         )
     {
@@ -210,16 +273,17 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
             raffle.cost,
             raffle.endingSeedRound,
             raffle.maxEntries,
+            raffle.winnerCount,
             raffle.totalTicketsBought
         );
     }
 
-    function getUserTicketsBought(uint256 index, address user)
+    function getUserTicketsBought(uint256 raffleId, address user)
         public
         view
         returns (uint256)
     {
-        return getRaffleSafe(index).ticketsBought[user];
+        return getRaffleSafe(raffleId).ticketsBought[user];
     }
 
     // Utility functions
@@ -243,8 +307,9 @@ contract RaffleParty is Context, Ownable, Pausable, AccessControlEnumerable {
         for (uint256 i = 0; i < addresses.length - 1; i++) {
             // Randomly pick a value from i (incl.) till the end of the array
             // To further increase randomness entropy, add the current player address
+            // and the current iteration
             pick =
-                uint256(keccak256(abi.encodePacked(addresses[i], seed))) %
+                uint256(keccak256(abi.encodePacked(i, addresses[i], seed))) %
                 (addresses.length - i);
 
             (shuffled[i], shuffled[i + pick]) = (

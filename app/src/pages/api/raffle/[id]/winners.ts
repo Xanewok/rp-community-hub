@@ -27,7 +27,12 @@ export default async function handler(
   const { id } = req.query
 
   let winners: string[]
+  let winnerCount = 1;
   try {
+
+    const raffleView = await RAFFLE_PARTY.getRaffleView(id);
+    winnerCount = raffleView.winnerCount;
+
     const raffleWinners = await RAFFLE_PARTY.raffleWinners(id)
     if (Array.isArray(raffleWinners)) {
       winners = raffleWinners
@@ -49,6 +54,7 @@ export default async function handler(
     .from('profiles')
     .select('discord_id, eth')
     .in('eth', [...winnersSet])
+    .limit(winnerCount)
 
   if (error) {
     return res.status(400).send(error.message)

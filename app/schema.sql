@@ -1,7 +1,10 @@
+-- Enable case-insensitive extension for the Ethereum addresses
+create extension if not exists citext with schema extensions;
+
 -- Table containing Ethereum wallets for Discord-logged-in users
 create table public.profiles (
   id uuid references auth.users not null,
-  eth text,
+  eth citext, -- allow for linking a Discord ID to multiple wallets
   discord_id text unique not null,
 
   primary key (id)

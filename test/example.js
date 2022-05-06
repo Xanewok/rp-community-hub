@@ -51,6 +51,6 @@ contract("RaffleParty", accounts => {
     await rpSeeder.executeRequestMulti();
     await rpSeeder.executeRequestMulti();
 
-    await raffleParty.createRaffle(CFTI(1), 5, 10);
+    await raffleParty.createRaffle(10, CFTI(1), 5, 10);
   })
 })
