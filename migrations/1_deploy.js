@@ -28,6 +28,7 @@ module.exports = async function (deployer, network, accounts) {
       IConfetti.address,
       IParty.address,
       RpSeeder.address,
+      accounts[0],
       "https://market.roll.party/api/raffle/"
     );
   } else if (chainId == 0x01) {
@@ -47,6 +48,7 @@ module.exports = async function (deployer, network, accounts) {
       TestConfetti.address,
       TestParty.address,
       RpSeeder.address,
+      accounts[0],
       "http://localhost:3000/api/raffle/"
     );
   }
