@@ -245,8 +245,9 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
         view
         returns (
             uint128 cost,
-            uint64 endingSeedRound,
+            uint32 endingSeedRound,
             uint32 maxEntries,
+            uint32 winnerCount,
             uint32 totalTicketsBought
         )
     {
@@ -255,6 +256,7 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
             raffle.cost,
             raffle.endingSeedRound,
             raffle.maxEntries,
+            raffle.winnerCount,
             raffle.totalTicketsBought
         );
     }
