@@ -85,7 +85,7 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
         );
 
         Raffle storage newRaffle = _raffles.push();
-        // Max entries being 0 means unlimited raffle tickets
+        // Max entries being 0 means "unlimited" raffle tickets
         newRaffle.maxEntries = maxEntries == 0 ? type(uint32).max : maxEntries;
         newRaffle.cost = cost;
         newRaffle.endingSeedRound = endingSeedRound;
@@ -261,12 +261,12 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
         );
     }
 
-    function getUserTicketsBought(uint256 index, address user)
+    function getUserTicketsBought(uint256 raffleId, address user)
         public
         view
         returns (uint256)
     {
-        return getRaffleSafe(index).ticketsBought[user];
+        return getRaffleSafe(raffleId).ticketsBought[user];
     }
 
     // Utility functions
