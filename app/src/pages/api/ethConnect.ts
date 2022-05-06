@@ -30,7 +30,9 @@ export default async function hello(req: any, res: any) {
       .send('Signer is different than the address in the message')
   }
 
-  const { error } = await supabase.from('wallets').upsert({ profile, eth })
+  const { error } = await supabase
+    .from('wallets')
+    .upsert({ profile, eth }, { onConflict: 'eth', returning: 'minimal' })
 
   if (error) {
     return res.status(400).json({ error })
