@@ -16,7 +16,6 @@ interface MarketItemProps {
   allocatedSpots: number
   onRedeem: () => void
   roundsLeft: number
-  buttonTooltip: string
 }
 
 export const MarketItem: React.FC<MarketItemProps> = (props) => {
@@ -101,7 +100,6 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
               : `Ends in ${props.roundsLeft} seed rounds`}
           </Text>
         </Flex>
-        <Tooltip shouldWrapChildren label={props.buttonTooltip}>
           <Button
             my={1}
             minH="40px"
@@ -111,7 +109,6 @@ export const MarketItem: React.FC<MarketItemProps> = (props) => {
           >
             {allocatedSpots >= spots ? 'Sold out' : 'Buy tickets'}
           </Button>
-        </Tooltip>
       </Flex>
     </Flex>
   )

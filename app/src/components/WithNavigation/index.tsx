@@ -203,7 +203,7 @@ export const WithNavigation: React.FC = (props) => {
                         // FIXME: Make UserProvider handle the logged out case
                         // more gracefully and actually handle logging out *sigh*
                         await fetch('/api/auth/logout', { method: 'POST' })
-                        location.reload()
+                        setTimeout(() => location.reload(), 200) // sigh...
                       }}
                     >
                       X

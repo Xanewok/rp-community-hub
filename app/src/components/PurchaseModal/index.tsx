@@ -12,6 +12,8 @@ import {
   Input,
   Box,
   useNumberInput,
+  OrderedList,
+  ListItem,
 } from '@chakra-ui/react'
 import { useEthers, useTokenAllowance } from '@usedapp/core'
 import { useEffect, useMemo, useState } from 'react'
@@ -99,9 +101,16 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
   }, [account, connectedDiscordName, showErrorToast, user.user?.id])
 
   // Close the modal whenever we change accounts
-  useEffect(onClose, [account, onClose])
+  // useEffect(onClose, [account, onClose])
+  useEffect(() => {
+    if (ticketsLeft <= 0) {
+      onClose()
+    }
+  }, [account, onClose, ticketsLeft])
 
   const [loading, setLoading] = useState(false)
+  const needsSignIn =
+    !Boolean(connectedDiscordName) || !Boolean(isLoggedWithEthereum)
 
   return (
     <Modal size="xl" isOpen={isOpen} onClose={onClose}>
@@ -116,7 +125,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
         <ModalCloseButton />
         <ModalBody
           w="100%"
-          p={0}
+          p={5}
           display="flex"
           flexDirection="column"
           backgroundImage="/tiles.png"
@@ -142,43 +151,35 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
               <Img src="/banner-r.png"></Img>
             </Box>
           </Flex>
-          <Flex pt={8} pb={5} px={10} direction="column" justify="center">
-            <Text mx="auto" px="15%" textAlign="center" fontWeight="500">
-              You&apos;re almost done! Approve the Marketplace to spend your
-              $CFTI and choose how many tickets you&apos;d like to buy. In the
-              future, you will need to submit your Discord ID in order to
-              participate in raffles.
-            </Text>
-            <Text
-              mx="auto"
-              py={3}
-              pb={5}
-              fontWeight="bold"
-              alignSelf="center"
-              textColor="red.400"
-            >
-              This transaction will cost {formatNumber(cftiCost * itemCount, 2)}{' '}
-              <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
-            </Text>
-            <Flex direction="row" justify="space-evenly">
-              {!!connectedDiscordName || (
-                <Button
-                  onClick={async () => {
-                    const { user, session, error } = await supabase.auth.signIn(
-                      {
-                        provider: 'discord',
-                      }
-                    )
-                    console.log({ user, session, error })
-                  }}
-                >
-                  Login with Discord
-                </Button>
-              )}
-              {!!connectedDiscordName &&
-                (!!isLoggedWithEthereum || (
+
+          <Flex direction="column" justify="center"></Flex>
+          {needsSignIn ? (
+            <>
+              <Text mx="auto" px="15%" textAlign="center" fontWeight="500">
+                You&apos;re almost done! We reward raffles using Discord
+                handles, so please login with Discord and connect your Ethereum
+                wallet.
+              </Text>
+              <Flex pt={5} direction="row" justify="space-evenly">
+                {
                   <Button
+                    isDisabled={connectedDiscordName}
+                    onClick={async () => {
+                      const { user, session, error } =
+                        await supabase.auth.signIn({
+                          provider: 'discord',
+                        })
+                      console.log({ user, session, error })
+                    }}
+                  >
+                    1. Login with Discord
+                  </Button>
+                }
+                {
+                  <Button
+                    isDisabled={!connectedDiscordName || !!isLoggedWithEthereum}
                     isLoading={loading}
+                    loadingText="Connecting"
                     onClick={async () => {
                       const signer = library?.getSigner()
                       const user = supabase.auth.user()
@@ -202,17 +203,20 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                             signature,
                           }),
                         })
-                        const { error } = await supabase
+                        const { data, error } = await supabase
                           .from('profiles')
                           .upsert(
                             {
                               id: user?.id,
+                              discord_id: user?.user_metadata.sub,
                               eth: account,
                             },
                             { returning: 'minimal' }
                           )
                         if (!error) {
                           setLoggedWithEthereum(true)
+                        } else {
+                          throw error
                         }
                       } catch (e) {
                         showErrorToast(e)
@@ -221,10 +225,39 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                       }
                     }}
                   >
-                    Connect wallet
+                    2. Connect wallet
                   </Button>
-                ))}
-              {!!connectedDiscordName && !!isLoggedWithEthereum && (
+                }
+              </Flex>
+            </>
+          ) : (
+            <>
+              <Text mx="auto" px="15%" textAlign="center" fontWeight="500">
+                Approve the Marketplace to spend your hard-earned $CFTI and
+                choose how many tickets you&apos;d like to buy.
+              </Text>
+              <Text
+                mx="auto"
+                px="15%"
+                pt={2}
+                textAlign="center"
+                fontWeight="500"
+              >
+                Also make sure you have an actively raiding hero, first!
+              </Text>
+              <Text
+                mx="auto"
+                py={3}
+                pb={5}
+                fontWeight="bold"
+                alignSelf="center"
+                textColor="red.400"
+              >
+                This transaction will cost{' '}
+                {formatNumber(cftiCost * itemCount, 2)}{' '}
+                <Img mb={-0.5} h="14px" display="inline" src="/cfti.png"></Img>
+              </Text>
+              <Flex direction="row" justify="space-evenly">
                 <>
                   <Flex direction="row">
                     <Button
@@ -248,23 +281,36 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                   ) : (
                     <Button
                       w="33%"
+                      isLoading={loading}
+                      loadingText="Buying"
+                      isDisabled={loading}
                       onClick={async () => {
                         const signer = library?.getSigner()
                         if (!account || !signer || typeof raffleId !== 'number')
                           return
 
-                        await RaffleParty.connect(signer)
-                          .buyTickets(raffleId, itemCount)
-                          .catch(showErrorToast)
+                        try {
+                          const tx = await RaffleParty.connect(
+                            signer
+                          ).buyTickets(raffleId, itemCount)
+                          setLoading(true)
+                          await tx.wait()
+                          // Close the dialog after the user purchased their tickets
+                          onClose()
+                        } catch (e) {
+                          showErrorToast(e)
+                        } finally {
+                          setLoading(false)
+                        }
                       }}
                     >
                       Buy tickets
                     </Button>
                   )}
                 </>
-              )}
-            </Flex>
-          </Flex>
+              </Flex>
+            </>
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>

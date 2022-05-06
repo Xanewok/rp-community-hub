@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { ChainId, useEthers, useGasPrice, useNetwork } from '@usedapp/core'
 import assert from 'assert'
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useContracts } from '../../constants'
 import { useCurrentSeedRound, useNextSeed } from '../../hooks/useNextSeed'
 import {
@@ -102,18 +102,32 @@ const RaffleItem: React.FC<{
     Number(endingSeedRound) - Number(currentRound) + 1
   )
 
-  const [winners, setWinners] = useState('')
+  const [winners, setWinners] = useState<
+    Array<{ discord_id: string; eth: string }>
+  >([])
   useEffect(() => {
     if (roundsLeft > 0) {
-      setWinners('')
+      setWinners([])
     } else {
       // TODO: Unify what's on chain and what's not (URI-wise)
-      fetch(`/api/raffle/${id}/winners`).then(async (res) => {
-        setWinners(res.ok ? `Winners: ${await res.text()}` : '')
+      fetch(`${metadataUri}/winners`).then(async (res) => {
+        const response = await res
+          .json()
+          .then((value) => (Array.isArray(value) ? value : []))
+          .catch(() => [])
+        setWinners(response)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundsLeft])
+  const isWinner = useMemo(
+    () =>
+      winners.some(
+        (winner) => winner.eth.toLowerCase() == account?.toLowerCase()
+      ),
+    [account, winners]
+  )
+  console.log({ winners, isWinner, id })
 
   // TODO: Handle errors
   if (!data || !raffle) return null
@@ -127,7 +141,6 @@ const RaffleItem: React.FC<{
       price={formatNumber(cost, 2)}
       onRedeem={() => openModalWithData({ raffleId: id, cost })}
       roundsLeft={roundsLeft}
-      buttonTooltip={winners}
     >
       {data.description}
     </MarketItem>

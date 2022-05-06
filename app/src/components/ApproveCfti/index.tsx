@@ -55,8 +55,9 @@ export const ApproveCfti = (props: { owner?: any }) => {
   return (
     <Button
       isLoading={loading}
+      loadingText={state.msg}
       onClick={state.onClick}
-      disabled={state.disabled}
+      disabled={state.disabled || loading}
     >
       {state.msg}
     </Button>
