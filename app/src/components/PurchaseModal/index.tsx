@@ -273,7 +273,7 @@ const PurchaseModal: React.FC<ModalProps> = (props) => {
                     <Button {...getIncrementButtonProps()}>+</Button>
                   </Flex>
                   {allowance?.lt(BigNumber.from(10).pow(27)) ? (
-                    <ApproveCfti />
+                    <ApproveCfti spender={RaffleParty.address} />
                   ) : (
                     <Button
                       w="33%"

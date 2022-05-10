@@ -9,12 +9,16 @@ import { BigNumber } from '@ethersproject/bignumber'
 const MAX_UINT256 = ethers.constants.MaxUint256
 
 // 1. If the user has already approved the contract, just
-export const ApproveCfti = (props: { owner?: any }) => {
+export const ApproveCfti = (props: {
+  owner?: any
+  spender?: any
+  small?: boolean
+}) => {
   const { Confetti, RaffleParty } = useContracts()
 
   const { library, account } = useEthers()
   const owner = props.owner || account
-  const spender = RaffleParty.address
+  const spender = props.spender || RaffleParty.address
   const allowance = useTokenAllowance(Confetti.address, owner, spender)
   // TODO: Set that up in a smarter way
   const requiredAllowance = BigNumber.from(10).pow(27)
@@ -54,6 +58,14 @@ export const ApproveCfti = (props: { owner?: any }) => {
 
   return (
     <Button
+      {...(props.small
+        ? {
+            size: 'xs',
+            p: '0 1px 6px 1px',
+            fontSize: 'xl',
+            fontWeight: '500',
+          }
+        : {})}
       isLoading={loading}
       loadingText={state.msg}
       onClick={state.onClick}

@@ -4,6 +4,7 @@ import { useSigner } from './useSigner'
 import { useLocalStorage } from './useLocalStorage'
 import { useUserHero } from './useUserHero'
 import { useConfettiRoll } from './useConfettiRoll'
+import { usePendingRewards } from './usePendingRewards'
 
 export {
   useInterval,
@@ -12,4 +13,5 @@ export {
   useLocalStorage,
   useUserHero,
   useConfettiRoll,
+  usePendingRewards,
 }

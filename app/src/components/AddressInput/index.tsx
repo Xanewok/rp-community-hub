@@ -53,6 +53,7 @@ export const AddressInput: ComponentWithAs<
       {...{ value: props.value, isInvalid }}
       {...props}
       onChange={onChange}
+      fontSize="2xl"
     />
   )
 }
