@@ -69,6 +69,10 @@ const customTheme = extendTheme({
       800: 'rgb(11 9 21)',
     },
   },
+  shadows: {
+    ...theme.shadows,
+    outline: "0 0 0 3px rgb(62 46 108)"
+  },
   components: {
     Heading: {
       sizes: {
