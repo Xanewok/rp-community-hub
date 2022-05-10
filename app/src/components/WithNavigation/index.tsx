@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useUserHero } from '../../hooks'
 import { supabase } from '../../utils/supabaseClient'
 import { SideNavLink } from '../SideNavLink'
+import { useRouter } from 'next/router'
 
 export const WithNavigation: React.FC = (props) => {
   const { account, library } = useEthers()
@@ -27,6 +28,8 @@ export const WithNavigation: React.FC = (props) => {
   const heroId = useUserHero(account)
   const user = useUser()
   const discordName = useMemo(() => user.user?.user_metadata.name, [user])
+
+  const { route } = useRouter()
 
   return (
     <Flex
@@ -137,9 +140,9 @@ export const WithNavigation: React.FC = (props) => {
                   1px 0 0 0 #281c49
                   "
                 />
-                <SideNavLink type="market" selected />
-                <SideNavLink type="roll" />
-                <SideNavLink type="collect" />
+                <SideNavLink type="market" selected={route === '/'} />
+                <SideNavLink type="roll" selected={route === '/roll'} />
+                <SideNavLink type="collect" selected={route === '/collect'} />
               </UnorderedList>
             </Box>
 

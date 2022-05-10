@@ -25,7 +25,7 @@ function NextApp({ Component, pageProps, router }: AppProps): JSX.Element {
       <UserProvider supabaseClient={supabaseClient} pathname={pathname}>
         <ChakraProvider resetCSS theme={customTheme}>
           <DefaultSeo {...SEO} />
-            <Component {...pageProps} />
+          <Component {...pageProps} />
         </ChakraProvider>
       </UserProvider>
     </DAppProvider>

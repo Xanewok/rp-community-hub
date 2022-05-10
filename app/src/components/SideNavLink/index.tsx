@@ -1,4 +1,5 @@
 import { ListItem, Link, Text } from '@chakra-ui/react'
+import NextLink from 'next/link'
 
 const capitalize = (value: string) =>
   value.replace(/^\w/, (c) => c.toUpperCase())
@@ -15,51 +16,54 @@ export type LinkType =
 
 export const SideNavLink = (props: { type: LinkType; selected?: boolean }) => (
   <ListItem display="block" p={1} mt={2}>
-    <Link
-      px={2}
-      h="40px"
-      minWidth="148px"
-      alignItems="center"
-      display="flex"
-      color={props.selected ? 'white' : 'rgb(255 255 255/.4)'}
-      borderRadius={props.selected ? undefined : '.375rem'}
-      _hover={{ bg: props.selected ? '' : 'indigo.700' }}
-      href={LINKS[props.type]}
-      bg={props.selected ? 'indigo.400' : undefined}
-      ringColor="rgb(59 130 246/0.5)"
-      boxShadow={
-        props.selected
-          ? ' 0 -2px 0 0 #3e2e6c,0 2px 0 0 #2d265a,-2px 0 0 0 #281c49,2px 0 0 0 #281c49,0 0 0 2px #0f0c1b,0 -4px 0 0 #0f0c1b,0 4px 0 0 #0b0915,-4px 0 0 0 #0b0915,4px 0 0 0 #0b0915;'
-          : ''
-      }
-    >
-      {IMAGES[props.type]}
-      <Text
-        as="span"
-        fontSize="2xl"
-        textColor={props.selected ? 'white' : 'rgb(255 255 255/.4)'}
-        userSelect="none"
-        translateY="-0.5"
-        fontWeight="bold"
-        lineHeight={10}
-        ml={3}
-        pb={2}
+    <NextLink href={LINKS[props.type] || ''} passHref>
+      <Link
+        px={2}
+        h="40px"
+        minWidth="148px"
+        alignItems="center"
+        display="flex"
+        color={props.selected ? 'white' : 'rgb(255 255 255/.4)'}
+        borderRadius={props.selected ? undefined : '.375rem'}
+        _hover={{ bg: props.selected ? '' : 'indigo.700' }}
+        href={LINKS[props.type]}
+        bg={props.selected ? 'indigo.400' : undefined}
+        // ringColor="rgb(59 130 246/0.5)"
+        boxShadow={
+          props.selected
+            ? ' 0 -2px 0 0 #3e2e6c,0 2px 0 0 #2d265a,-2px 0 0 0 #281c49,2px 0 0 0 #281c49,0 0 0 2px #0f0c1b,0 -4px 0 0 #0f0c1b,0 4px 0 0 #0b0915,-4px 0 0 0 #0b0915,4px 0 0 0 #0b0915;'
+            : ''
+        }
+        transitionDuration=".2s"
       >
-        {capitalize(props.type)}
-      </Text>
-    </Link>
+        {IMAGES[props.type]}
+        <Text
+          as="span"
+          fontSize="2xl"
+          textColor={props.selected ? 'white' : 'rgb(255 255 255/.4)'}
+          userSelect="none"
+          translateY="-0.5"
+          fontWeight="bold"
+          lineHeight={10}
+          ml={3}
+          pb={2}
+        >
+          {capitalize(props.type)}
+        </Text>
+      </Link>
+    </NextLink>
   </ListItem>
 )
 
-const LINKS: Record<LinkType, string | undefined> = {
+const LINKS: Record<LinkType, string> = {
   raid: 'https://play.raid.party/',
   wallet: 'https://play.raid.party/my-wallet',
   summon: 'https://play.raid.party/summon',
   enhance: 'https://play.raid.party/enhance',
   guild: 'https://play.raid.party/guild',
-  market: undefined,
-  roll: 'https://roll.party',
-  collect: 'https://collect.roll.party',
+  market: '/',
+  roll: '/roll',
+  collect: '/collect',
 }
 
 const IMAGES = {
@@ -185,19 +189,19 @@ const IMAGES = {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M1.6315 0C1.4425 0 1.274 0.131 1.209 0.328L0.0550001 3.8335C0.0185628 3.94436 -2.6634e-06 4.06031 2.86589e-10 4.177V5.5715C2.86589e-10 6.36 0.5755 7 1.2855 7C1.9955 7 2.5715 6.36 2.5715 5.5715C2.5715 6.3605 3.147 7 3.857 7C4.567 7 5.143 6.36 5.143 5.5715C5.143 6.3605 5.7185 7 6.4285 7C7.1385 7 7.7135 6.361 7.7145 5.5725C7.7145 6.361 8.29 7 9 7C9.71 7 10.2855 6.36 10.2855 5.5715C10.2855 6.3605 10.8615 7 11.5715 7C12.2815 7 12.8565 6.361 12.857 5.5725C12.8575 6.361 13.433 7 14.143 7C14.853 7 15.4285 6.36 15.4285 5.5715C15.4285 6.3605 16.004 7 16.7145 7C17.4245 7 18 6.36 18 5.5715V4.177C18 4.06031 17.9814 3.94436 17.945 3.8335L16.791 0.3285C16.726 0.131 16.5575 0 16.3685 0H1.6315Z"
-        fill="white"
+        fill="currentColor"
       />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M1.99878 7.61506V11.5001H0.748779C0.682475 11.5001 0.618887 11.5264 0.572003 11.5733C0.525119 11.6202 0.498779 11.6838 0.498779 11.7501V12.2501C0.498779 12.3164 0.525119 12.38 0.572003 12.4268C0.618887 12.4737 0.682475 12.5001 0.748779 12.5001H17.2488C17.3151 12.5001 17.3787 12.4737 17.4256 12.4268C17.4724 12.38 17.4988 12.3164 17.4988 12.2501V11.7501C17.4988 11.6838 17.4724 11.6202 17.4256 11.5733C17.3787 11.5264 17.3151 11.5001 17.2488 11.5001H15.9988V7.61506C15.7895 7.53165 15.5961 7.41274 15.4273 7.26356C15.2977 7.37788 15.1536 7.47471 14.9988 7.55156V11.5001H2.99878V7.55156C2.84397 7.47471 2.69991 7.37788 2.57028 7.26356C2.40228 7.41106 2.21028 7.53106 1.99878 7.61506ZM14.9988 6.63656C15.0413 6.59406 15.0813 6.54856 15.1188 6.50006H14.9988V6.63656ZM15.7358 6.50006C15.8114 6.598 15.8998 6.68529 15.9988 6.75956V6.50006H15.7358ZM1.99878 6.75956C2.09822 6.68587 2.18676 6.59851 2.26178 6.50006H1.99878V6.75956ZM2.87878 6.50006H2.99878V6.63656C2.95583 6.59374 2.91574 6.54814 2.87878 6.50006ZM1.24878 13.5001C1.18248 13.5001 1.11889 13.5264 1.072 13.5733C1.02512 13.6202 0.998779 13.6838 0.998779 13.7501V17.5001C0.998779 17.6327 1.05146 17.7598 1.14523 17.8536C1.23899 17.9474 1.36617 18.0001 1.49878 18.0001H16.4988C16.6314 18.0001 16.7586 17.9474 16.8523 17.8536C16.9461 17.7598 16.9988 17.6327 16.9988 17.5001V13.7501C16.9988 13.6838 16.9724 13.6202 16.9256 13.5733C16.8787 13.5264 16.8151 13.5001 16.7488 13.5001H1.24878Z"
-        fill="white"
+        fill="currentColor"
       />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M4.25073 10.0002H5.75073C5.8888 10.0002 6.00073 10.1121 6.00073 10.2502V10.4998H6.74852C6.88659 10.4998 6.99852 10.6117 6.99852 10.7498V11.2498C6.99852 11.3878 6.88659 11.4998 6.74852 11.4998H5.76519C5.76041 11.5 5.75558 11.5002 5.75073 11.5002H4.25073C4.11266 11.5002 4.00073 11.3883 4.00073 11.2502V10.2502C4.00073 10.1121 4.11266 10.0002 4.25073 10.0002Z"
-        fill="white"
+        fill="currentColor"
       />
     </svg>
   ),
