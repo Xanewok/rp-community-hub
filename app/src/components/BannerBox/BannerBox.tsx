@@ -1,12 +1,12 @@
-import { Text, Box, Img, Flex } from '@chakra-ui/react'
+import { Text, Box, Img, Flex, Heading, FlexProps } from '@chakra-ui/react'
 
 type BannerBoxProps = {
   heading: string
   children?: JSX.Element | JSX.Element[]
-}
+} & FlexProps
 
-const BannerBox = ({ heading, children }: BannerBoxProps) => (
-  <Flex justify="center" w="100%">
+const BannerBox = ({ heading, children, ...props }: BannerBoxProps) => (
+  <Flex justify="center" w="100%" {...props}>
     <Box
       mt="48px"
       px="16px"
@@ -26,7 +26,7 @@ const BannerBox = ({ heading, children }: BannerBoxProps) => (
           w="150px"
           textAlign="center"
         >
-          <Text fontSize="lg" mt="-5px" color="white" fontWeight="bold">
+          <Text mt="-3px" fontWeight="bold" fontSize="2xl" lineHeight="36px" verticalAlign="middle" color="white">
             {heading}
           </Text>
         </Box>
