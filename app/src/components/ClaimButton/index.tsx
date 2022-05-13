@@ -70,25 +70,53 @@ export const ClaimButton = (props: ClaimButtonProps) => {
       const contract = RpYieldCollector.connect(signer)
 
       if (!accumulate && !collectTax) {
-        await contract.claimMultipleRewards(wallets)
+        const estimate = await contract.estimateGas.claimMultipleRewards(
+          wallets
+        )
+        await contract.claimMultipleRewards(wallets, {
+          gasLimit: estimate.add(estimate.div(10)),
+        })
       } else if (!collectTax) {
-        await contract.claimMultipleRewardsTo(wallets, stash)
+        const estimate = await contract.estimateGas.claimMultipleRewardsTo(
+          wallets,
+          stash
+        )
+        await contract.claimMultipleRewardsTo(wallets, stash, {
+          gasLimit: estimate.add(estimate.div(10)),
+        })
       } else if (!accumulate) {
         const taxBasisPoints = Math.round(taxRate * 100)
 
-        await contract.taxedClaimMultipleRewards(
+        const estimate = await contract.estimateGas.taxedClaimMultipleRewards(
           wallets,
           taxBasisPoints,
           taxCollector
         )
+        await contract.taxedClaimMultipleRewards(
+          wallets,
+          taxBasisPoints,
+          taxCollector,
+          {
+            gasLimit: estimate.add(estimate.div(10)),
+          }
+        )
       } else {
         const taxBasisPoints = Math.round(taxRate * 100)
 
-        await contract.taxedClaimMultipleRewardsTo(
+        const estimate = await contract.estimateGas.taxedClaimMultipleRewardsTo(
           wallets,
           stash,
           taxBasisPoints,
           taxCollector
+        )
+        await contract.taxedClaimMultipleRewardsTo(
+          wallets,
+          stash,
+          taxBasisPoints,
+          taxCollector,
+          {
+            gasLimit: estimate.add(estimate.div(10)),
+          }
         )
       }
     } catch (e) {
