@@ -34,13 +34,13 @@ export const CommitSnapshot: React.FC = (props) => {
 
   const isDisabled = !account || isNaN(lastSnapshotTime) || timeTillSnapshot > 0
 
-  const doSeed = useCallback(() => {
+  const commitSnapshot = useCallback(() => {
     if (isDisabled) return
     const signer = account && library?.getSigner(account)
     if (signer) {
       Raid.connect(signer).commitSnapshot().catch(showErrorToast)
     }
-  }, [isDisabled, Raid, account, library])
+  }, [isDisabled, account, library, Raid, showErrorToast])
 
   return (
     <Tooltip shouldWrapChildren label="Snapshots allow players to claim their rewards with lower gas fees. This is done automatically by the dev team - ONLY use this if you know what you're doing!">
@@ -54,7 +54,7 @@ export const CommitSnapshot: React.FC = (props) => {
         boxShadow="0 -2px 0 0 #2b2258,0 2px 0 0 #2b2258,-2px 0 0 0 #2b2258,2px 0 0 0 #2b2258,0 0 0 2px #0a0414,0 -4px 0 0 #0a0414,0 4px 0 0 #0a0414,-4px 0 0 0 #0a0414,4px 0 0 0 #0a0414;"
         cursor={isDisabled ? 'not-allowed' : 'pointer'}
         userSelect="none"
-        onClick={doSeed}
+        onClick={commitSnapshot}
       >
         <Text
           as="span"
