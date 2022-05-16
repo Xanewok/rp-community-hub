@@ -11,7 +11,7 @@ export const CommitSnapshot: React.FC = (props) => {
   const { Raid } = useContracts()
 
   const lastSnapshotTime = Number(useSnapshotTime())
-  const nextSnapshotTime = lastSnapshotTime + SNAPSHOT_CADENCE_IN_SECONDS;
+  const nextSnapshotTime = lastSnapshotTime + SNAPSHOT_CADENCE_IN_SECONDS
   console.log({ nextSnapshotTime })
   const [timeTillSnapshot, setTimeTillSnapshot] = useState(NaN)
   useInterval(() => {
@@ -43,7 +43,25 @@ export const CommitSnapshot: React.FC = (props) => {
   }, [isDisabled, account, library, Raid, showErrorToast])
 
   return (
-    <Tooltip shouldWrapChildren label="Snapshots allow players to claim their rewards with lower gas fees. This is done automatically by the dev team - ONLY use this if you know what you're doing!">
+    <Tooltip
+      shouldWrapChildren
+      label={
+        <>
+          <Text>
+            Last snapshot:{' '}
+            {new Date(lastSnapshotTime * 1000).toLocaleString([], {
+              dateStyle: 'full',
+              timeStyle: 'long',
+            })}
+          </Text>
+          <Text>
+            Snapshots allow players to claim their rewards with lower gas fees.
+            This is done automatically by the dev team - ONLY use this if you
+            know what you&apos;re doing!
+          </Text>
+        </>
+      }
+    >
       <Flex
         justify="center"
         alignItems="center"
@@ -70,10 +88,9 @@ export const CommitSnapshot: React.FC = (props) => {
             : timeTillSnapshot <= 0
             ? 'now'
             : `in ${new Date(timeTillSnapshot).toLocaleTimeString([], {
-		    
                 hour: '2-digit',
                 minute: '2-digit',
-		hour12: false
+                hour12: false,
               })} hrs`}
         </Text>
       </Flex>
