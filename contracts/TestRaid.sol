@@ -9,11 +9,14 @@ interface Mintable {
 
 contract TestRaid is IRaid {
     Mintable immutable _confetti;
+    uint64 public lastSnapshotTime;
     mapping(address => uint256) _pendingRewards;
 
     constructor(address confetti) {
         _confetti = Mintable(confetti);
     }
+
+    function commitSnapshot() external {}
 
     function setPendingRewards(address wallet, uint256 amount) public {
         _pendingRewards[wallet] = amount;

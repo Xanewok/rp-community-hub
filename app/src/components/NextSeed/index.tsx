@@ -1,5 +1,5 @@
-import { Button, Flex, Img, Text, Tooltip, useInterval } from '@chakra-ui/react'
-import { useEthers, useTokenBalance } from '@usedapp/core'
+import { Flex, Text, useInterval } from '@chakra-ui/react'
+import { useEthers } from '@usedapp/core'
 import { useState, useCallback } from 'react'
 import { useContracts } from '../../constants'
 import { useNextSeed } from '../../hooks'
@@ -31,7 +31,7 @@ export const NextSeed: React.FC = (props) => {
       ml={6}
       px={3}
       h="38px"
-      bg="#0A0414"
+      bg={isDisabled ? '#0A0414' : '#2b2258'}
       boxShadow="0 -2px 0 0 #2b2258,0 2px 0 0 #2b2258,-2px 0 0 0 #2b2258,2px 0 0 0 #2b2258,0 0 0 2px #0a0414,0 -4px 0 0 #0a0414,0 4px 0 0 #0a0414,-4px 0 0 0 #0a0414,4px 0 0 0 #0a0414;"
       cursor={isDisabled ? 'not-allowed' : 'pointer'}
       userSelect="none"

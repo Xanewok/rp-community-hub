@@ -5,6 +5,7 @@ import { useLocalStorage } from './useLocalStorage'
 import { useUserHero } from './useUserHero'
 import { useConfettiRoll } from './useConfettiRoll'
 import { usePendingRewards } from './usePendingRewards'
+import { useSnapshotTime } from './useSnapshotTime'
 
 export {
   useInterval,
@@ -14,4 +15,5 @@ export {
   useUserHero,
   useConfettiRoll,
   usePendingRewards,
+  useSnapshotTime,
 }

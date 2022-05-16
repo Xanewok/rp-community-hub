@@ -11,8 +11,8 @@ import {
   ListItem,
   OrderedList,
 } from '@chakra-ui/react'
-import ConfettiRoll from '../components/ConfettiRoll'
 import { InfoShield } from '../components/InfoShield'
+import { CommitSnapshot } from '../components/CommitSnapshot'
 import { NextSeed } from '../components/NextSeed'
 import { useContracts } from '../constants'
 import BatchClaim from '../components/BatchClaim'
@@ -46,6 +46,7 @@ const CollectInner: React.FC = (props) => {
   return (
     <Box position="relative" h="100%" w="100%" overflow="auto">
       <Flex position="absolute" top={10} right={10} zIndex={10}>
+        <CommitSnapshot />
         <NextSeed />
         <InfoShield
           value={`⛽ ${Math.trunc((Number(gasPrice) || 0) / 10 ** 9)}`}
@@ -64,7 +65,7 @@ const CollectInner: React.FC = (props) => {
         <Heading textColor="white" lineHeight="36px" mb={0}>
           Collect rewards
         </Heading>
-	<BatchClaim connected={true} />
+        <BatchClaim connected={true} />
         {/* <ConfettiRoll connected={true} /> */}
         <Box mt="80px" mx="2em" textAlign="center" textColor="white">
           <Heading textAlign="center" color="white">
