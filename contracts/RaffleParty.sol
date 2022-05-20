@@ -67,13 +67,7 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
         uint128 cost,
         uint32 maxEntries,
         uint32 winnerCount
-    )
-        public
-        // NOTE: cba to add a hot wallet role admin setup so just allow everyone
-        // to create raffles during the Rinkeby testing period
-        // onlyRole(RAFFLE_CREATOR_ROLE)
-        whenNotPaused
-    {
+    ) public onlyRole(RAFFLE_CREATOR_ROLE) whenNotPaused {
         // Mitigate possible front-running - disallow the txn about a minute
         // before the seeder can request randomness. The RP seeder is pre-configured
         // to require 3 block confirmations, so 60 seconds makes sense (< 3 * 14s)
@@ -96,9 +90,7 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
 
     function setRaffleEndingSeed(uint256 raffleId, uint32 endingSeedRound)
         public
-        // NOTE: cba to add a hot wallet role admin setup so just allow everyone
-        // to create raffles during the Rinkeby testing period
-        // onlyRole(RAFFLE_CREATOR_ROLE)
+        onlyRole(RAFFLE_CREATOR_ROLE)
         whenNotPaused
     {
         require(getSeed(endingSeedRound) == 0, "Raffle finished");
@@ -164,7 +156,7 @@ contract RaffleParty is Context, Pausable, AccessControlEnumerable {
         // can maintain a O(lg N) lookup on the ticket number (where nodes store
         // the total tickets in their subtrees) and apply a pseudorandom permutation
         // function.
-        // This way, the storage cost would be 2*|participants| rather than
+        // This way, the memory cost would be 2*|participants| rather than
         // |totalTickets|
         address[] memory tickets = new address[](raffle.totalTicketsBought);
         // SAFETY: The local ticket counters are `uint256`, while the ticket
