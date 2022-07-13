@@ -140,9 +140,12 @@ export const WithNavigation: React.FC = (props) => {
                   1px 0 0 0 #281c49
                   "
                 />
-                <SideNavLink type="market" selected={route === '/'} />
+                <SideNavLink type="market" selected={route === '/market'} />
                 <SideNavLink type="roll" selected={route === '/roll'} />
-                <SideNavLink type="collect" selected={route === '/collect'} />
+                <SideNavLink
+                  type="collect"
+                  selected={['/collect', '/'].includes(route)}
+                />
               </UnorderedList>
             </Box>
 

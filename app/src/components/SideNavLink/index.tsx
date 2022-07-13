@@ -61,7 +61,7 @@ const LINKS: Record<LinkType, string> = {
   summon: 'https://play.raid.party/summon',
   enhance: 'https://play.raid.party/enhance',
   guild: 'https://play.raid.party/guild',
-  market: '/',
+  market: '/market',
   roll: '/roll',
   collect: '/collect',
 }
