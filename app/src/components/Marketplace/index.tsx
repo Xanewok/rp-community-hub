@@ -191,7 +191,11 @@ export const Marketplace: React.FC = () => {
     [onOpen]
   )
 
-  let raffleCount = useRaffleCount()
+  let chainRaffleCount = useRaffleCount()
+  // FIXME: This only points to a test raffle shop, which is overloaded rn, so
+  // for now just limit to 20 entries
+  let raffleCount = Math.min(chainRaffleCount, 20)
+
   const {
     network: { chainId },
   } = useNetwork()
