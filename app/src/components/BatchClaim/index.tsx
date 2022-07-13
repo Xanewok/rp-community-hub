@@ -190,7 +190,6 @@ const Status = ({ connected }: StatusProps) => {
           <Flex my="0.375em">
             <Text fontSize="2xl">Collector</Text>
             <AddressInput
-              fontSize="2xl"
               isDisabled={!connected || !collectTax}
               ml="auto"
               w="85%"

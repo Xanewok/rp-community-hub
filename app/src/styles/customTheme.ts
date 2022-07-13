@@ -68,10 +68,23 @@ const customTheme = extendTheme({
       700: 'rgb(15 12 27)',
       800: 'rgb(11 9 21)',
     },
+    blue: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6',
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+      1000: '#3136B0',
+    },
   },
   shadows: {
     ...theme.shadows,
-    outline: "0 0 0 3px rgb(62 46 108)"
+    outline: '0 0 0 3px rgb(62 46 108)',
   },
   components: {
     Heading: {
@@ -107,15 +120,17 @@ const customTheme = extendTheme({
     Input: {
       variants: {
         filled: {
+          boxShadow:
+            '0 -2px 0 0 #474cc3, 0 2px 0 0 #22268e, -2px 0 0 0 #393eba, 2px 0 0 0 #393eba, 0 0 0 2px #0f0c1b, 0 -4px 0 0 #0f0c1b, 0 4px 0 0 #0f0c1b, -4px 0 0 0 #0f0c1b, 4px 0 0 0 #0f0c1b',
           _hover: {
-            bg: 'rgb(49 54 176)',
+            bg: 'blue.1000',
           },
-          color: 'rgb(49 54 176)',
-          bg: 'rgb(49 54 176)',
+          color: 'blue.1000',
+          bg: 'blue.1000',
         },
         outline: {
-          color: 'rgb(49 54 176)',
-          bg: 'rgb(49 54 176)',
+          color: 'blue.1000',
+          bg: 'blue.1000',
         },
       },
     },
@@ -132,7 +147,7 @@ const customTheme = extendTheme({
       variants: {
         solid: {
           textColor: 'white',
-          bg: 'rgb(49 54 176)',
+          bg: 'blue.1000',
           boxShadow:
             '0 -2px 0 0 #474cc3, 0 2px 0 0 #22268e, -2px 0 0 0 #393eba, 2px 0 0 0 #393eba, 0 0 0 2px #0f0c1b, 0 -4px 0 0 #0f0c1b, 0 4px 0 0 #0f0c1b, -4px 0 0 0 #0f0c1b, 4px 0 0 0 #0f0c1b',
           borderRadius: '1px',
@@ -141,15 +156,15 @@ const customTheme = extendTheme({
               '0 -2px 0 0 #474cc3, 0 2px 0 0 #22268e, -2px 0 0 0 #393eba, 2px 0 0 0 #393eba, 0 0 0 2px #0f0c1b, 0 -4px 0 0 #0f0c1b, 0 4px 0 0 #0f0c1b, -4px 0 0 0 #0f0c1b, 4px 0 0 0 #0f0c1b',
           },
           _active: {
-            bg: 'rgb(49 54 176)',
+            bg: 'blue.1000',
             boxShadow:
               '0 -2px 0 0 #474cc3, 0 2px 0 0 #22268e, -2px 0 0 0 #393eba, 2px 0 0 0 #393eba, 0 0 0 2px #0f0c1b, 0 -4px 0 0 #0f0c1b, 0 4px 0 0 #0f0c1b, -4px 0 0 0 #0f0c1b, 4px 0 0 0 #0f0c1b',
           },
           _hover: {
-            bg: 'rgb(49 54 176)',
+            bg: 'blue.1000',
             filter: 'brightness(1.25)',
             _disabled: {
-              bg: 'rgb(49 54 176)',
+              bg: 'blue.1000',
               filter: 'brightness(1)',
             },
           },
