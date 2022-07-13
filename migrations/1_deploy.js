@@ -29,7 +29,7 @@ module.exports = async function (deployer, network, accounts) {
       IParty.address,
       RpSeeder.address,
       accounts[0],
-      "https://market.roll.party/api/raffle/"
+      "https://roll.party/api/raffle/"
     );
   } else if (chainId == 0x01) {
     IConfetti.address = "0xCfef8857E9C80e3440A823971420F7Fa5F62f020";
@@ -42,7 +42,7 @@ module.exports = async function (deployer, network, accounts) {
       IParty.address,
       IRpSeeder.address,
       accounts[0],
-      "https://market.roll.party/api/raffle/"
+      "https://roll.party/api/raffle/"
     );
   } else if (network == "development" || chainId == 1337) {
     await deployer.deploy(TestSeedStorage);

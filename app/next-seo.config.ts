@@ -1,6 +1,6 @@
-export const title = 'Raid Party Marketplace'
-const description = 'Spend your hard-earned CFTI tokens on prizes!'
-const url = 'https://market.roll.party'
+export const title = 'RP Community Hub'
+const description = 'Raid Party community-built tools, like multi-wallet claim or CFTI shop'
+const url = 'https://roll.party'
 
 const SEO = {
     title,
