@@ -44,11 +44,12 @@ export const AddressInput: ComponentWithAs<
       placeholder="Address"
       background={accepted ? 'indigo.600' : 'indigo.700'}
       border="1px solid"
-      textColor={!!props.value && !isInvalid ? undefined : 'gray.600'}
+      borderRadius={0}
       borderColor={!isInvalid ? 'indigo.600' : '#aa4444'}
       boxShadow={
         '0 -2px 0 0 #231b4c,0 2px 0 0 #231b47,-2px 0 0 0 #231b4c,2px 0 0 0 #231b4c,0 0 0 2px #080611,0 -4px 0 0 #080611,0 4px 0 0 #080611,-4px 0 0 0 #080611,4px 0 0 0 #080611'
       }
+      textColor={!!props.value && !isInvalid ? undefined : 'gray.600'}
       _hover={{ filter: props.disabled != null ? 'brightness(1.15)' : '' }}
       _focus={{
         outline: 'none',
@@ -56,7 +57,6 @@ export const AddressInput: ComponentWithAs<
         borderColor: !isInvalid ? 'indigo.100' : '#aa4444',
       }}
       variant={accepted ? 'filled' : 'outline'}
-      borderRadius={0}
       fontSize="2xl"
       {...{ value: props.value, isInvalid }}
       {...props}

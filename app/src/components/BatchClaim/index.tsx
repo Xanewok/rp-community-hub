@@ -110,6 +110,12 @@ const Status = ({ connected }: StatusProps) => {
             <Text fontSize="2xl">Operator</Text>
             <Select
               fontSize="2xl"
+              border="1px solid"
+              borderRadius={0}
+              borderColor={'indigo.600'}
+              boxShadow={
+                '0 -2px 0 0 #231b4c,0 2px 0 0 #231b47,-2px 0 0 0 #231b4c,2px 0 0 0 #231b4c,0 0 0 2px #080611,0 -4px 0 0 #080611,0 4px 0 0 #080611,-4px 0 0 0 #080611,4px 0 0 0 #080611'
+              }
               ml="auto"
               w="85%"
               variant={
@@ -118,12 +124,12 @@ const Status = ({ connected }: StatusProps) => {
                   : undefined
               }
               _hover={{ filter: 'brightness(1.25)' }}
+              _focus={{ outline: 'none' }}
               background={
                 operator != '' && web3.utils.isAddress(operator)
-                  ? 'purple.300'
-                  : 'purple.200'
+                  ? 'indigo.600'
+                  : 'indigo.700'
               }
-              border="1px"
               onChange={(ev) => setOperator(ev.target.value)}
               placeholder="Address"
               value={operator}
@@ -187,7 +193,7 @@ const Status = ({ connected }: StatusProps) => {
           </Checkbox>
         </Flex>
         <Tooltip label="The account that will receive a portion (tax) of all of the claimed rewards">
-          <Flex my="0.375em">
+          <Flex mb={4}>
             <Text fontSize="2xl">Collector</Text>
             <AddressInput
               isDisabled={!connected || !collectTax}
@@ -201,7 +207,7 @@ const Status = ({ connected }: StatusProps) => {
           </Flex>
         </Tooltip>
         <Tooltip label="How much of all of the claimed rewards will be sent to the Collector account">
-          <Flex my="0.375em">
+          <Flex my={2}>
             <Text fontSize="2xl">Tax rate</Text>
             <Flex ml="auto" w="85%">
               <NumberInput
@@ -216,6 +222,19 @@ const Status = ({ connected }: StatusProps) => {
               >
                 <NumberInputField
                   fontSize="2xl"
+                  border="1px solid"
+                  borderRadius={0}
+                  borderColor="indigo.600"
+                  boxShadow={
+                    '0 -2px 0 0 #231b4c,0 2px 0 0 #231b47,-2px 0 0 0 #231b4c,2px 0 0 0 #231b4c,0 0 0 2px #080611,0 -4px 0 0 #080611,0 4px 0 0 #080611,-4px 0 0 0 #080611,4px 0 0 0 #080611'
+                  }
+                  _hover={{
+                    filter: collectTax ? 'brightness(1.15)' : '',
+                  }}
+                  _focus={{
+                    outline: 'none',
+                    background: 'indigo.700',
+                  }}
                   disabled={!connected || !collectTax}
                 />
               </NumberInput>
