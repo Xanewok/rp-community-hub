@@ -12,7 +12,6 @@ export const CommitSnapshot: React.FC = (props) => {
 
   const lastSnapshotTime = Number(useSnapshotTime())
   const nextSnapshotTime = lastSnapshotTime + SNAPSHOT_CADENCE_IN_SECONDS
-  console.log({ nextSnapshotTime })
   const [timeTillSnapshot, setTimeTillSnapshot] = useState(NaN)
   useInterval(() => {
     setTimeTillSnapshot(nextSnapshotTime * 1000 - new Date().getTime())

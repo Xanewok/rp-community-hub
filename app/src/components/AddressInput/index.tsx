@@ -32,12 +32,6 @@ export const AddressInput: ComponentWithAs<
 
   const accepted =
     (typeof props.value === 'undefined' || !!props.value) && !isInvalid
-  console.log({
-    accepted,
-    value: props.value,
-    disabled: props.disabled,
-    isInvalid,
-  })
 
   return (
     <Input
