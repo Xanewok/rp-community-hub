@@ -36,6 +36,7 @@ const Status = ({ connected }: StatusProps) => {
   const [accountList, setAccountList] = useLocalStorage<string[]>('accs', [])
 
   const [accumulate, enableAccumulate] = useState(false)
+  const [fetchPartyInfo, enablePartyInfoFetch] = useState(false)
   const [stash, setStash] = useState('')
   const [collectTax, enableCollectTax] = useState(false)
   const [taxCollector, setTaxCollector] = useState('')
@@ -98,11 +99,27 @@ const Status = ({ connected }: StatusProps) => {
           </Text>
         )}
 
+        <Flex>
+          <Checkbox
+            size="lg"
+            isDisabled={!connected}
+            isChecked={fetchPartyInfo}
+            onChange={({ target }) => enablePartyInfoFetch(target.checked)}
+          >
+            <Text ml="2" mb="2" fontSize="2xl" fontWeight="bold">
+              <Tooltip label="If enabled, fetches parties and wallets for each account, inline">
+                Fetch parties&apos; info
+              </Tooltip>
+            </Text>
+          </Checkbox>
+        </Flex>
+
         <AccountTable
           accountList={accountList}
           setAccountList={setAccountList}
           operator={operator}
           needsAuthorization={accumulate || collectTax}
+          fetchPartyInfo={fetchPartyInfo}
         />
 
         <Tooltip label="The account that is authorized by the above addresses to move their $CFTI tokens for accumulation/tax">
