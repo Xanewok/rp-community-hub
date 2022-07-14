@@ -41,7 +41,6 @@ export const AccountTable = (props: {
   const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) =>
       setAccountList((list) => {
-        console.log({ current: e.currentTarget, target: e.target })
         const idx = Number(e.target.id.replace('account-', ''))
         return [...list.slice(0, idx), e.target.value, ...list.slice(idx + 1)]
       }),

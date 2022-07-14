@@ -23,7 +23,6 @@ async function fetchAssets(account: string): Promise<GetNftsData> {
   // FIXME: Use our own deployment
   const res = await fetch(`https://rp-api.waves.gg/getNfts/${account}`)
   const response: GetNftsResponse = await res.json()
-  console.log({ response })
 
   if (!response.success) {
     throw new Error("Couldn't fetch fighters")
