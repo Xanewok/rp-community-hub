@@ -146,6 +146,7 @@ export const WithNavigation: React.FC = (props) => {
                   type="collect"
                   selected={['/collect', '/'].includes(route)}
                 />
+                <SideNavLink type="insurance" />
               </UnorderedList>
             </Box>
 
