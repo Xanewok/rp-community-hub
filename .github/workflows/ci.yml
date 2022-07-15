@@ -29,3 +29,10 @@ jobs:
         working-directory: app
       - run: yarn lint
         working-directory: app
+      - run: |
+          echo "
+          NEXT_PUBLIC_SUPABASE_URL=dummy
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy
+          " > .env.local
+          yarn build
+        working-directory: app
