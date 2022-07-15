@@ -1,6 +1,7 @@
+import { useMemo } from 'react'
 import { Contract } from '@ethersproject/contracts'
+import { ChainId, useNetwork } from '@usedapp/core'
 
-import { ChainId, ERC20, useNetwork } from '@usedapp/core'
 import RaffleParty from '../../../build/contracts/RaffleParty.json'
 import RpSeeder from '../../../build/contracts/RpSeeder.json'
 import IConfetti from '../../../build/contracts/IConfetti.json'
@@ -8,7 +9,7 @@ import ConfettiRoll from '../../../build/contracts/ConfettiRoll.json'
 import RpYieldCollector from '../../../build/contracts/RpYieldCollector.json'
 import TestParty from '../../../build/contracts/TestParty.json'
 import TestRaid from '../../../build/contracts/TestRaid.json'
-import { useMemo } from 'react'
+import { FighterUriHandlerAbi, HeroUriHandlerAbi } from './abis'
 
 type KnownContracts =
   | 'Confetti'
@@ -18,6 +19,8 @@ type KnownContracts =
   | 'RaffleParty'
   | 'ConfettiRoll'
   | 'RpYieldCollector'
+  | 'HeroURIHandler'
+  | 'FighterURIHandler'
 
 export const CONTRACT_ABI = {
   Confetti: IConfetti.abi,
@@ -27,6 +30,8 @@ export const CONTRACT_ABI = {
   RaffleParty: RaffleParty.abi,
   ConfettiRoll: ConfettiRoll.abi,
   RpYieldCollector: RpYieldCollector.abi,
+  HeroURIHandler: HeroUriHandlerAbi,
+  FighterURIHandler: FighterUriHandlerAbi,
 } as const
 
 export const CONTRACT_ADDRESS = {
@@ -38,6 +43,8 @@ export const CONTRACT_ADDRESS = {
     RaffleParty: '0xd3babf32a741b03e5c72a3def7961cb6f43746e7',
     ConfettiRoll: '0x1fAaC523223fBf79667ab621653bd378093E8693',
     RpYieldCollector: '0xecd1c195192782Cd7c343aD8171C183aC93277D6',
+    HeroURIHandler: '0x8271Ca0DeA5d7c5B3B63A54903383EdaBcb58AE8',
+    FighterURIHandler: '0x5cfEf6B6777aD143e6Edc122632984C87dC6FB40',
   },
   [ChainId.Rinkeby]: {
     Confetti: '0x0B4f94A0a8ad26F3f151AC581ac7156eB04Ab61C',
@@ -47,6 +54,8 @@ export const CONTRACT_ADDRESS = {
     RaffleParty: '0xC0325482668d71f25f35D7f032aeA83c616176Bb',
     ConfettiRoll: '0x1fAaC523223fBf79667ab621653bd378093E8693',
     RpYieldCollector: '0x5027d32D205681A4e3374903A11ffEeC5e5e3402',
+    HeroURIHandler: '0x1f513d2371df0733b0d59cf9f3119fdf941cc57e',
+    FighterURIHandler: '0xce3dbdbcc87dc81f7bf474ebd47d672fff99773f',
   },
 } as const
 
@@ -65,6 +74,8 @@ export function useContracts(): Record<KnownContracts, Contract> {
         RaffleParty: { address: null },
         ConfettiRoll: { address: '' },
         RpYieldCollector: { address: '' },
+        HeroURIHandler: { address: '' },
+        FighterURIHandler: { address: '' },
       }
     } else {
       const addresses = CONTRACT_ADDRESS[chainId]

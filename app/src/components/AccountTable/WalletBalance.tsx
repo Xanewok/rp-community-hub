@@ -7,8 +7,10 @@ import {
   Flex,
   Spinner,
 } from '@chakra-ui/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import web3 from 'web3'
+import { useContracts } from '../../constants'
+import { useSigner } from '../../hooks'
 
 interface GetNftsData {
   fighters: string[]
@@ -31,9 +33,28 @@ async function fetchAssets(account: string): Promise<GetNftsData> {
   }
 }
 
+// Defined in IFighterURIHandler.sol
+interface FighterStats {
+  dmg: number
+  enhancement: number
+}
+
+// Defined in IHeroURIHandler.sol
+interface HeroStats {
+  dmgMultiplier: number
+  partySize: number
+  enhancement: number
+}
+
 export const WalletBalance = (props: { owner: string }) => {
   const { owner } = props
+  const signer = useSigner()
+  const { HeroURIHandler, FighterURIHandler } = useContracts()
 
+  const [fighterStats, setFighterStats] = useState<
+    Record<number, FighterStats>
+  >({})
+  const [heroStats, setHeroStats] = useState<Record<number, HeroStats>>({})
   const [data, setData] = useState<Record<string, 'loading' | GetNftsData>>({})
   const [lastUpdate, setLastUpdate] = useState(new Date(0))
 
@@ -60,6 +81,96 @@ export const WalletBalance = (props: { owner: string }) => {
   }, [fetchAndUpdate, owner])
 
   const balance = data[owner]
+  const [heroes, fighters] = useMemo(
+    () =>
+      !balance || balance === 'loading'
+        ? [[], []]
+        : [
+            [balance.partyHero].concat(balance.heros).filter((id) => id != '0'),
+            balance.partyFighters
+              .concat(balance.fighters)
+              .filter((id) => id != '0'),
+          ],
+
+    [balance]
+  )
+
+  useEffect(() => {
+    if (!signer) return
+
+    const uriHandler = HeroURIHandler.connect(signer)
+    Promise.all(
+      heroes.map((id) =>
+        uriHandler.getStats(id).then((stats: any) => [Number(id), stats])
+      )
+    )
+      .then((entries) => Object.fromEntries(entries))
+      .then(setHeroStats)
+  }, [HeroURIHandler, heroes, signer])
+
+  useEffect(() => {
+    if (!signer) return
+
+    const uriHandler = FighterURIHandler.connect(signer)
+    Promise.all(
+      fighters.map((id) =>
+        uriHandler.getStats(id).then((stats: any) => [Number(id), stats])
+      )
+    )
+      .then((entries) => Object.fromEntries(entries))
+      .then(setFighterStats)
+  }, [FighterURIHandler, fighters, signer])
+
+  const renderHero = useCallback(
+    (tokenId: string) => {
+      const [id, stats] = [Number(tokenId), heroStats[Number(tokenId)]] as const
+      const aux = stats
+        ? `+${stats.enhancement} (${stats.dmgMultiplier}/
+      ${stats.partySize})`
+        : ''
+
+      return (
+        <ListItem fontSize="xl" key={`${owner}-hero-${id}`}>
+          Hero #{id} {aux}
+        </ListItem>
+      )
+    },
+    [heroStats, owner]
+  )
+
+  const renderFighter = useCallback(
+    (tokenId: string) => {
+      // trash, common, uncommon, rare, epic, legendary
+      const rarityColors = [
+        [1397, '#ff8000'],
+        [1350, '#a335ee'],
+        [1300, '#0070dd'],
+        [1200, '#1eff00'],
+        [1000, 'white'],
+        [0, 'gray'],
+      ] as const
+
+      const [id, stats] = [
+        Number(tokenId),
+        fighterStats[Number(tokenId)],
+      ] as const
+      const aux = stats ? `+${stats.enhancement} (${stats.dmg})` : ''
+      const [, textColor] = (stats?.dmg &&
+        rarityColors.find(([dmg]) => stats?.dmg >= dmg)) || [null, 'white']
+
+      return (
+        <ListItem
+          fontSize={'xl'}
+          key={`${owner}-fighter-${id}`}
+          textColor={textColor}
+          filter={'saturate(0.7)'}
+        >
+          Fighter #{id} {aux}
+        </ListItem>
+      )
+    },
+    [fighterStats, owner]
+  )
 
   return (
     <Tr borderBottom={'1px solid'}>
@@ -76,14 +187,10 @@ export const WalletBalance = (props: { owner: string }) => {
                   Party:
                 </Text>
                 <UnorderedList>
-                  <ListItem>Hero: #{balance.partyHero}</ListItem>
+                  {renderHero(balance.partyHero)}
                   {balance.partyFighters
                     .filter((id) => id != '0')
-                    .map((id) => (
-                      <ListItem key={`${owner}-wallet-hero-${id}`}>
-                        Fighter #{id}
-                      </ListItem>
-                    ))}
+                    .map(renderFighter)}
                 </UnorderedList>
               </div>
               {(balance.heros.length > 0 || balance.fighters.length > 0) && (
@@ -92,20 +199,10 @@ export const WalletBalance = (props: { owner: string }) => {
                     Wallet:
                   </Text>
                   <UnorderedList>
-                    {balance.heros
-                      .filter((id) => id != '0')
-                      .map((id) => (
-                        <ListItem key={`${owner}-wallet-hero-${id}`}>
-                          Hero #{id}
-                        </ListItem>
-                      ))}
+                    {balance.heros.filter((id) => id != '0').map(renderHero)}
                     {balance.fighters
                       .filter((id) => id != '0')
-                      .map((id) => (
-                        <ListItem key={`${owner}-wallet-fighter-${id}`}>
-                          Fighter #{id}
-                        </ListItem>
-                      ))}
+                      .map(renderFighter)}
                   </UnorderedList>
                 </div>
               )}
