@@ -7,7 +7,15 @@ git clone https://github.com/Oktalize/raidparty-helper
 
 ## Getting Started
 
-First, run the development server:
+### Installation:
+
+install dependencies
+`yarn install`
+
+compile contracts from root
+`cd .. && yarn install && yarn run compile`
+
+run the development server:
 
 ```bash
 npm run dev

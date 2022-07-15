@@ -45,15 +45,14 @@ export const NextSeed: React.FC = (props) => {
         mr={1.5}
         lineHeight="32px"
       >
-        Next seed{' '}
-        {!account
+        { isNaN(timeTillSeed) ? 'loading...' : `Next seed  ${!account
           ? 'unavailable'
           : timeTillSeed <= 0
           ? 'available'
           : `in ${new Date(timeTillSeed).toLocaleTimeString([], {
               minute: '2-digit',
               second: '2-digit',
-            })}`}
+            })}`}`}
       </Text>
     </Flex>
   )

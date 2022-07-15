@@ -81,8 +81,7 @@ export const CommitSnapshot: React.FC = (props) => {
           mr={1.5}
           lineHeight="32px"
         >
-          Commit snapshot{' '}
-          {!account
+          { isNaN(timeTillSnapshot) ? 'loading...' : `Commit snapshot ${!account
             ? 'unavailable'
             : timeTillSnapshot <= 0
             ? 'now'
@@ -90,7 +89,7 @@ export const CommitSnapshot: React.FC = (props) => {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
-              })} hrs`}
+              })} hrs` }` }
         </Text>
       </Flex>
     </Tooltip>
