@@ -44,8 +44,8 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       setStoredValue(valueToStore)
       // Save to local storage
       if (typeof window !== 'undefined') {
-        debounce(key, 1000, () =>{
-          console.log("Debouncing now: ", new Date().getTime())
+        debounce(key, 1000, () => {
+          console.log('Debouncing now: ', new Date().getTime())
           window.localStorage.setItem(key, JSON.stringify(valueToStore))
         })
       }

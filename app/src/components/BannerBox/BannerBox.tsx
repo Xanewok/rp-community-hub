@@ -26,7 +26,14 @@ const BannerBox = ({ heading, children, ...props }: BannerBoxProps) => (
           w="150px"
           textAlign="center"
         >
-          <Text mt="-3px" fontWeight="bold" fontSize="2xl" lineHeight="36px" verticalAlign="middle" color="white">
+          <Text
+            mt="-3px"
+            fontWeight="bold"
+            fontSize="2xl"
+            lineHeight="36px"
+            verticalAlign="middle"
+            color="white"
+          >
             {heading}
           </Text>
         </Box>

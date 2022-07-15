@@ -81,15 +81,19 @@ export const CommitSnapshot: React.FC = (props) => {
           mr={1.5}
           lineHeight="32px"
         >
-          { isNaN(timeTillSnapshot) ? 'loading...' : `Commit snapshot ${!account
-            ? 'unavailable'
-            : timeTillSnapshot <= 0
-            ? 'now'
-            : `in ${new Date(timeTillSnapshot).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              })} hrs` }` }
+          {isNaN(timeTillSnapshot)
+            ? 'loading...'
+            : `Commit snapshot ${
+                !account
+                  ? 'unavailable'
+                  : timeTillSnapshot <= 0
+                  ? 'now'
+                  : `in ${new Date(timeTillSnapshot).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                    })} hrs`
+              }`}
         </Text>
       </Flex>
     </Tooltip>
