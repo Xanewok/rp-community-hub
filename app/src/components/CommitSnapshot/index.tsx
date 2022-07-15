@@ -1,6 +1,5 @@
 import { Flex, Text, Tooltip, useInterval, useToast } from '@chakra-ui/react'
 import { useEthers } from '@usedapp/core'
-import { time } from 'console'
 import { useState, useCallback } from 'react'
 import { useContracts } from '../../constants'
 import { useSnapshotTime } from '../../hooks'
