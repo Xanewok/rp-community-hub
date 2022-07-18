@@ -140,14 +140,14 @@ export const WalletBalance = (props: { owner: string }) => {
 
   const renderFighter = useCallback(
     (tokenId: string) => {
-      // trash, common, uncommon, rare, epic, legendary
+      // Inspired by https://wowpedia.fandom.com/wiki/Quality
       const rarityColors = [
-        [1397, '#ff8000'],
-        [1350, '#a335ee'],
-        [1300, '#0070dd'],
-        [1200, '#1eff00'],
-        [1000, 'white'],
-        [0, 'gray'],
+        [1400, '#e6cc80'],
+        [1395, '#ff8000'],
+        [1371, '#a335ee'],
+        [1311, '#0070dd'],
+        [1161, '#1eff00'],
+        [1160, 'white'],
       ] as const
 
       const [id, stats] = [
