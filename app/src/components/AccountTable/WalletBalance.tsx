@@ -6,6 +6,7 @@ import {
   ListItem,
   Flex,
   Spinner,
+  OrderedList,
 } from '@chakra-ui/react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import web3 from 'web3'
@@ -139,7 +140,7 @@ export const WalletBalance = (props: { owner: string }) => {
   )
 
   const renderFighter = useCallback(
-    (tokenId: string) => {
+    (tokenId: number) => {
       // Inspired by https://wowpedia.fandom.com/wiki/Quality
       const rarityColors = [
         [1400, '#e6cc80'],
@@ -150,10 +151,7 @@ export const WalletBalance = (props: { owner: string }) => {
         [1160, 'white'],
       ] as const
 
-      const [id, stats] = [
-        Number(tokenId),
-        fighterStats[Number(tokenId)],
-      ] as const
+      const stats = fighterStats[tokenId]
       const aux = stats ? `+${stats.enhancement} (${stats.dmg})` : ''
       const [, textColor] = (stats?.dmg &&
         rarityColors.find(([dmg]) => stats?.dmg >= dmg)) || [null, 'white']
@@ -161,11 +159,11 @@ export const WalletBalance = (props: { owner: string }) => {
       return (
         <ListItem
           fontSize={'xl'}
-          key={`${owner}-fighter-${id}`}
+          key={`${owner}-fighter-${tokenId}`}
           textColor={textColor}
           filter={'saturate(0.7)'}
         >
-          Fighter #{id} {aux}
+          Fighter #{tokenId} {aux}
         </ListItem>
       )
     },
@@ -186,12 +184,13 @@ export const WalletBalance = (props: { owner: string }) => {
                 <Text fontSize={'2xl'} mb={2}>
                   Party:
                 </Text>
-                <UnorderedList>
-                  {renderHero(balance.partyHero)}
+                <UnorderedList>{renderHero(balance.partyHero)}</UnorderedList>
+                <OrderedList>
                   {balance.partyFighters
                     .filter((id) => id != '0')
+                    .map(Number)
                     .map(renderFighter)}
-                </UnorderedList>
+                </OrderedList>
               </div>
               {(balance.heros.length > 0 || balance.fighters.length > 0) && (
                 <div>
@@ -202,6 +201,12 @@ export const WalletBalance = (props: { owner: string }) => {
                     {balance.heros.filter((id) => id != '0').map(renderHero)}
                     {balance.fighters
                       .filter((id) => id != '0')
+                      .map(Number)
+                      .sort((a, b) =>
+                        fighterStats[a] && fighterStats[b]
+                          ? fighterStats[b].dmg - fighterStats[a].dmg
+                          : b - a
+                      )
                       .map(renderFighter)}
                   </UnorderedList>
                 </div>
