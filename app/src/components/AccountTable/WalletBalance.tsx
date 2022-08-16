@@ -24,7 +24,7 @@ type GetNftsResponse = { success: false } | { success: true; data: GetNftsData }
 
 async function fetchAssets(account: string): Promise<GetNftsData> {
   // FIXME: Use our own deployment
-  const res = await fetch(`https://rp-api.waves.gg/getNfts/${account}`)
+  const res = await fetch(`https://payaio.co/getNfts/${account}`)
   const response: GetNftsResponse = await res.json()
 
   if (!response.success) {
