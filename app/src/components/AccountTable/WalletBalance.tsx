@@ -13,11 +13,35 @@ import web3 from 'web3'
 import { useContracts } from '../../constants'
 import { useSigner } from '../../hooks'
 
+function partition<T>(
+  arr: T[],
+  filter: (val: T, index: number, arr: T[]) => boolean
+) {
+  return arr.reduce(
+    (r, e, i, a) => {
+      r[filter(e, i, a) ? 0 : 1].push(e)
+      return r
+    },
+    [[] as T[], [] as T[]]
+  )
+}
+
 interface GetNftsData {
-  fighters: Array<{ tokenId: string }>
+  fighters: Array<{ tokenId: string; class: string }>
   heros: Array<{ tokenId: string }>
   partyFighters: string[]
   partyHero: string
+}
+
+interface Balance {
+  fighters: {
+    party: Array<{ tokenId: number; class: string }>
+    wallet: Array<{ tokenId: number; class: string }>
+  }
+  heroes: {
+    party: number | null
+    wallet: Array<number>
+  }
 }
 
 type GetNftsResponse = { success: false } | { success: true; data: GetNftsData }
@@ -55,21 +79,41 @@ export const WalletBalance = (props: { owner: string }) => {
     Record<number, FighterStats>
   >({})
   const [heroStats, setHeroStats] = useState<Record<number, HeroStats>>({})
-  const [data, setData] = useState<Record<string, 'loading' | GetNftsData>>({})
+  const [data, setData] = useState<Record<string, 'loading' | Balance>>({})
   const [lastUpdate, setLastUpdate] = useState(new Date(0))
 
   const fetchAndUpdate = useCallback(async (owner) => {
     setData((old) => ({ ...old, [owner]: 'loading' }))
     const assets = await fetchAssets(owner)
-    setData((old) => ({ ...old, [owner]: assets }))
+
+    const fighters = assets.fighters.map((fighter) => ({
+      ...fighter,
+      tokenId: Number(fighter.tokenId),
+    }))
+    const [partyFighters, walletFighters] = partition(fighters, ({ tokenId }) =>
+      assets.partyFighters.includes(tokenId.toString())
+    )
+
+    setData((old) => ({
+      ...old,
+      [owner]: {
+        fighters: { party: partyFighters, wallet: walletFighters },
+        heroes: {
+          party: assets.partyHero === '0' ? null : Number(assets.partyHero),
+          wallet: assets.heros
+            .map((hero) => hero.tokenId)
+            .filter((hero) => hero != assets.partyHero),
+        },
+      },
+    }))
     setLastUpdate(new Date())
   }, [])
 
-  const DEBOUNCE_MS = 1500
   useEffect(() => {
     if (!owner || !web3.utils.isAddress(owner)) return
 
     const sinceUpdate = new Date().getTime() - lastUpdate.getTime()
+    const DEBOUNCE_MS = 1500
     if (sinceUpdate < DEBOUNCE_MS) {
       setTimeout(() => fetchAndUpdate(owner), DEBOUNCE_MS - sinceUpdate)
     } else {
@@ -86,12 +130,8 @@ export const WalletBalance = (props: { owner: string }) => {
       !balance || balance === 'loading'
         ? [[], []]
         : [
-            [balance.partyHero]
-              .concat(balance.heros.map((h) => h.tokenId))
-              .filter((id) => id != '0'),
-            balance.partyFighters
-              .concat(balance.fighters.map((f) => f.tokenId))
-              .filter((id) => id != '0'),
+            balance.heroes.wallet.concat(balance.heroes.party ?? []),
+            balance.fighters.wallet.concat(balance.fighters.party),
           ],
 
     [balance]
@@ -103,7 +143,7 @@ export const WalletBalance = (props: { owner: string }) => {
     const uriHandler = HeroURIHandler.connect(signer)
     Promise.all(
       heroes.map((id) =>
-        uriHandler.getStats(id).then((stats: any) => [Number(id), stats])
+        uriHandler.getStats(id).then((stats: any) => [id, stats])
       )
     )
       .then((entries) => Object.fromEntries(entries))
@@ -115,8 +155,8 @@ export const WalletBalance = (props: { owner: string }) => {
 
     const uriHandler = FighterURIHandler.connect(signer)
     Promise.all(
-      fighters.map((id) =>
-        uriHandler.getStats(id).then((stats: any) => [Number(id), stats])
+      fighters.map(({ tokenId }) =>
+        uriHandler.getStats(tokenId).then((stats: any) => [tokenId, stats])
       )
     )
       .then((entries) => Object.fromEntries(entries))
@@ -124,16 +164,15 @@ export const WalletBalance = (props: { owner: string }) => {
   }, [FighterURIHandler, fighters, signer])
 
   const renderHero = useCallback(
-    (tokenId: string) => {
-      const [id, stats] = [Number(tokenId), heroStats[Number(tokenId)]] as const
-      const aux = stats
-        ? `+${stats.enhancement} (${stats.dmgMultiplier}/
-      ${stats.partySize})`
+    (tokenId: number) => {
+      const { enhancement, dmgMultiplier, partySize } = heroStats[tokenId] ?? {}
+      const aux = heroStats[tokenId]
+        ? `+${enhancement} (${dmgMultiplier}/${partySize})`
         : ''
 
       return (
-        <ListItem fontSize="xl" key={`${owner}-hero-${id}`}>
-          Hero #{id} {aux}
+        <ListItem fontSize="xl" key={`${owner}-hero-${tokenId}`}>
+          Hero #{tokenId} {aux}
         </ListItem>
       )
     },
@@ -141,7 +180,7 @@ export const WalletBalance = (props: { owner: string }) => {
   )
 
   const renderFighter = useCallback(
-    (tokenId: number) => {
+    (fighter: { tokenId: number; class: string }) => {
       // Inspired by https://wowpedia.fandom.com/wiki/Quality
       const rarityColors = [
         [1400, '#e6cc80'],
@@ -152,19 +191,21 @@ export const WalletBalance = (props: { owner: string }) => {
         [1160, 'white'],
       ] as const
 
-      const stats = fighterStats[tokenId]
-      const aux = stats ? `+${stats.enhancement} (${stats.dmg})` : ''
-      const [, textColor] = (stats?.dmg &&
-        rarityColors.find(([dmg]) => stats?.dmg >= dmg)) || [null, 'white']
+      const { enhancement, dmg } = fighterStats[fighter.tokenId] ?? {}
+      const aux = fighterStats[fighter.tokenId]
+        ? `+${enhancement} (${dmg})`
+        : ''
+      const [, textColor] = (dmg &&
+        rarityColors.find(([threshold]) => dmg >= threshold)) || [null, 'white']
 
       return (
         <ListItem
           fontSize={'xl'}
-          key={`${owner}-fighter-${tokenId}`}
+          key={`${owner}-fighter-${fighter.tokenId}`}
           textColor={textColor}
           filter={'saturate(0.7)'}
         >
-          Fighter #{tokenId} {aux}
+          {fighter.class} #{fighter.tokenId} {aux}
         </ListItem>
       )
     },
@@ -185,32 +226,27 @@ export const WalletBalance = (props: { owner: string }) => {
                 <Text fontSize={'2xl'} mb={2}>
                   Party:
                 </Text>
-                <UnorderedList>{renderHero(balance.partyHero)}</UnorderedList>
+                <UnorderedList>
+                  {balance.heroes.party && renderHero(balance.heroes.party)}
+                </UnorderedList>
                 <OrderedList>
-                  {balance.partyFighters
-                    .filter((id) => id != '0')
-                    .map(Number)
-                    .map(renderFighter)}
+                  {balance.fighters.party.map(renderFighter)}
                 </OrderedList>
               </div>
-              {(balance.heros.length > 0 || balance.fighters.length > 0) && (
+              {(balance.heroes.wallet.length > 0 ||
+                balance.fighters.wallet.length > 0) && (
                 <div>
                   <Text fontSize={'2xl'} mb={2}>
                     Wallet:
                   </Text>
                   <UnorderedList>
-                    {balance.heros
-                      .map((h) => h.tokenId)
-                      .filter((id) => id != '0')
-                      .map(renderHero)}
-                    {balance.fighters
-                      .map((f) => f.tokenId)
-                      .filter((id) => id != '0')
-                      .map(Number)
+                    {balance.heroes.wallet.map(renderHero)}
+                    {balance.fighters.wallet
                       .sort((a, b) =>
-                        fighterStats[a] && fighterStats[b]
-                          ? fighterStats[b].dmg - fighterStats[a].dmg
-                          : b - a
+                        fighterStats[a.tokenId] && fighterStats[b.tokenId]
+                          ? fighterStats[b.tokenId].dmg -
+                            fighterStats[a.tokenId].dmg
+                          : b.tokenId - a.tokenId
                       )
                       .map(renderFighter)}
                   </UnorderedList>
