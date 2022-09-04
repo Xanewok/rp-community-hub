@@ -14,8 +14,8 @@ import { useContracts } from '../../constants'
 import { useSigner } from '../../hooks'
 
 interface GetNftsData {
-  fighters: string[]
-  heros: string[]
+  fighters: Array<{ tokenId: string }>
+  heros: Array<{ tokenId: string }>
   partyFighters: string[]
   partyHero: string
 }
@@ -23,8 +23,7 @@ interface GetNftsData {
 type GetNftsResponse = { success: false } | { success: true; data: GetNftsData }
 
 async function fetchAssets(account: string): Promise<GetNftsData> {
-  // FIXME: Use our own deployment
-  const res = await fetch(`https://payaio.co/getNfts/${account}`)
+  const res = await fetch(`https://api-mainnet.raid.party/getNfts/${account}`)
   const response: GetNftsResponse = await res.json()
 
   if (!response.success) {
@@ -87,9 +86,11 @@ export const WalletBalance = (props: { owner: string }) => {
       !balance || balance === 'loading'
         ? [[], []]
         : [
-            [balance.partyHero].concat(balance.heros).filter((id) => id != '0'),
+            [balance.partyHero]
+              .concat(balance.heros.map((h) => h.tokenId))
+              .filter((id) => id != '0'),
             balance.partyFighters
-              .concat(balance.fighters)
+              .concat(balance.fighters.map((f) => f.tokenId))
               .filter((id) => id != '0'),
           ],
 
@@ -198,8 +199,12 @@ export const WalletBalance = (props: { owner: string }) => {
                     Wallet:
                   </Text>
                   <UnorderedList>
-                    {balance.heros.filter((id) => id != '0').map(renderHero)}
+                    {balance.heros
+                      .map((h) => h.tokenId)
+                      .filter((id) => id != '0')
+                      .map(renderHero)}
                     {balance.fighters
+                      .map((f) => f.tokenId)
                       .filter((id) => id != '0')
                       .map(Number)
                       .sort((a, b) =>
